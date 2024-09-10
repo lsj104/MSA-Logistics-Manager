@@ -4,13 +4,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team12.slack.domain.Message;
 import com.team12.slack.dto.SlackRequestDto;
+import com.team12.slack.dto.SlackResDto;
 import com.team12.slack.repository.SlackRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -77,5 +82,17 @@ public class SlackService {
         } catch (Exception e) {
             return e.getMessage();
         }
+    }
+
+    public Page<SlackResDto> getSlackAll(String email, Pageable pageable) {
+        // return slackRepository.findById(targetUserId, pageable).map(SlackDto::new);
+        return slackRepository.findByEmail(email, pageable)
+                .map(SlackResDto::new); // Message를 SlackResDto로 변환
+    }
+
+    public Object getSlack(UUID messageId, Pageable pageable) {
+        // return slackRepository.findById(targetUserId, pageable).map(SlackDto::new);
+        return slackRepository.findById(messageId)
+                .map(SlackResDto::new); // Message를 SlackResDto로 변환
     }
 }
