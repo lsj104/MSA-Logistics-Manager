@@ -26,11 +26,15 @@ public class SlackService {
 
     public String sendMessageToUser(SlackRequestDto request) {
         try {
-            String slackUserId = getSlackUserIdByEmail(request.getEmail());
-            if(slackUserId.isEmpty()) {
+            // todo : Feign Client로 user 정보 가져오기
+//            User user = userRepository.findById(Long.parseLong(email)).orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+//            String slackUserId = getSlackUserId(user.getSlackEmail());
+
+
+            String slackUserId = getSlackUserId(request.getEmail());
+            if (slackUserId.isEmpty()) {
                 return "이메일 주소에 해당하는 사용자를 찾을 수 없습니다.";
             }
-//            User user = userRepository.findByEmail(Long.parseLong(email)).orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
 //            Message message = new Message(user, request.getContent());
             Message message = new Message(request.getEmail(), request.getContent());
             slackRepository.save(message);
@@ -49,7 +53,7 @@ public class SlackService {
         }
     }
 
-    public String getSlackUserIdByEmail(String email) {
+    public String getSlackUserId(String email) {
         String url = "https://slack.com/api/users.lookupByEmail";
 
         HttpHeaders headers = new HttpHeaders();
