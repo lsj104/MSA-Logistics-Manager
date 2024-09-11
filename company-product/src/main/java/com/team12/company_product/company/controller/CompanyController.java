@@ -14,6 +14,8 @@ import com.team12.company_product.company.dto.UpdateCompanyRequestDto;
 import com.team12.company_product.company.dto.UpdateCompanyResponseDto;
 import com.team12.company_product.company.service.CompanyService;
 import com.team12.company_product.global.response.CommonResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "업체", description = "업체 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/companies")
@@ -39,6 +42,7 @@ public class CompanyController {
 
     // TODO: user, hub 작업
     // 업체 생성
+    @Operation(summary = "업체 생성")
     @PostMapping
     public ResponseEntity<? extends CommonResponse> createCompany(
             @RequestBody CreateCompanyRequestDto requestDto) {
@@ -50,6 +54,7 @@ public class CompanyController {
     }
 
     // 업체 상세 조회
+    @Operation(summary = "업체 상세 조회", description = "업체ID로 업체를 상세 조회하는 API입니다.")
     @GetMapping("/{companyId}")
     public ResponseEntity<? extends CommonResponse> getCompany(
             @PathVariable("companyId") String companyId) {
@@ -61,6 +66,7 @@ public class CompanyController {
     }
 
     // 모든 업체 조회
+    @Operation(summary = "모든 업체 조회")
     @GetMapping
     public ResponseEntity<? extends CommonResponse> getAllCompany(
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
@@ -82,6 +88,7 @@ public class CompanyController {
     }
 
     // 업체 수정
+    @Operation(summary = "업체 수정")
     @PutMapping("/{companyId}")
     public ResponseEntity<? extends CommonResponse> updateCompany(
             @PathVariable("companyId") String companyId,
@@ -95,6 +102,7 @@ public class CompanyController {
     }
 
     // 업체 삭제
+    @Operation(summary = "업체 삭제")
     @DeleteMapping("/{companyId}")
     public ResponseEntity<? extends CommonResponse> deleteCompany(
             @PathVariable("companyId") String companyId
@@ -108,6 +116,7 @@ public class CompanyController {
     }
 
     // 업체 검색
+    @Operation(summary = "업체 검색", description = "업체 이름으로 검색, ID로 검색할 수 있는 API입니다.")
     @GetMapping("/search")
     public ResponseEntity<? extends CommonResponse> searchCompany(
             @RequestParam("keyword") String keyword, @RequestParam(defaultValue = "0") int page,
