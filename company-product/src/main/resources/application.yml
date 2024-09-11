@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: company-product
+  server:
+    port: 19091
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/logistics
+    username: postgres
+    password: ${POSTGRESQL_PW}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
+
+gemini:
+  base-url: ${GEMINI_BASE_URL}
+
+googleai:
+  api:
+    key: ${GEMINI_API_KEY}

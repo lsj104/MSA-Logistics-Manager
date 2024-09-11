@@ -22,7 +22,7 @@ public abstract class AuditingEntity {
 
     @CreatedBy
     @Column(name="created_by", updatable = false)
-    private String createdBy;
+    private Long createdBy;
 
     @LastModifiedDate
     @Column(name="updated_at")
@@ -30,13 +30,13 @@ public abstract class AuditingEntity {
 
     @LastModifiedBy
     @Column(name="updated_by")
-    private String updatedBy;
+    private Long updatedBy;
 
     @Column(name="deleted_at")
     private LocalDateTime deletedAt;
 
     @Column(name="deleted_by")
-    private String deletedBy;
+    private Long deletedBy;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
@@ -49,7 +49,7 @@ public abstract class AuditingEntity {
         this.isDeleted = isDeleted;
     }
 
-    public void setDeletedBy(String deletedBy) {
+    public void setDeletedBy(Long deletedBy) {
         this.deletedBy = deletedBy;
     }
 }
