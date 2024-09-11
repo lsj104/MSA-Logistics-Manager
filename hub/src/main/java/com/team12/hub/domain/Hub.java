@@ -1,5 +1,6 @@
 package com.team12.hub.domain;
 
+
 import com.team12.common.audit.AuditingEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
