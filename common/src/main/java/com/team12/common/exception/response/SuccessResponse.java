@@ -1,4 +1,4 @@
-package com.team12.company_product.global.response;
+package com.team12.common.exception.response;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static lombok.AccessLevel.PRIVATE;
