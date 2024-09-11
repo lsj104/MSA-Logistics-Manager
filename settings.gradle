@@ -1,0 +1,8 @@
+rootProject.name = 'msa-ai-project'
+
+include 'common'
+include 'company-product'
+include 'eureka-server'
+include 'hub'
+include 'order-delivery'
+include 'slack'
