@@ -2,7 +2,7 @@ spring:
   application:
     name: company-product
   server:
-    port: 19091
+    port: 19092
 
   datasource:
     url: jdbc:postgresql://localhost:5432/logistics
