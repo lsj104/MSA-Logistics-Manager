@@ -1,4 +1,4 @@
-package com.team12.hub.hubPath.service;
+package com.team12.hubPath.service;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

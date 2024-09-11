@@ -1,8 +1,8 @@
-package com.team12.hub.hub.controller;
+package com.team12.hub.controller;
 
-import com.team12.hub.hub.dto.HubRequestDto;
-import com.team12.hub.hub.dto.HubResponseDto;
-import com.team12.hub.hub.service.HubService;
+import com.team12.hub.dto.HubRequestDto;
+import com.team12.hub.dto.HubResponseDto;
+import com.team12.hub.service.HubService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;

@@ -1,11 +1,11 @@
-package com.team12.hub.hub.service;
+package com.team12.hub.service;
 
-import com.team12.hub.hub.domain.Hub;
-import com.team12.hub.hub.dto.HubRequestDto;
-import com.team12.hub.hub.dto.HubResponseDto;
-import com.team12.hub.hub.repository.HubRepository;
-import com.team12.hub.hubPath.service.HubPathService;
-import com.team12.hub.hubPath.service.KakaoMapService;
+import com.team12.hub.domain.Hub;
+import com.team12.hub.dto.HubRequestDto;
+import com.team12.hub.dto.HubResponseDto;
+import com.team12.hub.repository.HubRepository;
+import com.team12.hubPath.service.HubPathService;
+import com.team12.hubPath.service.KakaoMapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

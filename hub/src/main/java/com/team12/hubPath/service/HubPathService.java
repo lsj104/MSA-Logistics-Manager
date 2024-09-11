@@ -1,12 +1,11 @@
-package com.team12.hub.hubPath.service;
+package com.team12.hubPath.service;
 
-import com.team12.hub.hub.domain.Hub;
-import com.team12.hub.hub.repository.HubRepository;
-import com.team12.hub.hubPath.domain.HubPath;
-import com.team12.hub.hubPath.dto.HubPathRequestDto;
-import com.team12.hub.hubPath.repository.HubPathRepository;
+import com.team12.hub.domain.Hub;
+import com.team12.hub.repository.HubRepository;
+import com.team12.hubPath.domain.HubPath;
+import com.team12.hubPath.dto.HubPathRequestDto;
+import com.team12.hubPath.repository.HubPathRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;

@@ -1,7 +1,7 @@
-package com.team12.hub.hubPath.domain;
+package com.team12.hubPath.domain;
 
 import com.team12.common.audit.AuditingEntity;
-import com.team12.hub.hub.domain.Hub;
+import com.team12.hub.domain.Hub;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

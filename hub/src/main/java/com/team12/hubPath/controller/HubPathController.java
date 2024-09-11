@@ -1,14 +1,12 @@
-package com.team12.hub.hubPath.controller;
+package com.team12.hubPath.controller;
 
-import com.team12.hub.hubPath.domain.HubPath;
-import com.team12.hub.hubPath.dto.HubPathRequestDto;
-import com.team12.hub.hubPath.dto.HubPathResponseDto;
-import com.team12.hub.hubPath.service.HubPathService;
+import com.team12.hubPath.domain.HubPath;
+import com.team12.hubPath.dto.HubPathRequestDto;
+import com.team12.hubPath.service.HubPathService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor

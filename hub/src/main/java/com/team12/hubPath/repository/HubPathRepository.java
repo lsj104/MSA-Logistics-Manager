@@ -1,6 +1,6 @@
-package com.team12.hub.hubPath.repository;
+package com.team12.hubPath.repository;
 
-import com.team12.hub.hubPath.domain.HubPath;
+import com.team12.hubPath.domain.HubPath;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
