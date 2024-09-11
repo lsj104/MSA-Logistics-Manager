@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "p_delivery", schema = "s_order_delivery")
+//@SQLDelete(sql = "UPDATE p_delivery SET is_deleted = true WHERE id = ?")
 public class Delivery {
     @Id
     @GeneratedValue
@@ -35,6 +37,15 @@ public class Delivery {
         this.receiver = deliveryReqDto.getReceiver();
         this.receiverEmail = deliveryReqDto.getReceiverEmail();
         this.deliveryStatus = DeliveryStatus.PREPARING;
+    }
+
+    public void update(DeliveryReqDto deliveryReqDto) {
+        this.orderId = deliveryReqDto.getOrderId();
+        this.fromHubId = deliveryReqDto.getFromHubId();
+        this.toHubId = deliveryReqDto.getToHubId();
+        this.address = deliveryReqDto.getAddress();
+        this.receiver = deliveryReqDto.getReceiver();
+        this.receiverEmail = deliveryReqDto.getReceiverEmail();
     }
 
     public enum DeliveryStatus {
