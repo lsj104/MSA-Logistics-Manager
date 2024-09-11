@@ -60,7 +60,7 @@ public class HubPathService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 허브 간 이동을 찾을 수 없습니다."));
         hubPath.setIsDeleted(true);
         hubPath.setDeletedAt(LocalDateTime.now());
-        hubPath.setDeletedBy("loginUserIdx");
+        hubPath.setDeletedBy(0L);
         hubPathRepository.save(hubPath);
         return hubPathId;
     }

@@ -59,7 +59,7 @@ public class HubService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 허브를 찾을 수 없습니다."));
         hub.setIsDeleted(true);
          hub.setDeletedAt(LocalDateTime.now());
-         hub.setDeletedBy("loginUserIdx");
+         hub.setDeletedBy(0L);
         hubRepository.save(hub);
         return hub;
     }
