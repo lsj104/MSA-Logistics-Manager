@@ -2,6 +2,7 @@ package com.team12.company_product.global.response;
 
 import static lombok.AccessLevel.PRIVATE;
 
+import com.team12.common.exception.response.CommonResponse;
 import lombok.Builder;
 import lombok.NonNull;
 
