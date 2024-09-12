@@ -1,7 +1,7 @@
-package com.team12.hubPath.domain;
+package com.team12.hub.hubPath.domain;
 
 import com.team12.common.audit.AuditingEntity;
-import com.team12.hub.domain.Hub;
+import com.team12.hub.hub.domain.Hub;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "P_HUB_PATH")
+@Table(name = "P_HUB_PATH", schema = "s_hub")
 public class HubPath extends AuditingEntity {
     @Id
     @GeneratedValue
@@ -28,6 +28,9 @@ public class HubPath extends AuditingEntity {
     @ManyToOne
     @JoinColumn(name = "to_hub_id", nullable = false)
     private Hub toHub;  // 도착 허브 ID
+
+    @Column(name = "distance", nullable = false)
+    private double distance; // 허브 간 거리
 
     @Column(name = "duration", nullable = false)
     private int duration;  // 소요시간

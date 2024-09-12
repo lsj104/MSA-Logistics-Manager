@@ -1,5 +1,6 @@
-package com.team12.hubPath.service;
+package com.team12.hub.hubPath.service;
 
+import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class KakaoMapService {
     @Value("${kakao.api.key}")

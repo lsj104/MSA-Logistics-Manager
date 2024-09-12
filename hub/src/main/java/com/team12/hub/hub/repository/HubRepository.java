@@ -1,6 +1,6 @@
-package com.team12.hub.repository;
+package com.team12.hub.hub.repository;
 
-import com.team12.hub.domain.Hub;
+import com.team12.hub.hub.domain.Hub;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

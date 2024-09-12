@@ -1,4 +1,4 @@
-package com.team12.hub.dto;
+package com.team12.hub.hub.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.team12.hubPath.dto;
+package com.team12.hub.hubPath.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

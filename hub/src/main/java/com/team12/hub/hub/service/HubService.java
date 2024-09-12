@@ -1,13 +1,14 @@
-package com.team12.hub.service;
+package com.team12.hub.hub.service;
 
-import com.team12.hub.domain.Hub;
-import com.team12.hub.dto.HubRequestDto;
-import com.team12.hub.dto.HubResponseDto;
-import com.team12.hub.repository.HubRepository;
-import com.team12.hubPath.service.HubPathService;
-import com.team12.hubPath.service.KakaoMapService;
+import com.team12.hub.hub.domain.Hub;
+import com.team12.hub.hub.dto.HubRequestDto;
+import com.team12.hub.hub.dto.HubResponseDto;
+import com.team12.hub.hub.repository.HubRepository;
+import com.team12.hub.hubPath.service.HubPathService;
+import com.team12.hub.hubPath.service.KakaoMapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -48,6 +49,7 @@ public class HubService {
     }
 
     // 허브 삭제 메서드 (허브 삭제 시 HubPath도 삭제)
+    @Transactional
     public Hub deleteHub(UUID hubId) {
 
         // 삭제될 허브와 연결된 모든 hubPath 논리적 삭제
@@ -58,8 +60,8 @@ public class HubService {
         Hub hub = hubRepository.findByIdAndIsDeleted(hubId, false)
                 .orElseThrow(() -> new IllegalArgumentException("해당 허브를 찾을 수 없습니다."));
         hub.setIsDeleted(true);
-         hub.setDeletedAt(LocalDateTime.now());
-         hub.setDeletedBy(0L);
+        hub.setDeletedAt(LocalDateTime.now());
+        hub.setDeletedBy(0L);
         hubRepository.save(hub);
         return hub;
     }

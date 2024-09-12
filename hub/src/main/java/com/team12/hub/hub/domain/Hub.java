@@ -1,4 +1,4 @@
-package com.team12.hub.domain;
+package com.team12.hub.hub.domain;
 
 
 import com.team12.common.audit.AuditingEntity;
@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -17,7 +16,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "P_HUB")
+@Table(name = "P_HUB", schema = "s_hub")
 public class Hub extends AuditingEntity {
     @Id
     @GeneratedValue
