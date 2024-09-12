@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,18 +68,8 @@ public class ProductController {
     @Operation(summary = "모든 상품 조회")
     @GetMapping
     public ResponseEntity<SuccessResponse<CustomPageResponse<GetProductResponseDto>>> getAllProduct(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        if (size != 10 && size != 30 && size != 50) {
-            size = 10;
-        }
-
-        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
-
         Page<GetProductResponseDto> responseDto = productService.getAllProduct(pageable);
 
         CustomPageResponse<GetProductResponseDto> customResponse = new CustomPageResponse<>(
@@ -121,20 +112,9 @@ public class ProductController {
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<CustomPageResponse<GetProductResponseDto>>> searchProduct(
             @RequestParam("keyword") String keyword,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        if (size != 10 && size != 30 && size != 50) {
-            size = 10;
-        }
-
-        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
-
-        Page<GetProductResponseDto> responseDto = productService.searchProduct(keyword,
-                pageRequest);
+        Page<GetProductResponseDto> responseDto = productService.searchProduct(keyword, pageable);
 
         CustomPageResponse<GetProductResponseDto> customResponse = new CustomPageResponse<>(
                 responseDto);

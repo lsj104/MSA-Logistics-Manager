@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,17 +69,7 @@ public class CompanyController {
     @Operation(summary = "모든 업체 조회")
     @GetMapping
     public ResponseEntity<SuccessResponse<CustomPageResponse<GetCompanyResponseDto>>> getAllCompany(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction) {
-
-        if (size != 10 && size != 30 && size != 50) {
-            size = 10;
-        }
-
-        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         Page<GetCompanyResponseDto> responseDto = companyService.getAllCompany(pageable);
 
@@ -120,20 +111,9 @@ public class CompanyController {
     @GetMapping("/search")
     public ResponseEntity<SuccessResponse<CustomPageResponse<GetCompanyResponseDto>>> searchCompany(
             @RequestParam("keyword") String keyword,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction) {
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        if (size != 10 && size != 30 && size != 50) {
-            size = 10;
-        }
-
-        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
-
-        Page<GetCompanyResponseDto> responseDto = companyService.searchCompany(keyword,
-                pageRequest);
+        Page<GetCompanyResponseDto> responseDto = companyService.searchCompany(keyword, pageable);
 
         CustomPageResponse<GetCompanyResponseDto> customResponse = new CustomPageResponse<>(
                 responseDto);
