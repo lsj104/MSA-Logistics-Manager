@@ -1,8 +1,37 @@
 package com.team12.company_product.product.controller;
 
+import static com.team12.common.exception.response.SuccessResponse.success;
+import static com.team12.company_product.product.message.SuccessMessage.CREATE_PRODUCT;
+import static com.team12.company_product.product.message.SuccessMessage.DELETE_PRODUCT;
+import static com.team12.company_product.product.message.SuccessMessage.GET_PRODUCT;
+import static com.team12.company_product.product.message.SuccessMessage.SEARCH_PRODUCT;
+import static com.team12.company_product.product.message.SuccessMessage.UPDATE_PRODUCT;
+
+import com.team12.common.customPage.CustomPageResponse;
+import com.team12.common.exception.response.SuccessResponse;
+import com.team12.company_product.product.dto.request.CreateProductRequestDto;
+import com.team12.company_product.product.dto.request.UpdateProductRequestDto;
+import com.team12.company_product.product.dto.response.CreateProductResponseDto;
+import com.team12.company_product.product.dto.response.DeleteProductResponseDto;
+import com.team12.company_product.product.dto.response.GetProductResponseDto;
+import com.team12.company_product.product.dto.response.UpdateProductResponseDto;
+import com.team12.company_product.product.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "상품", description = "상품 API")
@@ -11,4 +40,107 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/products")
 public class ProductController {
 
+    private final ProductService productService;
+
+    @Operation(summary = "상품 생성")
+    @PostMapping
+    public ResponseEntity<SuccessResponse<CreateProductResponseDto>> createProduct(
+            @RequestBody CreateProductRequestDto requestDto) {
+
+        return ResponseEntity.status(CREATE_PRODUCT.getHttpStatus())
+                .body(success(CREATE_PRODUCT.getHttpStatus().value(),
+                        CREATE_PRODUCT.getMessage(),
+                        productService.createProduct(requestDto)));
+    }
+
+    @Operation(summary = "상품 상세 조회")
+    @GetMapping("/{productId}")
+    public ResponseEntity<SuccessResponse<GetProductResponseDto>> getProduct(
+            @PathVariable("productId") String productId) {
+        GetProductResponseDto responseDto = productService.getProduct(productId);
+
+        return ResponseEntity.status(GET_PRODUCT.getHttpStatus())
+                .body(success(GET_PRODUCT.getHttpStatus().value(),
+                        GET_PRODUCT.getMessage(), responseDto));
+    }
+
+    @Operation(summary = "모든 상품 조회")
+    @GetMapping
+    public ResponseEntity<SuccessResponse<CustomPageResponse<GetProductResponseDto>>> getAllProduct(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        if (size != 10 && size != 30 && size != 50) {
+            size = 10;
+        }
+
+        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+
+        Page<GetProductResponseDto> responseDto = productService.getAllProduct(pageable);
+
+        CustomPageResponse<GetProductResponseDto> customResponse = new CustomPageResponse<>(
+                responseDto);
+
+        return ResponseEntity.status(GET_PRODUCT.getHttpStatus())
+                .body(success(GET_PRODUCT.getHttpStatus().value(),
+                        GET_PRODUCT.getMessage(), customResponse));
+    }
+
+    @Operation(summary = "상품 수정")
+    @PutMapping("/{productId}")
+    public ResponseEntity<SuccessResponse<UpdateProductResponseDto>> updateProduct(
+            @PathVariable("productId") String productId,
+            @RequestBody UpdateProductRequestDto requestDto) {
+
+        UpdateProductResponseDto responseDto = productService.updateProduct(requestDto, productId);
+
+        return ResponseEntity.status(UPDATE_PRODUCT.getHttpStatus())
+                .body(success(UPDATE_PRODUCT.getHttpStatus().value(),
+                        UPDATE_PRODUCT.getMessage(), responseDto));
+
+    }
+
+    @Operation(summary = "상품 삭제")
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<SuccessResponse<DeleteProductResponseDto>> deleteProduct(
+            @PathVariable("productId") String productId
+    ) {
+        Long userId = null;
+        DeleteProductResponseDto responseDto = productService.deleteProduct(productId, userId);
+
+        return ResponseEntity.status(DELETE_PRODUCT.getHttpStatus())
+                .body(success(DELETE_PRODUCT.getHttpStatus().value(),
+                        DELETE_PRODUCT.getMessage(), responseDto));
+
+    }
+
+    @Operation(summary = "상품 검색", description = "상품 이름으로 검색, ID로 검색할 수 있는 API입니다.")
+    @GetMapping("/search")
+    public ResponseEntity<SuccessResponse<CustomPageResponse<GetProductResponseDto>>> searchProduct(
+            @RequestParam("keyword") String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        if (size != 10 && size != 30 && size != 50) {
+            size = 10;
+        }
+
+        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+
+        Page<GetProductResponseDto> responseDto = productService.searchProduct(keyword,
+                pageRequest);
+
+        CustomPageResponse<GetProductResponseDto> customResponse = new CustomPageResponse<>(
+                responseDto);
+
+        return ResponseEntity.status(SEARCH_PRODUCT.getHttpStatus())
+                .body(success(SEARCH_PRODUCT.getHttpStatus().value(),
+                        SEARCH_PRODUCT.getMessage(), customResponse));
+    }
 }

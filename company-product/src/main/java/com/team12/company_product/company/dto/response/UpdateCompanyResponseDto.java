@@ -1,4 +1,4 @@
-package com.team12.company_product.company.dto;
+package com.team12.company_product.company.dto.response;
 
 import com.team12.company_product.company.domain.Company;
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ public record UpdateCompanyResponseDto(
 
     public static UpdateCompanyResponseDto from(Company company) {
         return UpdateCompanyResponseDto.builder()
-                .companyId(company.getCompanyId())
+                .companyId(String.valueOf(company.getCompanyId()))
                 .companyName(company.getCompanyName())
                 .companyType(builder().companyType)
                 .hubId(company.getHubId())

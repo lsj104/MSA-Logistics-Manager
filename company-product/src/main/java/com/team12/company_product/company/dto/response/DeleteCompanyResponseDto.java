@@ -1,4 +1,4 @@
-package com.team12.company_product.company.dto;
+package com.team12.company_product.company.dto.response;
 
 import com.team12.company_product.company.domain.Company;
 import java.time.LocalDateTime;
