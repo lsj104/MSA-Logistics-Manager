@@ -3,13 +3,17 @@ package com.team12.hub.manager.service;
 import com.team12.hub.hub.domain.Hub;
 import com.team12.hub.hub.repository.HubRepository;
 import com.team12.hub.manager.domain.Manager;
+import com.team12.hub.manager.domain.ManagerSpecification;
 import com.team12.hub.manager.dto.ManagerRequestDto;
 import com.team12.hub.manager.dto.ManagerResponseDto;
+import com.team12.hub.manager.dto.ManagerSearchRequestDto;
 import com.team12.hub.manager.repository.ManagerRepositoy;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
+
 
 @RequiredArgsConstructor
 @Service
@@ -68,5 +72,11 @@ public class ManagerService {
         Manager manager =  managerRepository.findByIdAndIsDeleted(managerId, false)
                 .orElseThrow(() -> new IllegalArgumentException(managerId + " ID를 찾을 수 없습니다."));
         return new ManagerResponseDto(manager.getId(), manager.getHub().getId(), manager.getType());
+    }
+
+    public Page<ManagerResponseDto> getManagers(ManagerSearchRequestDto searchRequestDto, Pageable pageable) {
+        Page<Manager> managerPage = managerRepository.findAll(ManagerSpecification.searchWith(searchRequestDto), pageable);
+        Page<ManagerResponseDto> managerResponseDtoPage = managerPage.map(manager -> new ManagerResponseDto(manager));
+        return managerResponseDtoPage;
     }
 }
