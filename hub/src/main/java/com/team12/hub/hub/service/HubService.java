@@ -1,12 +1,15 @@
 package com.team12.hub.hub.service;
 
 import com.team12.hub.hub.domain.Hub;
+import com.team12.hub.hub.domain.HubSpecification;
 import com.team12.hub.hub.dto.HubRequestDto;
 import com.team12.hub.hub.dto.HubResponseDto;
+import com.team12.hub.hub.dto.HubSearchRequestDto;
 import com.team12.hub.hub.repository.HubRepository;
 import com.team12.hub.hubPath.service.HubPathService;
-import com.team12.hub.hubPath.service.KakaoMapService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,5 +74,11 @@ public class HubService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 허브를 찾을 수 없습니다."));
         HubResponseDto hubResponseDto = new HubResponseDto(hub.getId(), hub.getName(), hub.getAddress(), hub.getLatitude(), hub.getLongitude());
         return hubResponseDto;
+    }
+
+    public Page<HubResponseDto> getHubs(HubSearchRequestDto searchRequestDto, Pageable pageable) {
+        Page<Hub> hubPage = hubRepository.findAll(HubSpecification.searchWith(searchRequestDto), pageable);
+        Page<HubResponseDto> hubResponseDtoPage = hubPage.map(hub -> new HubResponseDto(hub));
+        return hubResponseDtoPage;
     }
 }

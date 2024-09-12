@@ -1,4 +1,4 @@
-package com.team12.hub.hubPath.service;
+package com.team12.hub.hub.service;
 
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
