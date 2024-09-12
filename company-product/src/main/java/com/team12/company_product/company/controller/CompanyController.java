@@ -7,13 +7,14 @@ import static com.team12.company_product.company.message.SuccessMessage.GET_COMP
 import static com.team12.company_product.company.message.SuccessMessage.SEARCH_COMPANY;
 import static com.team12.company_product.company.message.SuccessMessage.UPDATE_COMPANY;
 
+import com.team12.common.customPage.CustomPageResponse;
 import com.team12.common.exception.response.SuccessResponse;
-import com.team12.company_product.company.dto.CreateCompanyRequestDto;
-import com.team12.company_product.company.dto.CreateCompanyResponseDto;
-import com.team12.company_product.company.dto.DeleteCompanyResponseDto;
-import com.team12.company_product.company.dto.GetCompanyResponseDto;
-import com.team12.company_product.company.dto.UpdateCompanyRequestDto;
-import com.team12.company_product.company.dto.UpdateCompanyResponseDto;
+import com.team12.company_product.company.dto.request.CreateCompanyRequestDto;
+import com.team12.company_product.company.dto.response.CreateCompanyResponseDto;
+import com.team12.company_product.company.dto.response.DeleteCompanyResponseDto;
+import com.team12.company_product.company.dto.response.GetCompanyResponseDto;
+import com.team12.company_product.company.dto.request.UpdateCompanyRequestDto;
+import com.team12.company_product.company.dto.response.UpdateCompanyResponseDto;
 import com.team12.company_product.company.service.CompanyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,7 +43,6 @@ public class CompanyController {
     private final CompanyService companyService;
 
     // TODO: user, hub 작업
-    // 업체 생성
     @Operation(summary = "업체 생성")
     @PostMapping
     public ResponseEntity<SuccessResponse<CreateCompanyResponseDto>> createCompany(
@@ -54,7 +54,6 @@ public class CompanyController {
                         companyService.createCompany(requestDto)));
     }
 
-    // 업체 상세 조회
     @Operation(summary = "업체 상세 조회", description = "업체ID로 업체를 상세 조회하는 API입니다.")
     @GetMapping("/{companyId}")
     public ResponseEntity<SuccessResponse<GetCompanyResponseDto>> getCompany(
@@ -66,11 +65,11 @@ public class CompanyController {
                         GET_COMPANY.getMessage(), responseDto));
     }
 
-    // 모든 업체 조회
     @Operation(summary = "모든 업체 조회")
     @GetMapping
-    public ResponseEntity<SuccessResponse<Page<GetCompanyResponseDto>>> getAllCompany(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
+    public ResponseEntity<SuccessResponse<CustomPageResponse<GetCompanyResponseDto>>> getAllCompany(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String direction) {
 
@@ -83,12 +82,14 @@ public class CompanyController {
 
         Page<GetCompanyResponseDto> responseDto = companyService.getAllCompany(pageable);
 
+        CustomPageResponse<GetCompanyResponseDto> customResponse = new CustomPageResponse<>(
+                responseDto);
+
         return ResponseEntity.status(GET_COMPANY.getHttpStatus())
                 .body(success(GET_COMPANY.getHttpStatus().value(),
-                        GET_COMPANY.getMessage(), responseDto));
+                        GET_COMPANY.getMessage(), customResponse));
     }
 
-    // 업체 수정
     @Operation(summary = "업체 수정")
     @PutMapping("/{companyId}")
     public ResponseEntity<SuccessResponse<UpdateCompanyResponseDto>> updateCompany(
@@ -102,7 +103,6 @@ public class CompanyController {
                         UPDATE_COMPANY.getMessage(), responseDto));
     }
 
-    // 업체 삭제
     @Operation(summary = "업체 삭제")
     @DeleteMapping("/{companyId}")
     public ResponseEntity<SuccessResponse<DeleteCompanyResponseDto>> deleteCompany(
@@ -116,11 +116,11 @@ public class CompanyController {
                         DELETE_COMPANY.getMessage(), responseDto));
     }
 
-    // 업체 검색
     @Operation(summary = "업체 검색", description = "업체 이름으로 검색, ID로 검색할 수 있는 API입니다.")
     @GetMapping("/search")
-    public ResponseEntity<SuccessResponse<Page<GetCompanyResponseDto>>> searchCompany(
-            @RequestParam("keyword") String keyword, @RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<SuccessResponse<CustomPageResponse<GetCompanyResponseDto>>> searchCompany(
+            @RequestParam("keyword") String keyword,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String direction) {
@@ -135,8 +135,11 @@ public class CompanyController {
         Page<GetCompanyResponseDto> responseDto = companyService.searchCompany(keyword,
                 pageRequest);
 
+        CustomPageResponse<GetCompanyResponseDto> customResponse = new CustomPageResponse<>(
+                responseDto);
+
         return ResponseEntity.status(SEARCH_COMPANY.getHttpStatus())
                 .body(success(SEARCH_COMPANY.getHttpStatus().value(),
-                        SEARCH_COMPANY.getMessage(), responseDto));
+                        SEARCH_COMPANY.getMessage(), customResponse));
     }
 }

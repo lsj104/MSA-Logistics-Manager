@@ -1,12 +1,12 @@
 package com.team12.company_product.company.service;
 
 import com.team12.company_product.company.domain.Company;
-import com.team12.company_product.company.dto.CreateCompanyRequestDto;
-import com.team12.company_product.company.dto.CreateCompanyResponseDto;
-import com.team12.company_product.company.dto.DeleteCompanyResponseDto;
-import com.team12.company_product.company.dto.GetCompanyResponseDto;
-import com.team12.company_product.company.dto.UpdateCompanyRequestDto;
-import com.team12.company_product.company.dto.UpdateCompanyResponseDto;
+import com.team12.company_product.company.dto.request.CreateCompanyRequestDto;
+import com.team12.company_product.company.dto.response.CreateCompanyResponseDto;
+import com.team12.company_product.company.dto.response.DeleteCompanyResponseDto;
+import com.team12.company_product.company.dto.response.GetCompanyResponseDto;
+import com.team12.company_product.company.dto.request.UpdateCompanyRequestDto;
+import com.team12.company_product.company.dto.response.UpdateCompanyResponseDto;
 import com.team12.company_product.company.exception.CompanyException;
 import com.team12.company_product.company.exception.ExceptionMessage;
 import com.team12.company_product.company.repository.CompanyRepository;
@@ -95,6 +95,7 @@ public class CompanyServiceImpl implements CompanyService {
         return companyPage.map(GetCompanyResponseDto::from);
     }
 
+    // ID로 업체 검색
     @Transactional
     public Company findById(String companyId) {
         return companyRepository.findById(companyId)

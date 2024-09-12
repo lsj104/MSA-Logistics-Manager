@@ -1,8 +1,8 @@
 package com.team12.company_product.company.domain;
 
 import com.team12.common.audit.AuditingEntity;
-import com.team12.company_product.company.dto.CreateCompanyRequestDto;
-import com.team12.company_product.company.dto.UpdateCompanyRequestDto;
+import com.team12.company_product.company.dto.request.CreateCompanyRequestDto;
+import com.team12.company_product.company.dto.request.UpdateCompanyRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -33,7 +33,7 @@ public class Company extends AuditingEntity {
     @Enumerated(EnumType.STRING)
     private CompanyType companyType;
 
-    @Column(name = "hub_id")
+    @Column(name = "hubId")
     private String hubId;
 
     @Column(name = "user_id")
@@ -57,7 +57,7 @@ public class Company extends AuditingEntity {
         return Company.builder()
                 .companyName(requestDto.companyName())
                 .companyType(requestDto.companyType())
-                .hubId(requestDto.hub_id())
+                .hubId(requestDto.hubId())
                 .address(requestDto.address())
                 .build();
     }

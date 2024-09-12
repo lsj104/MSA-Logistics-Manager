@@ -1,4 +1,4 @@
-package com.team12.company_product.product.dto;
+package com.team12.company_product.product.dto.response;
 
 import com.team12.company_product.product.domain.Product;
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ public record GetProductResponseDto(
     public static GetProductResponseDto from(Product product) {
         return GetProductResponseDto.builder()
                 .productId(product.getProductId())
-                .companyId(product.getCompanyId())
+                .companyId(product.getCompany().getCompanyId())
                 .hub_id(product.getHubId())
                 .productName(product.getProductName())
                 .isDelete(product.getIsDeleted())
