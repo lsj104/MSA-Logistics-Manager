@@ -1,11 +1,12 @@
 package com.team12.order_delivery.delivery.controller;
 
+import com.team12.common.exception.response.SuccessResponse;
 import com.team12.order_delivery.delivery.dto.DeliveryReqDto;
+import com.team12.order_delivery.delivery.message.SuccessMessage;
 import com.team12.order_delivery.delivery.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -16,29 +17,31 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
 
     @PostMapping("")
-    public ResponseEntity<?> createDelivery(@RequestBody DeliveryReqDto deliveryReqDto) {
-        return ResponseEntity.ok(deliveryService.createDelivery(deliveryReqDto));
+    public SuccessResponse<?> createDelivery(@RequestBody DeliveryReqDto deliveryReqDto) {
+        return SuccessResponse.success(SuccessMessage.CREATE_DELIVERY.getHttpStatus().value(), SuccessMessage.CREATE_DELIVERY.getMessage(), deliveryService.createDelivery(deliveryReqDto));
     }
 
+
     @GetMapping("")
-    public ResponseEntity<?> getDelivery(@RequestParam String deliveryId) {
-        return ResponseEntity.ok(deliveryService.getDelivery(deliveryId));
+    public SuccessResponse<?> getDelivery(@RequestParam String deliveryId) {
+        return SuccessResponse.success(SuccessMessage.GET_DELIVERY.getHttpStatus().value(), SuccessMessage.GET_DELIVERY.getMessage(), deliveryService.getDelivery(deliveryId));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllDelivery(Pageable pageable) {
-        return ResponseEntity.ok(deliveryService.getAllDelivery(pageable));
+    public SuccessResponse<?> getAllDelivery(Pageable pageable) {
+        return SuccessResponse.success(SuccessMessage.GET_DELIVERY.getHttpStatus().value(), SuccessMessage.GET_DELIVERY.getMessage(), deliveryService.getAllDelivery(pageable));
     }
 
     // 배송 정보 수정, 삭제 API 추가
     @PutMapping("")
-    public ResponseEntity<?> updateDelivery(@RequestParam String deliveryId ,@RequestBody DeliveryReqDto deliveryReqDto) {
-        return ResponseEntity.ok(deliveryService.updateDelivery(deliveryId,deliveryReqDto));
+    public SuccessResponse<?> updateDelivery(@RequestParam String deliveryId ,@RequestBody DeliveryReqDto deliveryReqDto) {
+        return SuccessResponse.success(SuccessMessage.UPDATE_DELIVERY.getHttpStatus().value(), SuccessMessage.UPDATE_DELIVERY.getMessage(), deliveryService.updateDelivery(deliveryId, deliveryReqDto));
     }
 
     @DeleteMapping("")
-    public ResponseEntity<?> deleteDelivery(@RequestParam String deliveryId) {
-        return ResponseEntity.ok(deliveryService.deleteDelivery(deliveryId));
+    public SuccessResponse<?> deleteDelivery(@RequestParam String deliveryId) {
+        deliveryService.deleteDelivery(deliveryId);
+        return SuccessResponse.success(SuccessMessage.DELETE_DELIVERY.getHttpStatus().value(), SuccessMessage.DELETE_DELIVERY.getMessage());
     }
 
 
