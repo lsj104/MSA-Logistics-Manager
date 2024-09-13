@@ -7,8 +7,8 @@ import java.util.UUID;
 @Data
 public class DeliveryReqDto {
     private UUID orderId;
-    private UUID fromHubId;
-    private UUID toHubId;
+    private UUID departmentId;
+    private UUID arrivalHubId;
     private String address;
     private String receiver;
     private String receiverEmail;

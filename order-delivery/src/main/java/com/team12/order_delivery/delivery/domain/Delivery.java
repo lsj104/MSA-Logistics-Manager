@@ -23,8 +23,8 @@ public class Delivery extends AuditingEntity {
     private UUID orderId;
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
-    private UUID fromHubId;
-    private UUID toHubId;
+    private UUID departmentId;
+    private UUID arrivalHubId;
     private String address;
     private String receiver;
     private String receiverEmail;
@@ -32,8 +32,8 @@ public class Delivery extends AuditingEntity {
 
     public void update(DeliveryReqDto deliveryReqDto) {
         this.orderId = deliveryReqDto.getOrderId();
-        this.fromHubId = deliveryReqDto.getFromHubId();
-        this.toHubId = deliveryReqDto.getToHubId();
+        this.departmentId = deliveryReqDto.getDepartmentId();
+        this.arrivalHubId = deliveryReqDto.getArrivalHubId();
         this.address = deliveryReqDto.getAddress();
         this.receiver = deliveryReqDto.getReceiver();
         this.receiverEmail = deliveryReqDto.getReceiverEmail();
