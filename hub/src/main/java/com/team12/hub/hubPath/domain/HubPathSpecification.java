@@ -7,7 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 public class HubPathSpecification {
     public static Specification<HubPath> searchWith(HubPathSearchRequestDto searchRequestDto) {
         return (root, query, criteriaBuilder) -> {
-            // 기본 조건: 삭제되지 않은(delYn = 'N') 레코드만 검색
+            // 기본 조건: 삭제되지 않은(delYn = false) 레코드만 검색
             Predicate predicate = criteriaBuilder.equal(root.get("isDeleted"), false);
             // 검색 조건 1: fromHubId가 null이 아닌 경우, 해당 상태와 일치하는 레코드 추가
             if (searchRequestDto.getFromHubId() != null) {
