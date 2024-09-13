@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: odl
+    password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        default_schema: s_order_delivery
+  application:
+    name: order-delivery
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      username: default
+      password: default
+  profiles:
+    include: private
