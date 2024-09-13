@@ -17,11 +17,11 @@ import java.time.LocalDateTime;
 @Getter
 public abstract class AuditingEntity {
     @CreatedDate
-    @Column(name="created_at", updatable = false, nullable = false)
+    @Column(name="created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @CreatedBy
-    @Column(name="created_by", updatable = false)
+    @Column(name="created_by")
     private Long createdBy;
 
     @LastModifiedDate
