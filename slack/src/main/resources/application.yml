@@ -2,8 +2,8 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
-    username: slack_user
-    password: slack_user
+    username: slc
+    password: 1234
 
   jpa:
     hibernate:
@@ -12,7 +12,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
-        default_schema: slack
+        default_schema: s_slack
   application:
     name: slack
   data:

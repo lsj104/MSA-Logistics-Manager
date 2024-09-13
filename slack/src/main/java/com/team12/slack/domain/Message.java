@@ -11,8 +11,8 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "p_message", schema = "SLACK")
-@Entity(name = "p_messages")
+@Table(name = "p_message", schema = "s_slack")
+@Entity(name = "p_message")
 public class Message {
     // todo : auditEntity 상속
     // todo : 추후 유저 정보 받아오는 로직 추가
