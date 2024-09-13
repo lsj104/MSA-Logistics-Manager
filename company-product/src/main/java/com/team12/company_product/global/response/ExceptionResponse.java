@@ -1,0 +1,22 @@
+package com.team12.company_product.global.response;
+
+import static lombok.AccessLevel.PRIVATE;
+
+import com.team12.common.exception.response.CommonResponse;
+import lombok.Builder;
+import lombok.NonNull;
+
+@Builder(access = PRIVATE)
+public record ExceptionResponse(
+        int resultCode,
+        @NonNull
+        String message
+) implements CommonResponse {
+
+    public static ExceptionResponse of(String message, int resultCode) {
+        return ExceptionResponse.builder()
+                .resultCode(resultCode)
+                .message(message)
+                .build();
+    }
+}
