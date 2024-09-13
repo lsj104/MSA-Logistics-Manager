@@ -11,4 +11,6 @@ import java.util.UUID;
 @Repository
 public interface DeliveryRouteRepository extends JpaRepository<DeliveryRoute, UUID> {
     List<DeliveryRoute> findByDeliveryId(UUID deliveryId);
+
+    int countByDeliveryId(UUID deliveryId);
 }

@@ -2,7 +2,7 @@ package com.team12.order_delivery.delivery.controller;
 
 import com.team12.common.exception.response.SuccessResponse;
 import com.team12.order_delivery.delivery.dto.DeliveryReqDto;
-import com.team12.order_delivery.delivery.message.SuccessMessage;
+import com.team12.order_delivery.util.SuccessMessage;
 import com.team12.order_delivery.delivery.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +32,14 @@ public class DeliveryController {
         return SuccessResponse.success(SuccessMessage.GET_DELIVERY.getHttpStatus().value(), SuccessMessage.GET_DELIVERY.getMessage(), deliveryService.getAllDelivery(pageable));
     }
 
-    // 배송 정보 수정, 삭제 API 추가
     @PutMapping("")
-    public SuccessResponse<?> updateDelivery(@RequestParam String deliveryId ,@RequestBody DeliveryReqDto deliveryReqDto) {
+    public SuccessResponse<?> updateDelivery(@RequestParam String deliveryId, @RequestBody DeliveryReqDto deliveryReqDto) {
         return SuccessResponse.success(SuccessMessage.UPDATE_DELIVERY.getHttpStatus().value(), SuccessMessage.UPDATE_DELIVERY.getMessage(), deliveryService.updateDelivery(deliveryId, deliveryReqDto));
+    }
+
+    @PatchMapping("")
+    public SuccessResponse<?> updateDeliveryStatus(@RequestParam String deliveryId, @RequestParam String deliveryStatus) {
+        return SuccessResponse.success(SuccessMessage.UPDATE_DELIVERY.getHttpStatus().value(), SuccessMessage.UPDATE_DELIVERY.getMessage(), deliveryService.updateDeliveryStatus(deliveryId, deliveryStatus));
     }
 
     @DeleteMapping("")
@@ -44,10 +48,8 @@ public class DeliveryController {
         return SuccessResponse.success(SuccessMessage.DELETE_DELIVERY.getHttpStatus().value(), SuccessMessage.DELETE_DELIVERY.getMessage());
     }
 
-
-
-    // 배송 상태 업데이트? -> 배송 경로 정보도 같이 업데이트 해야되는데 ...
-
-
+    // Delivery, Delivery Route 생성됨
+    // sequence1인 Delivery Route에서 배송 시작 -> Delivery의 status 변경
+    // 마지막 sequence인 Delivery Route에서 배송 완료 -> Delivery의 status 변경
 
 }

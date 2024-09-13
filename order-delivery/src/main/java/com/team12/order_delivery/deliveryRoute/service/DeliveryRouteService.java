@@ -1,12 +1,15 @@
 package com.team12.order_delivery.deliveryRoute.service;
 
 import com.team12.order_delivery.delivery.domain.Delivery;
+import com.team12.order_delivery.delivery.service.DeliveryService;
 import com.team12.order_delivery.deliveryRoute.domain.DeliveryRoute;
 import com.team12.order_delivery.deliveryRoute.dto.RouteResDto;
 import com.team12.order_delivery.deliveryRoute.repository.DeliveryRouteRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DeliveryRouteService {
     private final DeliveryRouteRepository deliveryRouteRepository;
+    private final DeliveryService deliveryService;
 
     public void createDeliveryRoutes(Delivery delivery) {
 
@@ -45,6 +49,16 @@ public class DeliveryRouteService {
                     .build();
 
             deliveryRouteRepository.save(deliveryRoute);
+            deliveryRoute = DeliveryRoute.builder()
+                    .deliveryId(delivery.getId())
+                    .sequence(2)
+                    .fromHubId(UUID.randomUUID())
+                    .toHubId(UUID.randomUUID())
+                    .status(DeliveryRoute.RouteStatus.WAITING)
+                    .estimatedTime(null)
+                    .estimatedDistance(null)
+                    .build();
+            deliveryRouteRepository.save(deliveryRoute);
             new RouteResDto(deliveryRoute);
         } catch (Exception e) {
             log.info("createDeliveryRoutes error");
@@ -62,5 +76,47 @@ public class DeliveryRouteService {
 
     public RouteResDto getDeliveryRoute(String deliveryRouteId) {
         return new RouteResDto(deliveryRouteRepository.findById(UUID.fromString(deliveryRouteId)).orElseThrow());
+    }
+
+    @Transactional
+    public RouteResDto updateDeliveryRouteStatus(String deliveryRouteId, String deliveryRouteStatus) {
+        DeliveryRoute deliveryRoute = deliveryRouteRepository.findById(UUID.fromString(deliveryRouteId))
+                .orElseThrow(() -> new EntityNotFoundException("DeliveryRoute not found with id: " + deliveryRouteId));
+
+        DeliveryRoute.RouteStatus newStatus;
+        try {
+            newStatus = DeliveryRoute.RouteStatus.valueOf(deliveryRouteStatus);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid delivery route status: " + deliveryRouteStatus);
+        }
+
+        if(deliveryRoute.getSequence() == 1 && newStatus == DeliveryRoute.RouteStatus.DELIVERING) {
+            deliveryService.updateDeliveryStatus(String.valueOf(deliveryRoute.getDeliveryId()), "DELIVERING");
+        } else if (isLastRoute(deliveryRoute) && newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
+            deliveryService.updateDeliveryStatus(String.valueOf(deliveryRoute.getDeliveryId()), "ARRIVED");
+        }
+
+        deliveryRoute.setStatus(newStatus);
+        deliveryRouteRepository.save(deliveryRoute);
+        return new RouteResDto(deliveryRoute);
+    }
+
+    private boolean isLastRoute(DeliveryRoute route) {
+        return deliveryRouteRepository.countByDeliveryId(route.getDeliveryId()) == route.getSequence();
+    }
+
+    public void deleteDeliveryRoute(String deliveryRouteId) {
+        deliveryRouteRepository.deleteById(UUID.fromString(deliveryRouteId));
+    }
+
+    public RouteResDto updateDeliveryRoute(String deliveryRouteId, String deliveryId, String sequence, String hubId) {
+        DeliveryRoute deliveryRoute = deliveryRouteRepository.findById(UUID.fromString(deliveryRouteId))
+                .orElseThrow(() -> new EntityNotFoundException("DeliveryRoute not found with id: " + deliveryRouteId));
+
+        deliveryRoute.setDeliveryId(UUID.fromString(deliveryId));
+        deliveryRoute.setSequence(Integer.parseInt(sequence));
+        deliveryRoute.setFromHubId(UUID.fromString(hubId));
+        deliveryRouteRepository.save(deliveryRoute);
+        return new RouteResDto(deliveryRoute);
     }
 }
