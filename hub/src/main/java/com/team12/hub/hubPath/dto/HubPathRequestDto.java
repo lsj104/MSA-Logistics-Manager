@@ -1,0 +1,14 @@
+package com.team12.hub.hubPath.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.UUID;
+
+@Getter
+@AllArgsConstructor
+public class HubPathRequestDto {
+    private UUID fromHubId;
+    private UUID toHubId;
+    private Integer duration;
+}
