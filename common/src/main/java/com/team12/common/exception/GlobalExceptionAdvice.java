@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionAdvice {
+    
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(
             MethodArgumentNotValidException e) {
-        final ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST, "Validation failed for argument(s)");
+        final ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST,
+                "Validation failed for argument(s)");
 
         return response;
     }
@@ -30,7 +32,8 @@ public class GlobalExceptionAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleConstraintViolationException(
             ConstraintViolationException e) {
-        final ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST, "Constraint violation occurred");
+        final ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST,
+                "Constraint violation occurred");
 
         return response;
     }
