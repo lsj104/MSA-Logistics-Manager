@@ -3,13 +3,17 @@ package com.team12.hub.hubPath.service;
 import com.team12.hub.hub.domain.Hub;
 import com.team12.hub.hub.repository.HubRepository;
 import com.team12.hub.hubPath.domain.HubPath;
+import com.team12.hub.hubPath.domain.HubPathSpecification;
 import com.team12.hub.hubPath.dto.HubPathRequestDto;
 import com.team12.hub.hubPath.dto.HubPathResponseDto;
+import com.team12.hub.hubPath.dto.HubPathSearchRequestDto;
 import com.team12.hub.hubPath.repository.HubPathRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,5 +87,11 @@ public class HubPathService {
             hubPath.setDeletedBy(0L);
         }
         return hubPathIds;
+    }
+
+    public Page<HubPathResponseDto> getHubs(HubPathSearchRequestDto searchRequestDto, Pageable pageable) {
+        Page<HubPath> hubPathPage = hubPathRepository.findAll(HubPathSpecification.searchWith(searchRequestDto), pageable);
+        Page<HubPathResponseDto> hubPathResponseDtoPage = hubPathPage.map(hubPath -> new HubPathResponseDto(hubPath));
+        return hubPathResponseDtoPage;
     }
 }

@@ -3,6 +3,7 @@ package com.team12.hub.hubPath.repository;
 import com.team12.hub.hubPath.domain.HubPath;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface HubPathRepository extends JpaRepository<HubPath, UUID> {
+public interface HubPathRepository extends JpaRepository<HubPath, UUID>, JpaSpecificationExecutor<HubPath> {
 
     Optional<HubPath> findByIdAndIsDeleted(UUID hubPathId, boolean isDeleted);
 
