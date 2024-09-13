@@ -48,6 +48,10 @@ public class DeliveryController {
         return SuccessResponse.success(SuccessMessage.DELETE_DELIVERY.getHttpStatus().value(), SuccessMessage.DELETE_DELIVERY.getMessage());
     }
 
+    @PatchMapping("/route")
+    public SuccessResponse<?> updateDeliveryRouteStatus(@RequestParam String deliveryRouteId, @RequestParam String deliveryRouteStatus) {
+        return SuccessResponse.success(SuccessMessage.UPDATE_DELIVERY_ROUTE.getHttpStatus().value(), SuccessMessage.UPDATE_DELIVERY_ROUTE.getMessage(), deliveryService.updateDeliveryRouteStatus(deliveryRouteId, deliveryRouteStatus));
+    }
     // Delivery, Delivery Route 생성됨
     // sequence1인 Delivery Route에서 배송 시작 -> Delivery의 status 변경
     // 마지막 sequence인 Delivery Route에서 배송 완료 -> Delivery의 status 변경

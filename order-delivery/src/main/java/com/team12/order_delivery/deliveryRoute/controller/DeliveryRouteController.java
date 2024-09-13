@@ -23,10 +23,6 @@ public class DeliveryRouteController {
         return SuccessResponse.success(SuccessMessage.GET_DELIVERY_ROUTE.getHttpStatus().value(), SuccessMessage.GET_DELIVERY_ROUTE.getMessage(), deliveryRouteService.getDeliveryRoute(deliveryRouteId));
     }
 
-    @PatchMapping("")
-    public SuccessResponse<?> updateDeliveryRouteStatus(@RequestParam String deliveryRouteId, @RequestParam String deliveryRouteStatus) {
-        return SuccessResponse.success(SuccessMessage.UPDATE_DELIVERY_ROUTE.getHttpStatus().value(), SuccessMessage.UPDATE_DELIVERY_ROUTE.getMessage(), deliveryRouteService.updateDeliveryRouteStatus(deliveryRouteId, deliveryRouteStatus));
-    }
 
     @PutMapping("")
     public SuccessResponse<?> updateDeliveryRoute(@RequestParam String deliveryRouteId, @RequestParam String deliveryId, @RequestParam String sequence, @RequestParam String hubId) {
