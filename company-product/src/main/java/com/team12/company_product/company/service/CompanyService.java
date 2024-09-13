@@ -1,11 +1,12 @@
 package com.team12.company_product.company.service;
 
-import com.team12.company_product.company.dto.CreateCompanyRequestDto;
-import com.team12.company_product.company.dto.CreateCompanyResponseDto;
-import com.team12.company_product.company.dto.DeleteCompanyResponseDto;
-import com.team12.company_product.company.dto.GetCompanyResponseDto;
-import com.team12.company_product.company.dto.UpdateCompanyRequestDto;
-import com.team12.company_product.company.dto.UpdateCompanyResponseDto;
+import com.team12.company_product.company.domain.Company;
+import com.team12.company_product.company.dto.request.CreateCompanyRequestDto;
+import com.team12.company_product.company.dto.response.CreateCompanyResponseDto;
+import com.team12.company_product.company.dto.response.DeleteCompanyResponseDto;
+import com.team12.company_product.company.dto.response.GetCompanyResponseDto;
+import com.team12.company_product.company.dto.request.UpdateCompanyRequestDto;
+import com.team12.company_product.company.dto.response.UpdateCompanyResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -28,4 +29,7 @@ public interface CompanyService {
 
     // 업체 검색
     Page<GetCompanyResponseDto> searchCompany(String keyword, Pageable pageable);
+
+    // id로 업체 검색
+    Company findById(String companyId);
 }
