@@ -1,5 +1,7 @@
 package com.team12.order_delivery.deliveryRoute.service;
 
+import com.team12.common.exception.BusinessLogicException;
+import com.team12.common.exception.ExceptionCode;
 import com.team12.order_delivery.delivery.domain.Delivery;
 import com.team12.order_delivery.deliveryRoute.domain.DeliveryRoute;
 import com.team12.order_delivery.deliveryRoute.dto.RouteResDto;
@@ -34,7 +36,7 @@ public class DeliveryRouteService {
 //            deliveryRoute.setStatus(RouteStatus.WAITING_FOR_TRANSIT);
 //        }
 
-        try{
+        try {
             DeliveryRoute deliveryRoute = DeliveryRoute.builder()
                     .deliveryId(delivery.getId())
                     .sequence(1)
@@ -58,35 +60,56 @@ public class DeliveryRouteService {
             deliveryRouteRepository.save(deliveryRoute);
             new RouteResDto(deliveryRoute);
         } catch (Exception e) {
-            log.info("createDeliveryRoutes error");
-            log.info(e.getMessage());
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
 
     }
 
     public List<RouteResDto> getAllDeliveryRoutes(String deliveryId) {
-        List<DeliveryRoute> deliveryRoutes = deliveryRouteRepository.findByDeliveryId(UUID.fromString(deliveryId));
-        return deliveryRoutes.stream()
-                .map(RouteResDto::new)
-                .collect(Collectors.toList());
+        try {
+            List<DeliveryRoute> deliveryRoutes = deliveryRouteRepository.findByDeliveryId(UUID.fromString(deliveryId));
+            return deliveryRoutes.stream()
+                    .map(RouteResDto::new)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        }
     }
 
     public RouteResDto getDeliveryRoute(String deliveryRouteId) {
-        return new RouteResDto(deliveryRouteRepository.findById(UUID.fromString(deliveryRouteId)).orElseThrow());
+        try {
+            DeliveryRoute deliveryRoute = findById(UUID.fromString(deliveryRouteId));
+
+            return new RouteResDto(deliveryRoute);
+        } catch (Exception e) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        }
     }
 
     public void deleteDeliveryRoute(String deliveryRouteId) {
-        deliveryRouteRepository.deleteById(UUID.fromString(deliveryRouteId));
+        try {
+            DeliveryRoute deliveryRoute = findById(UUID.fromString(deliveryRouteId));
+            deliveryRouteRepository.delete(deliveryRoute);
+        } catch (Exception e) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        }
     }
 
     public RouteResDto updateDeliveryRoute(String deliveryRouteId, String deliveryId, String sequence, String hubId) {
-        DeliveryRoute deliveryRoute = deliveryRouteRepository.findById(UUID.fromString(deliveryRouteId))
-                .orElseThrow(() -> new EntityNotFoundException("DeliveryRoute not found with id: " + deliveryRouteId));
+        try {
+            DeliveryRoute deliveryRoute = findById(UUID.fromString(deliveryRouteId));
+            deliveryRoute.setDeliveryId(UUID.fromString(deliveryId));
+            deliveryRoute.setSequence(Integer.parseInt(sequence));
+            deliveryRoute.setFromHubId(UUID.fromString(hubId));
+            deliveryRouteRepository.save(deliveryRoute);
+            return new RouteResDto(deliveryRoute);
+        } catch (Exception e) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        }
+    }
 
-        deliveryRoute.setDeliveryId(UUID.fromString(deliveryId));
-        deliveryRoute.setSequence(Integer.parseInt(sequence));
-        deliveryRoute.setFromHubId(UUID.fromString(hubId));
-        deliveryRouteRepository.save(deliveryRoute);
-        return new RouteResDto(deliveryRoute);
+    public DeliveryRoute findById(UUID deliveryRouteId) {
+        return deliveryRouteRepository.findById(deliveryRouteId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 배송 경로를 찾을 수 없습니다."));
     }
 }
