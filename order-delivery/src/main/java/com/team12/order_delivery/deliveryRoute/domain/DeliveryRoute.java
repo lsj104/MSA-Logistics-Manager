@@ -1,19 +1,23 @@
-package com.team12.order_delivery.delivery.domain;
+package com.team12.order_delivery.deliveryRoute.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "p_delivery_route", schema = "s_order_delivery")
 public class DeliveryRoute {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     @CollectionTable(name = "p_delivery", joinColumns = @JoinColumn(name = "id"))
     private UUID deliveryId;
@@ -21,9 +25,12 @@ public class DeliveryRoute {
     private UUID fromHubId;
     private UUID toHubId;
     private Double estimatedDistance;
-    private Double estimatedTime;
+    private LocalDateTime estimatedTime;
     private Double actualDistance;
-    private Double actualTime;
+    private LocalDateTime actualTime;
+    private LocalDateTime startAt;
+    private LocalDateTime endAt;
+
     @Enumerated(EnumType.STRING)
     private RouteStatus status;
 //    private int deliveryPersonId;

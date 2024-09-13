@@ -7,10 +7,12 @@ import com.team12.order_delivery.delivery.domain.Delivery;
 import com.team12.order_delivery.delivery.dto.DeliveryReqDto;
 import com.team12.order_delivery.delivery.dto.DeliveryResDto;
 import com.team12.order_delivery.delivery.repository.DeliveryRespository;
+import com.team12.order_delivery.deliveryRoute.service.DeliveryRouteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -19,7 +21,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DeliveryService {
     private final DeliveryRespository deliveryRespository;
+    private final DeliveryRouteService deliveryRouteService;
 
+    @Transactional
     public DeliveryResDto createDelivery(DeliveryReqDto deliveryReqDto) {
         try {
             Delivery delivery = Delivery.builder()
@@ -33,7 +37,7 @@ public class DeliveryService {
                     .build();
 
             deliveryRespository.save(delivery);
-            createDeliveryRoutes(delivery);
+            deliveryRouteService.createDeliveryRoutes(delivery);
             return new DeliveryResDto(delivery);
         } catch (Exception e) {
             log.info(e.getMessage());
@@ -42,19 +46,11 @@ public class DeliveryService {
 
     }
 
-    private void createDeliveryRoutes(Delivery delivery) {
 
-        // TODO : 허브 간 이동 경로 가져옴
-
-        int sequence = 1;
-        // TODO : 허브 간 이동 경로 저장
-
-
-    }
 
     public DeliveryResDto getDelivery(String deliveryId) {
         try {
-            return new DeliveryResDto(deliveryRespository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new IllegalArgumentException("배송 정보가 없습니다.")));
+            return new DeliveryResDto(deliveryRespository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new BusinessLogicException(ExceptionCode.INVALID_PARAMETER)));
         } catch (Exception e) {
             log.info(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
@@ -88,6 +84,17 @@ public class DeliveryService {
             deliveryRespository.delete(delivery);
         } catch (Exception e) {
             log.info(e.getMessage());
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        }
+    }
+
+    public DeliveryResDto updateDeliveryStatus(String deliveryId, String deliveryStatus) {
+        try {
+            Delivery delivery = deliveryRespository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new IllegalArgumentException("배송 정보가 없습니다."));
+            delivery.setDeliveryStatus(Delivery.DeliveryStatus.valueOf(deliveryStatus));
+            deliveryRespository.save(delivery);
+            return new DeliveryResDto(delivery);
+        } catch (Exception e) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
