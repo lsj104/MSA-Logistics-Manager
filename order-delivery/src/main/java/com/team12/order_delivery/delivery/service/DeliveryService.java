@@ -33,8 +33,8 @@ public class DeliveryService {
         try {
             Delivery delivery = Delivery.builder()
                     .orderId(deliveryReqDto.getOrderId())
-                    .fromHubId(deliveryReqDto.getFromHubId())
-                    .toHubId(deliveryReqDto.getToHubId())
+                    .departmentId(deliveryReqDto.getDepartmentId())
+                    .arrivalHubId(deliveryReqDto.getArrivalHubId())
                     .address(deliveryReqDto.getAddress())
                     .receiver(deliveryReqDto.getReceiver())
                     .receiverEmail(deliveryReqDto.getReceiverEmail())
@@ -50,7 +50,6 @@ public class DeliveryService {
         }
 
     }
-
 
 
     public DeliveryResDto getDelivery(String deliveryId) {
@@ -101,16 +100,10 @@ public class DeliveryService {
             delivery.setDeliveryStatus(Delivery.DeliveryStatus.valueOf(deliveryStatus));
             deliveryRespository.save(delivery);
             return new DeliveryResDto(delivery);
-        } catch (IllegalArgumentException e) {
-            log.error("Invalid status or UUID format: ", e);
-            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
-        } catch (EntityNotFoundException e) {
-            log.error("Delivery not found: ", e);
-            throw new BusinessLogicException(ExceptionCode.ENTITY_NOT_FOUND);
         } catch (Exception e) {
-            log.error("Unexpected error in updateDeliveryStatus: ", e);
-            return null;
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
+
     }
 
     @Transactional
@@ -121,7 +114,7 @@ public class DeliveryService {
 
             DeliveryRoute.RouteStatus newStatus = DeliveryRoute.RouteStatus.valueOf(deliveryRouteStatus);
 
-            if(deliveryRoute.getSequence() == 1 && newStatus == DeliveryRoute.RouteStatus.DELIVERING) {
+            if (deliveryRoute.getSequence() == 1 && newStatus == DeliveryRoute.RouteStatus.DELIVERING) {
                 updateDeliveryStatus(String.valueOf(deliveryRoute.getDeliveryId()), "DELIVERING");
             } else if (isLastRoute(deliveryRoute) && newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
                 updateDeliveryStatus(String.valueOf(deliveryRoute.getDeliveryId()), "DELIVERED");
