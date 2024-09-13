@@ -45,7 +45,6 @@ public class DeliveryService {
             deliveryRouteService.createDeliveryRoutes(delivery);
             return new DeliveryResDto(delivery);
         } catch (Exception e) {
-            log.info(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
 
@@ -55,7 +54,7 @@ public class DeliveryService {
     public DeliveryResDto getDelivery(String deliveryId) {
         try {
             return new DeliveryResDto(deliveryRespository.findById(UUID.fromString(deliveryId)).orElseThrow(() ->
-                    new BusinessLogicException(ExceptionCode.INVALID_PARAMETER)));
+                    new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND)));
         } catch (Exception e) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
@@ -66,14 +65,13 @@ public class DeliveryService {
         try {
             return new CustomPageResponse<>(deliveryRespository.findAll(pageable).map(DeliveryResDto::new));
         } catch (Exception e) {
-            log.info(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
 
     public DeliveryResDto updateDelivery(String deliveryId, DeliveryReqDto deliveryReqDto) {
         try {
-            Delivery delivery = deliveryRespository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new IllegalArgumentException("배송 정보가 없습니다."));
+            Delivery delivery = deliveryRespository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
             delivery.update(deliveryReqDto);
             deliveryRespository.save(delivery);
             return new DeliveryResDto(delivery);
@@ -84,7 +82,7 @@ public class DeliveryService {
 
     public void deleteDelivery(String deliveryId) {
         try {
-            Delivery delivery = deliveryRespository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new IllegalArgumentException("배송 정보가 없습니다."));
+            Delivery delivery = deliveryRespository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
             deliveryRespository.delete(delivery);
         } catch (Exception e) {
             log.info(e.getMessage());
@@ -96,7 +94,7 @@ public class DeliveryService {
     public DeliveryResDto updateDeliveryStatus(String deliveryId, String deliveryStatus) {
         try {
             Delivery delivery = deliveryRespository.findById(UUID.fromString(deliveryId))
-                    .orElseThrow(() -> new EntityNotFoundException("배송 정보가 없습니다."));
+                    .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
             delivery.setDeliveryStatus(Delivery.DeliveryStatus.valueOf(deliveryStatus));
             deliveryRespository.save(delivery);
             return new DeliveryResDto(delivery);
@@ -110,7 +108,7 @@ public class DeliveryService {
     public RouteResDto updateDeliveryRouteStatus(String deliveryRouteId, String deliveryRouteStatus) {
         try {
             DeliveryRoute deliveryRoute = deliveryRouteRepository.findById(UUID.fromString(deliveryRouteId))
-                    .orElseThrow(() -> new EntityNotFoundException("DeliveryRoute not found with id: " + deliveryRouteId));
+                    .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
 
             DeliveryRoute.RouteStatus newStatus = DeliveryRoute.RouteStatus.valueOf(deliveryRouteStatus);
 
