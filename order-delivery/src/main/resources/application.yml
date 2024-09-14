@@ -24,3 +24,11 @@ spring:
       password: default
   profiles:
     include: private
+server:
+  port: 19094
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
