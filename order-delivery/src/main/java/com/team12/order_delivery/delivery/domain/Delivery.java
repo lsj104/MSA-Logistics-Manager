@@ -37,6 +37,7 @@ public class Delivery extends AuditingEntity {
         this.address = deliveryReqDto.getAddress();
         this.receiver = deliveryReqDto.getReceiver();
         this.receiverEmail = deliveryReqDto.getReceiverEmail();
+        this.setUpdatedBy(0L);
     }
 
     public enum DeliveryStatus {

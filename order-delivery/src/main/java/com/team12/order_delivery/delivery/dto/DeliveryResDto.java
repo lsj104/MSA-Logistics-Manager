@@ -9,7 +9,7 @@ import java.util.UUID;
 public class DeliveryResDto {
     private UUID deliveryId;
     private UUID orderId;
-    private String deliveryStatus;
+    private Delivery.DeliveryStatus deliveryStatus;
     private UUID departmentId;
     private UUID arrivalHubId;
     private String address;
@@ -19,7 +19,7 @@ public class DeliveryResDto {
     public DeliveryResDto(Delivery delivery) {
         this.deliveryId = delivery.getId();
         this.orderId = delivery.getOrderId();
-        this.deliveryStatus = delivery.getDeliveryStatus().name();
+        this.deliveryStatus = delivery.getDeliveryStatus();
         this.departmentId = delivery.getDepartmentId();
         this.arrivalHubId = delivery.getArrivalHubId();
         this.address = delivery.getAddress();
