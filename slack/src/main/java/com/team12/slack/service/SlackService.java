@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,6 +31,19 @@ public class SlackService {
     private String slackToken;
 
     private static final String SLACK_API_URL = "https://slack.com/api/chat.postMessage";
+
+    @KafkaListener(topics = "delivery-status-update", groupId = "slack-group")
+    public void kafkaListener(String message) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            SlackRequestDto request = objectMapper.readValue(message, SlackRequestDto.class);
+            sendMessageToUser(request);
+        } catch (Exception e) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        }
+
+    }
+
 
     public void sendMessageToUser(SlackRequestDto request) {
         try {

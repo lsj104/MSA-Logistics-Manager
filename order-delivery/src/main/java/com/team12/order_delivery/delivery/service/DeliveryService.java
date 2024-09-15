@@ -1,11 +1,12 @@
 package com.team12.order_delivery.delivery.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team12.common.customPage.CustomPageResponse;
 import com.team12.common.dto.slack.SlackRequestDto;
 import com.team12.common.dto.slack.SlackTemplate;
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
-import com.team12.order_delivery.delivery.client.SlackClient;
 import com.team12.order_delivery.delivery.domain.Delivery;
 import com.team12.order_delivery.delivery.dto.DeliveryReqDto;
 import com.team12.order_delivery.delivery.dto.DeliveryResDto;
@@ -17,6 +18,7 @@ import com.team12.order_delivery.deliveryRoute.service.DeliveryRouteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +31,7 @@ public class DeliveryService {
     private final DeliveryRespository deliveryRespository;
     private final DeliveryRouteRepository deliveryRouteRepository;
     private final DeliveryRouteService deliveryRouteService;
-    private final SlackClient slackClient;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Transactional
     public DeliveryResDto createDelivery(DeliveryReqDto deliveryReqDto) {
@@ -122,8 +124,6 @@ public class DeliveryService {
             DeliveryRoute deliveryRoute = deliveryRouteRepository.findById(UUID.fromString(deliveryRouteId))
                     .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
             DeliveryRoute.RouteStatus newStatus = DeliveryRoute.RouteStatus.valueOf(deliveryRouteStatus);
-            // delivery receiver email
-
             Delivery delivery = deliveryRespository.findById(deliveryRoute.getDeliveryId())
                     .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
             String content;
@@ -138,8 +138,19 @@ public class DeliveryService {
                 content = SlackTemplate.updateDeliveryStatus(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
             }
 
-            SlackRequestDto slackRequestDto = new SlackRequestDto(delivery.getReceiverEmail(), content);
-            slackClient.sendMessage(slackRequestDto);
+            SlackRequestDto slackRequestDto = SlackRequestDto.builder()
+                    .email(delivery.getReceiverEmail())
+                    .content(content)
+                    .build();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try{
+                objectMapper.writeValueAsString(slackRequestDto);
+                kafkaTemplate.send("delivery-status-update", objectMapper.writeValueAsString(slackRequestDto));
+            } catch (JsonProcessingException e) {
+                log.error("Failed to serialize object: {}", slackRequestDto, e);
+                throw new RuntimeException("Serialization error", e);
+            }
+
             deliveryRoute.setStatus(newStatus);
             deliveryRouteRepository.save(deliveryRoute);
             return new RouteResDto(deliveryRoute);
