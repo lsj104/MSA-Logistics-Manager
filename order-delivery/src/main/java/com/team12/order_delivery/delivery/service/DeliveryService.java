@@ -101,11 +101,11 @@ public class DeliveryService {
     }
 
     @Transactional
-    public DeliveryResDto updateDeliveryStatus(String deliveryId, String deliveryStatus) {
+    public DeliveryResDto updateDeliveryStatus(String deliveryId, Delivery.DeliveryStatus deliveryStatus) {
         try {
             Delivery delivery = deliveryRespository.findById(UUID.fromString(deliveryId))
                     .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
-            delivery.setDeliveryStatus(Delivery.DeliveryStatus.valueOf(deliveryStatus));
+            delivery.setDeliveryStatus(deliveryStatus);
             deliveryRespository.save(delivery);
             return new DeliveryResDto(delivery);
         } catch (BusinessLogicException e) {
@@ -128,11 +128,11 @@ public class DeliveryService {
                     .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
             String content;
             if (deliveryRoute.getSequence() == 1 && newStatus == DeliveryRoute.RouteStatus.DELIVERING) {
-                updateDeliveryStatus(String.valueOf(deliveryRoute.getDeliveryId()), "DELIVERING");
+                updateDeliveryStatus(String.valueOf(deliveryRoute.getDeliveryId()), Delivery.DeliveryStatus.DELIVERING);
                 content = SlackTemplate.startDelivery(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
 
             } else if (isLastRoute(deliveryRoute) && newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
-                updateDeliveryStatus(String.valueOf(deliveryRoute.getDeliveryId()), "DELIVERED");
+                updateDeliveryStatus(String.valueOf(deliveryRoute.getDeliveryId()), Delivery.DeliveryStatus.DELIVERED);
                 content = SlackTemplate.endDelivery(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
             } else {
                 content = SlackTemplate.updateDeliveryStatus(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
