@@ -52,9 +52,15 @@ public abstract class AuditingEntity {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
     public void setDeletedBy(Long deletedBy) {
-        this.isDeleted = true;
-        this.deletedAt = LocalDateTime.now();
         this.deletedBy = deletedBy;
     }
 }
