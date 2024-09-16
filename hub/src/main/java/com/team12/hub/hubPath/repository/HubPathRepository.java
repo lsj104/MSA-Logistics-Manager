@@ -19,4 +19,6 @@ public interface HubPathRepository extends JpaRepository<HubPath, UUID>, JpaSpec
 
     @Query("SELECT p.id FROM HubPath p WHERE (p.fromHub.id = :hubId OR p.toHub.id = :hubId) and p.isDeleted = false")
     List<UUID> findHubPathsByHubId(@Param("hubId") UUID hubId);
+
+    List<HubPath> findByIsDeleted(boolean isDeleted);
 }
