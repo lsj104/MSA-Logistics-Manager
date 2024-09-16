@@ -1,10 +1,13 @@
 package com.team12.hub.hubPath.controller;
 
+import com.team12.common.dto.hub.HubPathDetailsResponseDto;
+import com.team12.common.dto.hub.HubPathOptimalRequestDto;
 import com.team12.hub.hub.dto.HubResponseDto;
 import com.team12.hub.hubPath.domain.HubPath;
-import com.team12.hub.hubPath.dto.HubPathRequestDto;
+import com.team12.hub.hubPath.dto.HubPathCreateRequestDto;
 import com.team12.hub.hubPath.dto.HubPathResponseDto;
 import com.team12.hub.hubPath.dto.HubPathSearchRequestDto;
+import com.team12.hub.hubPath.dto.HubPathUpdateRequestDto;
 import com.team12.hub.hubPath.service.HubPathService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -22,13 +26,13 @@ public class HubPathController {
     private final HubPathService hubPathService;
 
     @PostMapping
-    public HubPathResponseDto createHubPath(@RequestBody HubPathRequestDto hubPathRequestDto) {
-        return hubPathService.createHubPath(hubPathRequestDto);
+    public HubPathResponseDto createHubPath(@RequestBody HubPathCreateRequestDto hubPathCreateRequestDto) {
+        return hubPathService.createHubPath(hubPathCreateRequestDto);
     }
 
     @PutMapping("/{hubPathId}")
-    public HubPath updateHubPath(@PathVariable UUID hubPathId, @RequestBody HubPathRequestDto hubPathRequestDto) {
-        return hubPathService.updateHubPath(hubPathId, hubPathRequestDto);
+    public HubPath updateHubPath(@PathVariable UUID hubPathId, @RequestBody HubPathUpdateRequestDto hubPathUpdateRequestDto) {
+        return hubPathService.updateHubPath(hubPathId, hubPathUpdateRequestDto);
     }
 
     @DeleteMapping("/{hubPathId}")
@@ -60,5 +64,10 @@ public class HubPathController {
         Pageable pageable = PageRequest.of(page - 1, size, sortOption);
         Page<HubPathResponseDto> hubPathResponsDtoPage = hubPathService.getHubs(searchRequestDto, pageable);
         return hubPathResponsDtoPage;
+    }
+
+    @GetMapping("/findOptimalPath")
+    public List<HubPathDetailsResponseDto> findOptimalPath(@RequestBody HubPathOptimalRequestDto hubPathOptimalRequestDto) {
+        return hubPathService.findOptimalPath(hubPathOptimalRequestDto.getDepartureHubID(), hubPathOptimalRequestDto.getArrivalHubID());
     }
 }

@@ -27,7 +27,7 @@ public class HubService {
 
     public void createHub(HubRequestDto hubRequestDto) {
         // 새 허브가 등록될 때, Google Map API와 연동해 위도, 경도 받아오기
-        List<BigDecimal> latitudeAndLongitude = kakaoMapService.getLatLongFromAddress(hubRequestDto.getAddress());
+        List<String> latitudeAndLongitude = kakaoMapService.getLatLongFromAddress(hubRequestDto.getAddress());
 
         Hub hub = new Hub(
                 UUID.randomUUID()

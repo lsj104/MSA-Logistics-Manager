@@ -14,7 +14,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "P_HUB_PATH", schema = "s_hub")
+@Table(name = "p_hub_path", schema = "s_hub")
 public class HubPath extends AuditingEntity {
     @Id
     @GeneratedValue
@@ -30,15 +30,16 @@ public class HubPath extends AuditingEntity {
     private Hub toHub;  // 도착 허브 ID
 
     @Column(name = "distance", nullable = false)
-    private double distance; // 허브 간 거리
+    private int distance; // 허브 간 거리 (미터)
 
     @Column(name = "duration", nullable = false)
-    private int duration;  // 소요시간
+    private int duration;  // 소요시간 (초)
 
-    public HubPath(UUID id, Hub fromHub, Hub toHub, Integer duration, boolean isDeleted) {
+    public HubPath(UUID id, Hub fromHub, Hub toHub, int distance, int duration, boolean isDeleted) {
         this.id = id;
         this.fromHub = fromHub;
         this.toHub = toHub;
+        this.distance = distance;
         this.duration = duration;
         this.setIsDeleted(isDeleted);
     }
