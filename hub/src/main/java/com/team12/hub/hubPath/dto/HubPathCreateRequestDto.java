@@ -7,8 +7,7 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class HubPathRequestDto {
+public class HubPathCreateRequestDto {
     private UUID fromHubId;
     private UUID toHubId;
-    private Integer duration;
 }

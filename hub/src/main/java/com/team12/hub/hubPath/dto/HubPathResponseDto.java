@@ -16,7 +16,7 @@ public class HubPathResponseDto {
     private UUID id;
     private UUID fromHubId;  // 출발 허브 ID
     private UUID toHubId;  // 도착 허브 ID
-    private double distance; // 허브 간 거리
+    private int distance; // 허브 간 거리
     private int duration;  // 소요시간
 
     public HubPathResponseDto(HubPath hubPath){

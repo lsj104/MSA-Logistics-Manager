@@ -1,6 +1,5 @@
 package com.team12.hub.hub.domain;
 
-
 import com.team12.common.audit.AuditingEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +15,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "P_HUB", schema = "s_hub")
+@Table(name = "p_hub", schema = "s_hub")
 public class Hub extends AuditingEntity {
     @Id
     @GeneratedValue
@@ -30,12 +29,12 @@ public class Hub extends AuditingEntity {
     private String address;  // 주소
 
     @Column(name = "latitude", nullable = false)
-    private BigDecimal latitude;  // 위도
+    private String latitude;  // 위도
 
     @Column(name = "longitude", nullable = false)
-    private BigDecimal longitude;  // 경도
+    private String longitude;  // 경도
 
-    public Hub(UUID id, String name, String address, BigDecimal latitude, BigDecimal longitude, boolean isDeleted) {
+    public Hub(UUID id, String name, String address, String latitude, String longitude, boolean isDeleted) {
         this.id = id;
         this.name = name;
         this.address = address;

@@ -1,14 +1,17 @@
 package com.team12.common.dto.hub;
 
-import lombok.Data;
+import lombok.*;
 
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class HubPathDetailsResponseDto {
     private UUID hubPathId;
     private UUID fromHubId;
     private UUID toHubId;
-    private double distance;
+    private int distance;
     private int duration;
 }
