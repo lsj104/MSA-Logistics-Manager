@@ -17,30 +17,32 @@ import java.time.LocalDateTime;
 @Setter
 public abstract class AuditingEntity {
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
+    @Column(name="created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
     @CreatedBy
-    @Column(name = "created_by", updatable = false)
+    @Column(name="created_by")
     private Long createdBy;
 
     @LastModifiedDate
-    @Column(name = "updated_at")
+    @Column(name="updated_at",nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
 
     @LastModifiedBy
-    @Column(name = "updated_by")
+    @Column(name="updated_by", nullable = true)
     private Long updatedBy;
 
-    @Column(name="deleted_at")
+    @Column(name="deleted_at",nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime deletedAt;
 
-    @Column(name="deleted_by")
+    @Column(name="deleted_by",nullable = true)
     private Long deletedBy;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
+
 
 }

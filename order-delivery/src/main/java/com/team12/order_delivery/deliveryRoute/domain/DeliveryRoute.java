@@ -25,9 +25,9 @@ public class DeliveryRoute {
     private UUID fromHubId;
     private UUID toHubId;
     private Double estimatedDistance;
-    private LocalDateTime estimatedTime;
+    private Double estimatedTime;
     private Double actualDistance;
-    private LocalDateTime actualTime;
+    private Double actualTime;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
 
