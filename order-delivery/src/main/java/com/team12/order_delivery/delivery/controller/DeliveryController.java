@@ -1,6 +1,7 @@
 package com.team12.order_delivery.delivery.controller;
 
 import com.team12.common.exception.response.SuccessResponse;
+import com.team12.order_delivery.delivery.domain.Delivery;
 import com.team12.order_delivery.delivery.dto.DeliveryReqDto;
 import com.team12.order_delivery.util.SuccessMessage;
 import com.team12.order_delivery.delivery.service.DeliveryService;
@@ -39,7 +40,7 @@ public class DeliveryController {
 
     @PatchMapping("")
     public SuccessResponse<?> updateDeliveryStatus(@RequestParam String deliveryId, @RequestParam String deliveryStatus) {
-        return SuccessResponse.success(SuccessMessage.UPDATE_DELIVERY.getHttpStatus().value(), SuccessMessage.UPDATE_DELIVERY.getMessage(), deliveryService.updateDeliveryStatus(deliveryId, deliveryStatus));
+        return SuccessResponse.success(SuccessMessage.UPDATE_DELIVERY.getHttpStatus().value(), SuccessMessage.UPDATE_DELIVERY.getMessage(), deliveryService.updateDeliveryStatus(deliveryId, Delivery.DeliveryStatus.valueOf(deliveryStatus)));
     }
 
     @DeleteMapping("")

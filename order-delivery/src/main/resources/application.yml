@@ -16,6 +16,13 @@ spring:
         default_schema: s_order_delivery
   application:
     name: order-delivery
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+
   data:
     redis:
       host: localhost
@@ -24,3 +31,11 @@ spring:
       password: default
   profiles:
     include: private
+server:
+  port: 19094
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/

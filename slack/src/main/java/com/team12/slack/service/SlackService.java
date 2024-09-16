@@ -2,6 +2,8 @@ package com.team12.slack.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team12.common.exception.BusinessLogicException;
+import com.team12.common.exception.ExceptionCode;
 import com.team12.slack.domain.Message;
 import com.team12.slack.dto.SlackRequestDto;
 import com.team12.slack.dto.SlackResDto;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,7 +32,20 @@ public class SlackService {
 
     private static final String SLACK_API_URL = "https://slack.com/api/chat.postMessage";
 
-    public String sendMessageToUser(SlackRequestDto request) {
+    @KafkaListener(topics = "delivery-status-update", groupId = "slack-group")
+    public void kafkaListener(String message) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            SlackRequestDto request = objectMapper.readValue(message, SlackRequestDto.class);
+            sendMessageToUser(request);
+        } catch (Exception e) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        }
+
+    }
+
+
+    public void sendMessageToUser(SlackRequestDto request) {
         try {
             // todo : Feign Client로 user 정보 가져오기
 //            User user = userRepository.findById(Long.parseLong(email)).orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
@@ -38,7 +54,7 @@ public class SlackService {
 
             String slackUserId = getSlackUserId(request.getEmail());
             if (slackUserId.isEmpty()) {
-                return "이메일 주소에 해당하는 사용자를 찾을 수 없습니다.";
+                throw new BusinessLogicException(ExceptionCode.USER_NOT_FOUND);
             }
 //            Message message = new Message(user, request.getContent());
             Message message = new Message(request.getEmail(), request.getContent());
@@ -52,9 +68,8 @@ public class SlackService {
             HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
             ResponseEntity<String> response = restTemplate.postForEntity(SLACK_API_URL, entity, String.class);
-            return "메시지를 성공적으로 전송했습니다.";
         } catch (Exception e) {
-            return e.getMessage();
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
 
@@ -78,21 +93,29 @@ public class SlackService {
                     return root.path("user").path("id").asText();
                 }
             }
-            return "이메일 주소에 해당하는 사용자를 찾을 수 없습니다.";
+            throw new BusinessLogicException(ExceptionCode.USER_NOT_FOUND);
         } catch (Exception e) {
-            return e.getMessage();
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
 
     public Page<SlackResDto> getSlackAll(String email, Pageable pageable) {
         // return slackRepository.findById(targetUserId, pageable).map(SlackDto::new);
-        return slackRepository.findByEmail(email, pageable)
-                .map(SlackResDto::new); // Message를 SlackResDto로 변환
+        try {
+            return slackRepository.findByEmail(email, pageable)
+                    .map(SlackResDto::new); // Message를 SlackResDto로 변환
+        } catch (Exception e) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        }
     }
 
     public Object getSlack(UUID messageId, Pageable pageable) {
         // return slackRepository.findById(targetUserId, pageable).map(SlackDto::new);
-        return slackRepository.findById(messageId)
-                .map(SlackResDto::new); // Message를 SlackResDto로 변환
+        try {
+            return slackRepository.findById(messageId)
+                    .map(SlackResDto::new); // Message를 SlackResDto로 변환
+        } catch (Exception e) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        }
     }
 }

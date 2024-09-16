@@ -1,6 +1,10 @@
 package com.team12.order_delivery.delivery.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team12.common.customPage.CustomPageResponse;
+import com.team12.common.dto.slack.SlackRequestDto;
+import com.team12.common.dto.slack.SlackTemplate;
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
 import com.team12.order_delivery.delivery.domain.Delivery;
@@ -11,22 +15,25 @@ import com.team12.order_delivery.deliveryRoute.domain.DeliveryRoute;
 import com.team12.order_delivery.deliveryRoute.dto.RouteResDto;
 import com.team12.order_delivery.deliveryRoute.repository.DeliveryRouteRepository;
 import com.team12.order_delivery.deliveryRoute.service.DeliveryRouteService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class DeliveryService {
-    private final DeliveryRespository deliveryRespository;
+    private final DeliveryRespository deliveryRepository;
     private final DeliveryRouteRepository deliveryRouteRepository;
     private final DeliveryRouteService deliveryRouteService;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Transactional
     public DeliveryResDto createDelivery(DeliveryReqDto deliveryReqDto) {
@@ -40,11 +47,12 @@ public class DeliveryService {
                     .receiverEmail(deliveryReqDto.getReceiverEmail())
                     .deliveryStatus(Delivery.DeliveryStatus.PREPARING)
                     .build();
-
-            deliveryRespository.save(delivery);
+            delivery.setCreatedBy(0L);
+            deliveryRepository.save(delivery);
             deliveryRouteService.createDeliveryRoutes(delivery);
             return new DeliveryResDto(delivery);
         } catch (Exception e) {
+            log.info(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
 
@@ -53,9 +61,12 @@ public class DeliveryService {
 
     public DeliveryResDto getDelivery(String deliveryId) {
         try {
-            return new DeliveryResDto(deliveryRespository.findById(UUID.fromString(deliveryId)).orElseThrow(() ->
-                    new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND)));
+            Delivery delivery = deliveryRepository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
+            return new DeliveryResDto(delivery);
+        } catch (BusinessLogicException e) {
+            throw e;
         } catch (Exception e) {
+            log.info(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
@@ -63,7 +74,7 @@ public class DeliveryService {
 
     public CustomPageResponse<DeliveryResDto> getAllDelivery(Pageable pageable) {
         try {
-            return new CustomPageResponse<>(deliveryRespository.findAll(pageable).map(DeliveryResDto::new));
+            return new CustomPageResponse<>(deliveryRepository.findAll(pageable).map(DeliveryResDto::new));
         } catch (Exception e) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
@@ -71,10 +82,12 @@ public class DeliveryService {
 
     public DeliveryResDto updateDelivery(String deliveryId, DeliveryReqDto deliveryReqDto) {
         try {
-            Delivery delivery = deliveryRespository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
+            Delivery delivery = deliveryRepository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
             delivery.update(deliveryReqDto);
-            deliveryRespository.save(delivery);
+            deliveryRepository.save(delivery);
             return new DeliveryResDto(delivery);
+        } catch (BusinessLogicException e) {
+            throw e;
         } catch (Exception e) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
@@ -82,22 +95,25 @@ public class DeliveryService {
 
     public void deleteDelivery(String deliveryId) {
         try {
-            Delivery delivery = deliveryRespository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
-            deliveryRespository.delete(delivery);
+            Delivery delivery = deliveryRepository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
+            deliveryRepository.delete(delivery);
+        } catch (BusinessLogicException e) {
+            throw e;
         } catch (Exception e) {
-            log.info(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
 
     @Transactional
-    public DeliveryResDto updateDeliveryStatus(String deliveryId, String deliveryStatus) {
+    public DeliveryResDto updateDeliveryStatus(String deliveryId, Delivery.DeliveryStatus deliveryStatus) {
         try {
-            Delivery delivery = deliveryRespository.findById(UUID.fromString(deliveryId))
+            Delivery delivery = deliveryRepository.findById(UUID.fromString(deliveryId))
                     .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
-            delivery.setDeliveryStatus(Delivery.DeliveryStatus.valueOf(deliveryStatus));
-            deliveryRespository.save(delivery);
+            delivery.setDeliveryStatus(deliveryStatus);
+            deliveryRepository.save(delivery);
             return new DeliveryResDto(delivery);
+        } catch (BusinessLogicException e) {
+            throw e;
         } catch (Exception e) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
@@ -107,23 +123,92 @@ public class DeliveryService {
     @Transactional
     public RouteResDto updateDeliveryRouteStatus(String deliveryRouteId, String deliveryRouteStatus) {
         try {
-            DeliveryRoute deliveryRoute = deliveryRouteRepository.findById(UUID.fromString(deliveryRouteId))
-                    .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
-
+            DeliveryRoute deliveryRoute = findDeliveryRouteById(deliveryRouteId);
             DeliveryRoute.RouteStatus newStatus = DeliveryRoute.RouteStatus.valueOf(deliveryRouteStatus);
+            Delivery delivery = findDeliveryById(deliveryRoute.getDeliveryId());
 
-            if (deliveryRoute.getSequence() == 1 && newStatus == DeliveryRoute.RouteStatus.DELIVERING) {
-                updateDeliveryStatus(String.valueOf(deliveryRoute.getDeliveryId()), "DELIVERING");
-            } else if (isLastRoute(deliveryRoute) && newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
-                updateDeliveryStatus(String.valueOf(deliveryRoute.getDeliveryId()), "DELIVERED");
-            }
+            updateRouteStatus(deliveryRoute, newStatus);
+            String slackContent = generateSlackContent(deliveryRoute, newStatus);
+            sendSlackNotification(delivery.getReceiverEmail(), slackContent);
 
-            deliveryRoute.setStatus(newStatus);
-            deliveryRouteRepository.save(deliveryRoute);
             return new RouteResDto(deliveryRoute);
+        } catch (BusinessLogicException e) {
+            throw e;
         } catch (Exception e) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
+    }
+
+    private DeliveryRoute findDeliveryRouteById(String deliveryRouteId) {
+        return deliveryRouteRepository.findById(UUID.fromString(deliveryRouteId))
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.INVALID_PARAMETER));
+    }
+
+    private Delivery findDeliveryById(UUID deliveryId) {
+        return deliveryRepository.findById(deliveryId)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
+    }
+
+    private void updateRouteStatus(DeliveryRoute deliveryRoute, DeliveryRoute.RouteStatus newStatus) {
+        LocalDateTime now = LocalDateTime.now();
+
+        if (newStatus == DeliveryRoute.RouteStatus.DELIVERING) {
+            if (deliveryRoute.getSequence() == 1 || deliveryRoute.getStartAt() == null) {
+                updateDeliveryStatus(deliveryRoute.getDeliveryId(), Delivery.DeliveryStatus.DELIVERING);
+                deliveryRoute.setStartAt(now);
+            }
+        } else if (newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
+            if (isLastRoute(deliveryRoute)) {
+                updateDeliveryStatus(deliveryRoute.getDeliveryId(), Delivery.DeliveryStatus.DELIVERED);
+                deliveryRoute.setEndAt(now);
+                calculateAndSetActualTime(deliveryRoute, now);
+            } else {
+                deliveryRoute.setEndAt(now);
+            }
+        }
+        deliveryRoute.setStatus(newStatus);
+        deliveryRouteRepository.save(deliveryRoute);
+    }
+
+
+    private void calculateAndSetActualTime(DeliveryRoute deliveryRoute, LocalDateTime endTime) {
+        if (deliveryRoute.getStartAt() != null) {
+            Duration duration = Duration.between(deliveryRoute.getStartAt(), endTime);
+            double actualTimeInMinutes = duration.toSeconds() / 60.0;
+            deliveryRoute.setActualTime(actualTimeInMinutes);
+        }
+    }
+
+    private String generateSlackContent(DeliveryRoute deliveryRoute, DeliveryRoute.RouteStatus newStatus) {
+        if (deliveryRoute.getSequence() == 1 && newStatus == DeliveryRoute.RouteStatus.DELIVERING) {
+            return SlackTemplate.startDelivery(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
+        } else if (isLastRoute(deliveryRoute) && newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
+            return SlackTemplate.endDelivery(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
+        } else if (newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
+            return SlackTemplate.arrivedAtHub(deliveryRoute.getDeliveryId().toString(), newStatus.toString(), deliveryRoute.getFromHubId().toString());
+        } else {
+            return SlackTemplate.updateDeliveryStatus(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
+        }
+    }
+
+    private void sendSlackNotification(String receiverEmail, String content) {
+        SlackRequestDto slackRequestDto = SlackRequestDto.builder()
+                .email(receiverEmail)
+                .content(content)
+                .build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String jsonMessage = objectMapper.writeValueAsString(slackRequestDto);
+            kafkaTemplate.send("delivery-status-update", jsonMessage);
+        } catch (JsonProcessingException e) {
+            throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        }
+    }
+
+    private void updateDeliveryStatus(UUID deliveryId, Delivery.DeliveryStatus status) {
+        Delivery delivery = findDeliveryById(deliveryId);
+        delivery.setDeliveryStatus(status);
+        deliveryRepository.save(delivery);
     }
 
     private boolean isLastRoute(DeliveryRoute route) {
