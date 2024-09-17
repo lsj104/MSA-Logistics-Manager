@@ -16,7 +16,7 @@ public interface HubClient {
     @GetMapping("/hub-paths/findOptimalPath")
     List<HubPathDetailsResponseDto> findOptimalPath(@RequestBody HubPathOptimalRequestDto hubPathOptimalRequestDto);
 
-    @GetMapping("/hub/{hubId}")
+    @GetMapping("/hubs/{hubId}")
     HubResponseDto getHub(@PathVariable UUID hubId);
 
 }

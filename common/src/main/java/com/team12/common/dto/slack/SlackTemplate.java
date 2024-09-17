@@ -58,7 +58,7 @@ public class SlackTemplate {
             
             :memo: 주문 번호: `%s`
             :truck: 현재 상태: *%s*
-            :factory: 도착 경유지: `%s`
+            :factory: 도착 경유지: %s
             
             배송 상태가 변경될 때마다 업데이트해 드리겠습니다.
             

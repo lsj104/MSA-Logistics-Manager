@@ -66,7 +66,7 @@ public class HubPathController {
         return hubPathResponsDtoPage;
     }
 
-    @GetMapping("/findOptimalPath")
+    @PostMapping("/findOptimalPath")
     public List<HubPathDetailsResponseDto> findOptimalPath(@RequestBody HubPathOptimalRequestDto hubPathOptimalRequestDto) {
         return hubPathService.findOptimalPath(hubPathOptimalRequestDto.getDepartureHubID(), hubPathOptimalRequestDto.getArrivalHubID());
     }
