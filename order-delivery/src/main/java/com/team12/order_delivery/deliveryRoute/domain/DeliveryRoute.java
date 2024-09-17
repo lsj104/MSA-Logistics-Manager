@@ -23,8 +23,8 @@ public class DeliveryRoute extends AuditingEntity {
     @CollectionTable(name = "p_delivery", joinColumns = @JoinColumn(name = "id"))
     private UUID deliveryId;
     private int sequence;
-    private UUID fromHubId;
-    private UUID toHubId;
+    private String startPoint;
+    private String endPoint;
     private Double estimatedDistance;
     private Double estimatedTime;
     private Double actualDistance;

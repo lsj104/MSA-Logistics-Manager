@@ -35,11 +35,13 @@ public class DeliveryRouteService {
         try {
             int sequence = 1;
             for (HubPathDetailsResponseDto movement : hubMovments) {
+                String fromHubName = findHubNameById(movement.getFromHubId());
+                String toHubName = findHubNameById(movement.getToHubId());
                 DeliveryRoute deliveryRoute = DeliveryRoute.builder()
                         .deliveryId(delivery.getId())
                         .sequence(sequence)
-                        .fromHubId(movement.getFromHubId())
-                        .toHubId(movement.getToHubId())
+                        .startPoint(fromHubName)
+                        .endPoint(toHubName)
                         .status(DeliveryRoute.RouteStatus.WAITING)
                         .estimatedTime((double) movement.getDuration())
                         .estimatedDistance((double) movement.getDistance())
@@ -47,7 +49,20 @@ public class DeliveryRouteService {
                 deliveryRouteRepository.save(deliveryRoute);
                 sequence++;
             }
+
+            DeliveryRoute lastRoute = DeliveryRoute.builder()
+                    .deliveryId(delivery.getId())
+                    .sequence(sequence)
+                    .startPoint(findHubNameById(hubMovments.get(hubMovments.size() - 1).getToHubId()))
+                    .endPoint(delivery.getAddress())
+                    .status(DeliveryRoute.RouteStatus.WAITING)
+                    .estimatedTime(0.0)
+                    .estimatedDistance(0.0)
+                    .build();
+            deliveryRouteRepository.save(lastRoute);
+
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
 
@@ -88,7 +103,7 @@ public class DeliveryRouteService {
             DeliveryRoute deliveryRoute = findById(UUID.fromString(deliveryRouteId));
             deliveryRoute.setDeliveryId(UUID.fromString(deliveryId));
             deliveryRoute.setSequence(Integer.parseInt(sequence));
-            deliveryRoute.setFromHubId(UUID.fromString(hubId));
+            deliveryRoute.setStartPoint(findHubNameById(UUID.fromString(hubId)));
             deliveryRouteRepository.save(deliveryRoute);
             return new RouteResDto(deliveryRoute);
         } catch (Exception e) {
@@ -99,5 +114,9 @@ public class DeliveryRouteService {
     public DeliveryRoute findById(UUID deliveryRouteId) {
         return deliveryRouteRepository.findById(deliveryRouteId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 배송 경로를 찾을 수 없습니다."));
+    }
+
+    public String findHubNameById(UUID hubId) {
+        return hubClient.getHub(hubId).getName();
     }
 }

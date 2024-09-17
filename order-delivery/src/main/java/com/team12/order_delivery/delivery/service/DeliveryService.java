@@ -52,7 +52,6 @@ public class DeliveryService {
                     .receiverEmail(deliveryReqDto.getReceiverEmail())
                     .deliveryStatus(Delivery.DeliveryStatus.PREPARING)
                     .build();
-//            delivery.setCreatedBy(0L);
             deliveryRepository.save(delivery);
             deliveryRouteService.createDeliveryRoutes(delivery);
             return new DeliveryResDto(delivery);
@@ -138,8 +137,10 @@ public class DeliveryService {
 
             return new RouteResDto(deliveryRoute);
         } catch (BusinessLogicException e) {
+            log.error("##### BusinessLogicException ##### "+e.getMessage());
             throw e;
         } catch (Exception e) {
+            log.error("##### Exception ##### "+e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
@@ -190,7 +191,7 @@ public class DeliveryService {
         } else if (isLastRoute(deliveryRoute) && newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
             return SlackTemplate.endDelivery(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
         } else if (newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
-            return SlackTemplate.arrivedAtHub(deliveryRoute.getDeliveryId().toString(), newStatus.toString(), getHubNamebyId(deliveryRoute.getFromHubId()));
+            return SlackTemplate.arrivedAtHub(deliveryRoute.getDeliveryId().toString(), newStatus.toString(), deliveryRoute.getEndPoint());
         } else {
             return SlackTemplate.updateDeliveryStatus(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
         }
@@ -222,10 +223,5 @@ public class DeliveryService {
     private boolean isLastRoute(DeliveryRoute route) {
         int totalRoutes = deliveryRouteRepository.countByDeliveryId(route.getDeliveryId());
         return totalRoutes == route.getSequence();
-    }
-
-
-    public String getHubNamebyId(UUID hubId) {
-        return hubClient.getHub(hubId).getName();
     }
 }
