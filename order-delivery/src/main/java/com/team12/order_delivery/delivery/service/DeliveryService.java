@@ -216,4 +216,10 @@ public class DeliveryService {
         return totalRoutes == route.getSequence();
     }
 
+    @Transactional
+    public Delivery findById(UUID deliveryId) {
+        return deliveryRepository.findById(deliveryId)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.INVALID_PARAMETER));
+    }
+
 }
