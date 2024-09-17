@@ -224,4 +224,11 @@ public class DeliveryService {
         int totalRoutes = deliveryRouteRepository.countByDeliveryId(route.getDeliveryId());
         return totalRoutes == route.getSequence();
     }
+
+    @Transactional
+    public Delivery findById(UUID deliveryId) {
+        return deliveryRepository.findById(deliveryId)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.INVALID_PARAMETER));
+    }
+
 }

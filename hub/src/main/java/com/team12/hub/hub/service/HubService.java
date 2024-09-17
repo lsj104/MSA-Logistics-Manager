@@ -25,7 +25,7 @@ public class HubService {
     private final HubPathService hubPathService;
     private final KakaoMapService kakaoMapService;
 
-    public void createHub(HubRequestDto hubRequestDto) {
+    public HubResponseDto createHub(HubRequestDto hubRequestDto) {
         // 새 허브가 등록될 때, Google Map API와 연동해 위도, 경도 받아오기
         List<String> latitudeAndLongitude = kakaoMapService.getLatLongFromAddress(hubRequestDto.getAddress());
 
@@ -37,9 +37,10 @@ public class HubService {
                 , latitudeAndLongitude.get(1)
                 , false);
         hubRepository.save(hub);
+        return new HubResponseDto(hub);
     }
 
-    public void updateHub(UUID hubId, HubRequestDto hubRequestDto) {
+    public HubResponseDto updateHub(UUID hubId, HubRequestDto hubRequestDto) {
         Hub hub = hubRepository.findByIdAndIsDeleted(hubId,false)
                 .orElseThrow(() -> new IllegalArgumentException(hubId + "해당 허브를 찾을 수 없습니다."));
         if(hubRequestDto.getName() != null){
@@ -49,11 +50,12 @@ public class HubService {
             hub.setAddress(hubRequestDto.getAddress());
         }
         hubRepository.save(hub);
+        return new HubResponseDto(hub);
     }
 
     // 허브 삭제 메서드 (허브 삭제 시 HubPath도 삭제)
     @Transactional
-    public Hub deleteHub(UUID hubId) {
+    public UUID deleteHub(UUID hubId) {
 
         // 삭제될 허브와 연결된 모든 hubPath 논리적 삭제
         List<UUID> deletedHubPaths = hubPathService.deleteHubPathsByHubId(hubId);
@@ -66,7 +68,7 @@ public class HubService {
         hub.setDeletedAt(LocalDateTime.now());
         hub.setDeletedBy(0L);
         hubRepository.save(hub);
-        return hub;
+        return hubId;
     }
 
     public HubResponseDto getHub(UUID hubId) {
@@ -80,5 +82,11 @@ public class HubService {
         Page<Hub> hubPage = hubRepository.findAll(HubSpecification.searchWith(searchRequestDto), pageable);
         Page<HubResponseDto> hubResponseDtoPage = hubPage.map(hub -> new HubResponseDto(hub));
         return hubResponseDtoPage;
+    }
+
+    public UUID checkHub(UUID hubId) {
+        Hub hub = hubRepository.findByIdAndIsDeleted(hubId, false)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 Hub 입니다."));
+        return hub.getId();
     }
 }

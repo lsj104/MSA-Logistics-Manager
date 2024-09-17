@@ -13,7 +13,8 @@ public record CreateProductResponseDto(
         String productName,
         Boolean isDelete,
         LocalDateTime createdAt,
-        Long createdBy
+        Long createdBy,
+        Long quantity
 ) {
 
     public static CreateProductResponseDto from(Product product) {
@@ -25,6 +26,7 @@ public record CreateProductResponseDto(
                 .isDelete(product.getIsDeleted())
                 .createdAt(product.getCreatedAt())
                 .createdBy(product.getCreatedBy())
+                .quantity(product.getQuantity())
                 .build();
     }
 }

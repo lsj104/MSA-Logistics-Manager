@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: odl
-    password: 1234
+    url: jdbc:postgresql://localhost:5432/${POSTGRESQL_URL}
+    username: ${POSTGRESQL_USERNAME}
+    password: ${POSTGRESQL_PW}
 
   jpa:
     hibernate:
@@ -39,3 +39,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:19090/eureka/
+
+logging:
+  level:
+    com.team12.order_delivery.order.company: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
