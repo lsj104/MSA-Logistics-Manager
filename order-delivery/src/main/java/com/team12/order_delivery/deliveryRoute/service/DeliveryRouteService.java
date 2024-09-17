@@ -1,8 +1,11 @@
 package com.team12.order_delivery.deliveryRoute.service;
 
+import com.team12.common.dto.hub.HubPathDetailsResponseDto;
+import com.team12.common.dto.hub.HubPathOptimalRequestDto;
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
 import com.team12.order_delivery.delivery.domain.Delivery;
+import com.team12.order_delivery.deliveryRoute.client.HubClient;
 import com.team12.order_delivery.deliveryRoute.domain.DeliveryRoute;
 import com.team12.order_delivery.deliveryRoute.dto.RouteResDto;
 import com.team12.order_delivery.deliveryRoute.repository.DeliveryRouteRepository;
@@ -20,45 +23,30 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DeliveryRouteService {
     private final DeliveryRouteRepository deliveryRouteRepository;
+    private final HubClient hubClient;
 
     public void createDeliveryRoutes(Delivery delivery) {
 
-        // TODO : 허브 간 이동 경로 가져옴
-
-
-//        int sequence = 1; // 경로 순번
-//        for (HubMovement movement : hubMovements) {
-//            DeliveryRoute deliveryRoute = new DeliveryRoute();
-//            deliveryRoute.setDeliveryId(delivery.getId());
-//            deliveryRoute.setSequence((long) sequence++);
-//            deliveryRoute.setSourceHubId(movement.getStartHubId());
-//            deliveryRoute.setDestinationHubId(movement.getEndHubId());
-//            deliveryRoute.setStatus(RouteStatus.WAITING_FOR_TRANSIT);
-//        }
+        HubPathOptimalRequestDto hubPathOptimalRequestDto = new HubPathOptimalRequestDto();
+        hubPathOptimalRequestDto.setDepartureHubID(delivery.getDepartmentId());
+        hubPathOptimalRequestDto.setArrivalHubID(delivery.getArrivalHubId());
+        List<HubPathDetailsResponseDto> hubMovments = hubClient.findOptimalPath(hubPathOptimalRequestDto);
 
         try {
-            DeliveryRoute deliveryRoute = DeliveryRoute.builder()
-                    .deliveryId(delivery.getId())
-                    .sequence(1)
-                    .fromHubId(UUID.randomUUID())
-                    .toHubId(UUID.randomUUID())
-                    .status(DeliveryRoute.RouteStatus.WAITING)
-                    .estimatedTime(null)
-                    .estimatedDistance(null)
-                    .build();
-
-            deliveryRouteRepository.save(deliveryRoute);
-            deliveryRoute = DeliveryRoute.builder()
-                    .deliveryId(delivery.getId())
-                    .sequence(2)
-                    .fromHubId(UUID.randomUUID())
-                    .toHubId(UUID.randomUUID())
-                    .status(DeliveryRoute.RouteStatus.WAITING)
-                    .estimatedTime(null)
-                    .estimatedDistance(null)
-                    .build();
-            deliveryRouteRepository.save(deliveryRoute);
-            new RouteResDto(deliveryRoute);
+            int sequence = 1;
+            for (HubPathDetailsResponseDto movement : hubMovments) {
+                DeliveryRoute deliveryRoute = DeliveryRoute.builder()
+                        .deliveryId(delivery.getId())
+                        .sequence(sequence)
+                        .fromHubId(movement.getFromHubId())
+                        .toHubId(movement.getToHubId())
+                        .status(DeliveryRoute.RouteStatus.WAITING)
+                        .estimatedTime((double) movement.getDuration())
+                        .estimatedDistance((double) movement.getDistance())
+                        .build();
+                deliveryRouteRepository.save(deliveryRoute);
+                sequence++;
+            }
         } catch (Exception e) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
