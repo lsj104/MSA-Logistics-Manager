@@ -8,7 +8,8 @@ public enum ExceptionCode {
     EXIST_PRODUCT(403, "존재하는 상품입니다."),
     INVALID_PARAMETER(400, "잘못된 요청입니다."),
     DELIVERY_NOT_FOUND(404, "배송 정보를 찾을 수 없습니다."),
-    USER_NOT_FOUND(404, "사용자 정보를 찾을 수 없습니다."),;
+    USER_NOT_FOUND(404, "사용자 정보를 찾을 수 없습니다."),
+    SLACK_NOTIFICATION_FAILED(400, "슬랙 알림 전송에 실패했습니다.");
 
 
     private int status;

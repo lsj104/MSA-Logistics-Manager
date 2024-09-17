@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@EnableAsync
 public class DeliveryService {
     private final DeliveryRespository deliveryRepository;
     private final DeliveryRouteRepository deliveryRouteRepository;
@@ -47,7 +50,7 @@ public class DeliveryService {
                     .receiverEmail(deliveryReqDto.getReceiverEmail())
                     .deliveryStatus(Delivery.DeliveryStatus.PREPARING)
                     .build();
-            delivery.setCreatedBy(0L);
+//            delivery.setCreatedBy(0L);
             deliveryRepository.save(delivery);
             deliveryRouteService.createDeliveryRoutes(delivery);
             return new DeliveryResDto(delivery);
@@ -191,7 +194,8 @@ public class DeliveryService {
         }
     }
 
-    private void sendSlackNotification(String receiverEmail, String content) {
+    @Async
+    public void sendSlackNotification(String receiverEmail, String content) {
         SlackRequestDto slackRequestDto = SlackRequestDto.builder()
                 .email(receiverEmail)
                 .content(content)
@@ -202,6 +206,8 @@ public class DeliveryService {
             kafkaTemplate.send("delivery-status-update", jsonMessage);
         } catch (JsonProcessingException e) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        } catch (Exception e) {
+            throw new BusinessLogicException(ExceptionCode.SLACK_NOTIFICATION_FAILED);
         }
     }
 
