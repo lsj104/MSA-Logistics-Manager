@@ -3,9 +3,7 @@ package com.team12.user.service;
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
 import com.team12.user.domain.User;
-import com.team12.user.dto.UserDataDto;
-import com.team12.user.dto.UserRequestDto;
-import com.team12.user.dto.UserResponseDto;
+import com.team12.user.dto.*;
 import com.team12.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 //import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,7 +35,7 @@ public class UserService {
     }
 
     //관리자 : 유저 가입 승인
-    public UserResponseDto approve(Long userId, boolean isConfirmed) {
+    public UserResponseForRegisterDto approve(Long userId, boolean isConfirmed) {
         //repository 찾기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_EXIST_USER));
@@ -46,8 +44,8 @@ public class UserService {
         //User 승인 여부 db 저장
         userRepository.save(user);
         //dto로 변환
-        UserDataDto userDataDto = new UserDataDto(user);
-        return new UserResponseDto<UserDataDto>(200, "유저 생성 승인 성공", userDataDto);
+        UserDataForRegisterDto userDataForRegisterDto = new UserDataForRegisterDto(user);
+        return new UserResponseForRegisterDto<UserDataForRegisterDto>(200, "유저 생성 승인 성공", userDataForRegisterDto);
     }
 
     // 유저 : 개인의 상세 정보 조회
@@ -58,5 +56,15 @@ public class UserService {
         // dto 변환
         UserDataDto userDataDto = new UserDataDto(user);
         return new UserResponseDto<UserDataDto>(200, "유저의 개인 상세 정보 조회 성공", userDataDto);
+    }
+
+    // 관리자 : 유저의 상세 정보 조회
+    public UserResponseForRegisterDto getUserDetailForRegister(Long userId) {
+        //repository 찾기
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_EXIST_USER));
+        //dto 변환
+        UserDataForRegisterDto userDataForRegisterDto = new UserDataForRegisterDto(user);
+        return new UserResponseForRegisterDto<UserDataForRegisterDto>(200, "유저 상세 정보 조회 성공", userDataForRegisterDto);
     }
 }
