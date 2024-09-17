@@ -1,9 +1,11 @@
 package com.team12.hub.hub.controller;
 
+import com.team12.common.exception.response.SuccessResponse;
 import com.team12.hub.hub.dto.HubRequestDto;
 import com.team12.hub.hub.dto.HubResponseDto;
 import com.team12.hub.hub.dto.HubSearchRequestDto;
 import com.team12.hub.hub.service.HubService;
+import com.team12.hub.util.SuccessMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,23 +22,29 @@ import java.util.UUID;
 public class HubController {
     private final HubService hubService;
     @PostMapping
-    public void createHub(@RequestBody HubRequestDto hubRequestDto){
-        hubService.createHub(hubRequestDto);
+    public SuccessResponse<?> createHub(@RequestBody HubRequestDto hubRequestDto){
+        HubResponseDto createdHub = hubService.createHub(hubRequestDto);
+        return SuccessResponse.success(SuccessMessage.CREATE_HUB.getHttpStatus().value(), SuccessMessage.CREATE_HUB.getMessage(), createdHub);
     }
     @PutMapping("/{hubId}")
-    public void updateHub(@PathVariable UUID hubId, @RequestBody HubRequestDto hubRequestDto){
-        hubService.updateHub(hubId, hubRequestDto);
+    public SuccessResponse<?> updateHub(@PathVariable UUID hubId, @RequestBody HubRequestDto hubRequestDto){
+        HubResponseDto updatedHub = hubService.updateHub(hubId, hubRequestDto);
+        return SuccessResponse.success(SuccessMessage.UPDATE_HUB.getHttpStatus().value(), SuccessMessage.UPDATE_HUB.getMessage(), updatedHub);
     }
     @DeleteMapping("/{hubId}")
-    public void deleteHub(@PathVariable UUID hubId){
-        hubService.deleteHub(hubId);
+    public SuccessResponse<?> deleteHub(@PathVariable UUID hubId){
+
+        UUID deletedHubId = hubService.deleteHub(hubId);
+        return SuccessResponse.success(SuccessMessage.DELETE_HUB.getHttpStatus().value(), SuccessMessage.DELETE_HUB.getMessage(), deletedHubId);
     }
     @GetMapping("/{hubId}")
-    public HubResponseDto getHub(@PathVariable UUID hubId){
-        return hubService.getHub(hubId);
+    public SuccessResponse<?> getHub(@PathVariable UUID hubId){
+
+        HubResponseDto hubResponseDto = hubService.getHub(hubId);
+        return SuccessResponse.success(SuccessMessage.GET_HUB.getHttpStatus().value(), SuccessMessage.GET_HUB.getMessage(), hubResponseDto);
     }
     @GetMapping
-    public Page<HubResponseDto> getHubs(@RequestParam(required = false) UUID id,
+    public SuccessResponse<?> getHubs(@RequestParam(required = false) UUID id,
                                         @RequestParam(required = false) String name,
                                         @RequestParam(required = false) String address,
                                         @RequestParam(value = "page", defaultValue = "1") int page,
@@ -54,6 +62,11 @@ public class HubController {
         }
         Pageable pageable = PageRequest.of(page - 1, size, sortOption);
         Page<HubResponseDto> hubResponsDtoPage = hubService.getHubs(searchRequestDto, pageable);
-        return hubResponsDtoPage;
+        return SuccessResponse.success(SuccessMessage.GET_HUBS.getHttpStatus().value(), SuccessMessage.GET_HUBS.getMessage(), hubResponsDtoPage);
+    }
+    @GetMapping("/{hubId}/check")
+    public SuccessResponse<?> checkHub(@PathVariable UUID hubId){
+        UUID checkedHubId = hubService.checkHub(hubId);
+        return SuccessResponse.success(SuccessMessage.CHECK_HUB.getHttpStatus().value(), SuccessMessage.CHECK_HUB.getMessage(), checkedHubId);
     }
 }

@@ -37,3 +37,15 @@ kakao:
   api:
     key: ${KAKAO_API_KEY}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
