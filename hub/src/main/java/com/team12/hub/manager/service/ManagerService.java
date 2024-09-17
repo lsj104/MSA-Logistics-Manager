@@ -11,12 +11,13 @@ import com.team12.hub.manager.dto.ManagerResponseDto;
 import com.team12.hub.manager.dto.ManagerSearchRequestDto;
 import com.team12.hub.manager.repository.ManagerRepositoy;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ManagerService {
@@ -32,11 +33,13 @@ public class ManagerService {
         /*(허브 별) 업체 배송 담당자 TO_COMPANY_DELIVERY 라면
         로그인 유저 ID가 userId와 동일한지 확인
          */
+
         Hub hub = hubRepository.findByIdAndIsDeleted(managerRequestDto.getHubId(), false)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         Manager manager = new Manager(1357L, hub, managerRequestDto.getType());
         managerRepository.save(manager);
         return new ManagerResponseDto(manager);
+
     }
 
     public ManagerResponseDto updateManager(Long managerId, ManagerRequestDto managerRequestDto) {
@@ -71,14 +74,13 @@ public class ManagerService {
     }
 
     public ManagerResponseDto getManager(Long managerId) {
-        Manager manager =  managerRepository.findByIdAndIsDeleted(managerId, false)
+        Manager manager = managerRepository.findByIdAndIsDeleted(managerId, false)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MANAGER_NOT_FOUND));
         return new ManagerResponseDto(manager.getId(), manager.getHub().getId(), manager.getType());
     }
 
     public Page<ManagerResponseDto> getManagers(ManagerSearchRequestDto searchRequestDto, Pageable pageable) {
         Page<Manager> managerPage = managerRepository.findAll(ManagerSpecification.searchWith(searchRequestDto), pageable);
-        Page<ManagerResponseDto> managerResponseDtoPage = managerPage.map(manager -> new ManagerResponseDto(manager));
-        return managerResponseDtoPage;
+        return managerPage.map(ManagerResponseDto::new);
     }
 }

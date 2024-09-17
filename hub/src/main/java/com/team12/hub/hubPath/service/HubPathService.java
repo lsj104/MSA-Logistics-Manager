@@ -34,11 +34,11 @@ public class HubPathService {
     private final HubPathRepository hubPathRepository;
     private final HubRepository hubRepository;
     private final KakaoNaviService kakaoNaviService;
-    // 캐시 이름을 'hubPaths'로 설정
-    private static final String CACHE_NAME = "hubPaths";
 
 
     @Transactional
+    @CachePut(value = "hubPath", key = "#result.id")
+    @CacheEvict(value = "hubPathAll", allEntries = true)
     public HubPathResponseDto createHubPath(HubPathCreateRequestDto hubPathRequestDto) {
         Hub fromHub = hubRepository.findByIdAndIsDeleted(hubPathRequestDto.getFromHubId(), false)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.FROM_HUB_NOT_FOUND));
@@ -52,6 +52,8 @@ public class HubPathService {
         return hubPathResponseDto;
     }
     @Transactional
+    @CacheEvict(value = {"hubPath", "hubPathAll"}, allEntries = true)
+    @CachePut(value = "hubPath", key = "#hubPathId")
     public HubPathResponseDto updateHubPath(UUID hubPathId, HubPathUpdateRequestDto hubPathRequestDto) {
         HubPath hubPath = hubPathRepository.findById(hubPathId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_PATH_NOT_FOUND));
@@ -67,6 +69,7 @@ public class HubPathService {
 
 
     @Transactional
+    @CacheEvict(value = {"hubPath", "hubPathAll"}, allEntries = true)
     public UUID deleteHubPath(UUID hubPathId) {
 
         HubPath hubPath = hubPathRepository.findByIdAndIsDeleted(hubPathId, false)
@@ -79,13 +82,22 @@ public class HubPathService {
     }
 
     @Transactional
+    @Cacheable(value = "hubPath", key = "#hubPathId")
     public HubPathResponseDto getHubPath(UUID hubPathId) {
         HubPath hubPath = hubPathRepository.findByIdAndIsDeleted(hubPathId, false)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_PATH_NOT_FOUND));
         return new HubPathResponseDto(hubPath);
     }
 
+    @Cacheable(value = "hubPathAll", key = "#searchRequestDto")
+    public Page<HubPathResponseDto> getHubPaths(HubPathSearchRequestDto searchRequestDto, Pageable pageable) {
+        Page<HubPath> hubPathPage = hubPathRepository.findAll(HubPathSpecification.searchWith(searchRequestDto), pageable);
+        Page<HubPathResponseDto> hubPathResponseDtoPage = hubPathPage.map(hubPath -> new HubPathResponseDto(hubPath));
+        return hubPathResponseDtoPage;
+    }
+
     @Transactional
+    @CacheEvict(value = {"hubPath", "hubPathAll"}, allEntries = true)
     public List<UUID> deleteHubPathsByHubId(UUID hubId) {
         List<UUID> hubPathIds = hubPathRepository.findHubPathsByHubId(hubId);
 
@@ -99,12 +111,8 @@ public class HubPathService {
         return hubPathIds;
     }
 
-    public Page<HubPathResponseDto> getHubs(HubPathSearchRequestDto searchRequestDto, Pageable pageable) {
-        Page<HubPath> hubPathPage = hubPathRepository.findAll(HubPathSpecification.searchWith(searchRequestDto), pageable);
-        Page<HubPathResponseDto> hubPathResponseDtoPage = hubPathPage.map(hubPath -> new HubPathResponseDto(hubPath));
-        return hubPathResponseDtoPage;
-    }
-
+    @Transactional
+    @Cacheable(value = "optimalPaths", key = "{#departureHubID, #arrivalHubID}")
     public List<HubPathDetailsResponseDto> findOptimalPath(UUID departureHubID, UUID arrivalHubID) {
         List<HubPath> hubPathList = hubPathRepository.findByIsDeleted(false);
 
@@ -184,8 +192,14 @@ public class HubPathService {
         }
         Collections.reverse(optimalPathDetails); // 출발 허브부터 도착 허브까지 순서로 정렬
 
-        return optimalPathDetails;
+        return putOptimalPathToCache(departureHubID, arrivalHubID, optimalPathDetails);
+
 
     }
 
+    // findOptimalPath 결과 캐시에 저장
+    @CachePut(value = "optimalPaths", key = "{#departureHubID, #arrivalHubID}")
+    public List<HubPathDetailsResponseDto> putOptimalPathToCache(UUID departureHubID, UUID arrivalHubID, List<HubPathDetailsResponseDto> optimalPathDetails) {
+        return optimalPathDetails;
+    }
 }
