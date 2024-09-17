@@ -1,5 +1,6 @@
 package com.team12.order_delivery.deliveryRoute.domain;
 
+import com.team12.common.audit.AuditingEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @Entity
 @Builder
 @Table(name = "p_delivery_route", schema = "s_order_delivery")
-public class DeliveryRoute {
+public class DeliveryRoute extends AuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
