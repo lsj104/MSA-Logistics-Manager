@@ -30,25 +30,25 @@ public class HubPathController {
     @PostMapping
     public SuccessResponse<?> createHubPath(@RequestBody HubPathCreateRequestDto hubPathCreateRequestDto) {
         HubPathResponseDto createdHubPath = hubPathService.createHubPath(hubPathCreateRequestDto);
-        return SuccessResponse.success(SuccessMessage.CREATE_HUB.getHttpStatus().value(), SuccessMessage.CREATE_HUB.getMessage(), createdHubPath);
+        return SuccessResponse.success(SuccessMessage.CREATE_HUB_PATH.getHttpStatus().value(), SuccessMessage.CREATE_HUB_PATH.getMessage(), createdHubPath);
     }
 
     @PutMapping("/{hubPathId}")
     public SuccessResponse<?> updateHubPath(@PathVariable UUID hubPathId, @RequestBody HubPathUpdateRequestDto hubPathUpdateRequestDto) {
         HubPathResponseDto updatedHubPath = hubPathService.updateHubPath(hubPathId, hubPathUpdateRequestDto);
-        return SuccessResponse.success(SuccessMessage.UPDATE_HUB.getHttpStatus().value(), SuccessMessage.UPDATE_HUB.getMessage(), updatedHubPath);
+        return SuccessResponse.success(SuccessMessage.UPDATE_HUB_PATH.getHttpStatus().value(), SuccessMessage.UPDATE_HUB_PATH.getMessage(), updatedHubPath);
     }
 
     @DeleteMapping("/{hubPathId}")
     public SuccessResponse<?> deleteHubPath(@PathVariable UUID hubPathId) {
         UUID deletedHubPathId = hubPathService.deleteHubPath(hubPathId);
-        return SuccessResponse.success(SuccessMessage.DELETE_HUB.getHttpStatus().value(), SuccessMessage.DELETE_HUB.getMessage(), deletedHubPathId);
+        return SuccessResponse.success(SuccessMessage.DELETE_HUB_PATH.getHttpStatus().value(), SuccessMessage.DELETE_HUB_PATH.getMessage(), deletedHubPathId);
     }
 
     @GetMapping("/{hubPathId}")
     public SuccessResponse<?> getHubPath(@PathVariable UUID hubPathId) {
         HubPathResponseDto hubPathResponseDto = hubPathService.getHubPath(hubPathId);
-        return SuccessResponse.success(SuccessMessage.GET_HUB.getHttpStatus().value(), SuccessMessage.GET_HUB.getMessage(), hubPathResponseDto);
+        return SuccessResponse.success(SuccessMessage.GET_HUB_PATH.getHttpStatus().value(), SuccessMessage.GET_HUB_PATH.getMessage(), hubPathResponseDto);
     }
 
     @GetMapping
@@ -69,7 +69,7 @@ public class HubPathController {
         }
         Pageable pageable = PageRequest.of(page - 1, size, sortOption);
         Page<HubPathResponseDto> hubPathResponsDtoPage = hubPathService.getHubs(searchRequestDto, pageable);
-        return SuccessResponse.success(SuccessMessage.GET_HUBS.getHttpStatus().value(), SuccessMessage.GET_HUBS.getMessage(), hubPathResponsDtoPage);
+        return SuccessResponse.success(SuccessMessage.GET_HUB_PATHS.getHttpStatus().value(), SuccessMessage.GET_HUB_PATHS.getMessage(), hubPathResponsDtoPage);
     }
 
     @GetMapping("/findOptimalPath")
