@@ -11,8 +11,6 @@ import java.util.List;
 @Getter
 @Setter
 public class CustomPageResponse<T> {
-    private int status;
-    private String message;
     private List<T> data;
     private PageInfo pageInfo;
 
@@ -27,9 +25,7 @@ public class CustomPageResponse<T> {
         private boolean hasNext;
     }
 
-    public CustomPageResponse(int status, String message, Page<T> page) {
-        this.status = status;
-        this.message = message;
+    public CustomPageResponse(Page<T> page) {
         this.data = page.getContent();
 
         PageInfo pageInfo = new PageInfo();
