@@ -1,13 +1,19 @@
 package com.team12.user.service;
 
+import com.team12.common.exception.BusinessLogicException;
+import com.team12.common.exception.ExceptionCode;
+import com.team12.common.exception.test.BusinessException;
 import com.team12.user.domain.User;
 import com.team12.user.dto.UserDataDto;
 import com.team12.user.dto.UserRequestDto;
 import com.team12.user.dto.UserResponseDto;
 import com.team12.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import static com.team12.common.exception.test.ErrorCode.EXIST_PRODUCT;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +26,7 @@ public class UserService {
     public UserResponseDto signUp(UserRequestDto signUpReqeustDto) {
         // username 중복 확인
         if(userRepository.findByUsername(signUpReqeustDto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 username입니다.");
+            throw new BusinessLogicException(ExceptionCode.EXIST_PRODUCT);
         }
         // password 인코딩 (객체 생성 전)
         String encodedPassword = passwordEncoder.encode(signUpReqeustDto.getPassword());

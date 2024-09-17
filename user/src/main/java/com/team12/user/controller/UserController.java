@@ -17,8 +17,10 @@ public class UserController {
 
     //회원가입
     @PostMapping("/sign-up")
-    public ResponseEntity signUp(@RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity signUp(@RequestBody UserRequestDto userRequestDto) throws Exception {
         UserResponseDto userResponseDto = userService.signUp(userRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
     }
+
+
 }
