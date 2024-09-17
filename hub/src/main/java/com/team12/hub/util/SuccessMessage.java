@@ -21,7 +21,8 @@ public enum SuccessMessage {
     UPDATE_MANAGER(HttpStatus.OK, "담당자 수정 성공"),
     DELETE_MANAGER(HttpStatus.OK, "담당자 삭제 성공"),
     GET_MANAGER(HttpStatus.OK, "담당자 상세 조회 성공"),
-    GET_MANAGERS(HttpStatus.OK, "담당자 전체 조회 및 검색 성공");
+    GET_MANAGERS(HttpStatus.OK, "담당자 전체 조회 및 검색 성공"),
+    CHECK_HUB(HttpStatus.OK, "해당 허브가 존재합니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

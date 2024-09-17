@@ -64,4 +64,9 @@ public class HubController {
         Page<HubResponseDto> hubResponsDtoPage = hubService.getHubs(searchRequestDto, pageable);
         return SuccessResponse.success(SuccessMessage.GET_HUBS.getHttpStatus().value(), SuccessMessage.GET_HUBS.getMessage(), hubResponsDtoPage);
     }
+    @GetMapping("/{hubId}/check")
+    public SuccessResponse<?> checkHub(@PathVariable UUID hubId){
+        UUID checkedHubId = hubService.checkHub(hubId);
+        return SuccessResponse.success(SuccessMessage.CHECK_HUB.getHttpStatus().value(), SuccessMessage.CHECK_HUB.getMessage(), checkedHubId);
+    }
 }

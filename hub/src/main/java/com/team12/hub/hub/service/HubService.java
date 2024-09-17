@@ -83,4 +83,10 @@ public class HubService {
         Page<HubResponseDto> hubResponseDtoPage = hubPage.map(hub -> new HubResponseDto(hub));
         return hubResponseDtoPage;
     }
+
+    public UUID checkHub(UUID hubId) {
+        Hub hub = hubRepository.findByIdAndIsDeleted(hubId, false)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 Hub 입니다."));
+        return hub.getId();
+    }
 }
