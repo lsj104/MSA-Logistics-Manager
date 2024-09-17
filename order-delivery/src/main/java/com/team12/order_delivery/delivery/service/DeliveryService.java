@@ -11,6 +11,7 @@ import com.team12.order_delivery.delivery.domain.Delivery;
 import com.team12.order_delivery.delivery.dto.DeliveryReqDto;
 import com.team12.order_delivery.delivery.dto.DeliveryResDto;
 import com.team12.order_delivery.delivery.repository.DeliveryRespository;
+import com.team12.order_delivery.deliveryRoute.client.HubClient;
 import com.team12.order_delivery.deliveryRoute.domain.DeliveryRoute;
 import com.team12.order_delivery.deliveryRoute.dto.RouteResDto;
 import com.team12.order_delivery.deliveryRoute.repository.DeliveryRouteRepository;
@@ -37,6 +38,7 @@ public class DeliveryService {
     private final DeliveryRouteRepository deliveryRouteRepository;
     private final DeliveryRouteService deliveryRouteService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final HubClient hubClient;
 
     @Transactional
     public DeliveryResDto createDelivery(DeliveryReqDto deliveryReqDto) {
@@ -188,7 +190,7 @@ public class DeliveryService {
         } else if (isLastRoute(deliveryRoute) && newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
             return SlackTemplate.endDelivery(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
         } else if (newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
-            return SlackTemplate.arrivedAtHub(deliveryRoute.getDeliveryId().toString(), newStatus.toString(), deliveryRoute.getFromHubId().toString());
+            return SlackTemplate.arrivedAtHub(deliveryRoute.getDeliveryId().toString(), newStatus.toString(), getHubNamebyId(deliveryRoute.getFromHubId()));
         } else {
             return SlackTemplate.updateDeliveryStatus(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
         }
@@ -222,4 +224,8 @@ public class DeliveryService {
         return totalRoutes == route.getSequence();
     }
 
+
+    public String getHubNamebyId(UUID hubId) {
+        return hubClient.getHub(hubId).getName();
+    }
 }

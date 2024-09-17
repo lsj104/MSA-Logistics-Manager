@@ -50,7 +50,7 @@ public class SlackTemplate {
             """, orderNumber, status);
     }
 
-    public static String arrivedAtHub(String deliveryId, String status, String fromHubId) {
+    public static String arrivedAtHub(String deliveryId, String status, String fromHubName) {
         return String.format("""
             :package: *경유지 도착*
             
@@ -65,7 +65,7 @@ public class SlackTemplate {
             문의사항이 있으시면 언제든 고객센터로 연락 주세요.
             
             감사합니다!
-            """, deliveryId, status, fromHubId);
+            """, deliveryId, status, fromHubName);
 
     }
 }
