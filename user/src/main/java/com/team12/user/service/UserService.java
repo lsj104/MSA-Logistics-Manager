@@ -49,4 +49,14 @@ public class UserService {
         UserDataDto userDataDto = new UserDataDto(user);
         return new UserResponseDto<UserDataDto>(200, "유저 생성 승인 성공", userDataDto);
     }
+
+    // 유저 : 개인의 상세 정보 조회
+    public UserResponseDto getUserDetail(Long userId) {
+        // repository 찾기
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_EXIST_USER));
+        // dto 변환
+        UserDataDto userDataDto = new UserDataDto(user);
+        return new UserResponseDto<UserDataDto>(200, "유저의 개인 상세 정보 조회 성공", userDataDto);
+    }
 }

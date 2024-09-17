@@ -2,6 +2,7 @@ package com.team12.user.controller;
 
 import com.team12.user.dto.UserRequestDto;
 import com.team12.user.dto.UserResponseDto;
+import com.team12.user.repository.UserRepository;
 import com.team12.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userResponseDto);
     }
     //유저 : 개인 상세 정보 조회
+    @GetMapping
+    public ResponseEntity getUserDetail() {
+        //Todo : header 토큰 받아서 처리하기
+        Long userId = 1L;
+        UserResponseDto userResponseDto = userService.getUserDetail(userId);
+        return ResponseEntity.ok(userResponseDto);
+    }
 
     //관리자 : 유저 상세 정보 조회
 
