@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum ExceptionCode {
     // 예시
-    EXIST_PRODUCT(403, "존재하는 상품입니다.");
+    EXIST_PRODUCT(409, "존재하는 상품입니다."),
+    NOT_EXIST_USER(404, "존재하지 않는 회원입니다.");
 
 
     private int status;

@@ -44,4 +44,8 @@ public class User {
         this.userRoleEnum = signUpReqeustDto.getUserRoleEnum();
 
     }
+
+//    public User(UserApproveRequestDto userApproveRequestDto) {
+//        this.isConfirmed = userApproveRequestDto.isConfirmed();
+//    }
 }

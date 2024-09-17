@@ -22,5 +22,24 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
     }
 
+    //관리자 : 유저 가입 승인
+    @PatchMapping("/{userId}/approve")
+    public ResponseEntity approve(@PathVariable(name = "userId") Long userId,
+                                  @RequestParam(name = "isConfirmed") boolean isConfirmed) {
+        UserResponseDto userResponseDto = userService.approve(userId, isConfirmed);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userResponseDto);
+    }
+    //유저 : 개인 상세 정보 조회
+
+    //관리자 : 유저 상세 정보 조회
+
+    //관리자 : 유저 리스트 조회
+
+    //관리자 : 유저 검색
+
+    //관리자 : 유저 정보 수정
+
+    //관리자 : 유저 삭제
+
 
 }
