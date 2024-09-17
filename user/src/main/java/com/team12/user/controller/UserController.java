@@ -1,5 +1,6 @@
 package com.team12.user.controller;
 
+import com.team12.common.customPage.CustomPageResponse;
 import com.team12.user.dto.UserDataForRegisterDto;
 import com.team12.user.dto.UserRequestDto;
 import com.team12.user.dto.UserResponseDto;
@@ -10,8 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Pageable;
+
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -47,6 +50,13 @@ public class UserController {
         return ResponseEntity.ok(userResponseForRegisterDto);
     }
     //관리자 : 유저 리스트 조회
+    @GetMapping("/list")
+    public ResponseEntity getUsers(@RequestParam("page") int page,
+                                   @RequestParam("size") int size,
+                                   @RequestParam("sort") String sort) {
+        CustomPageResponse<UserDataForRegisterDto> userList = userService.getUsers(page-1, size, sort);
+        return ResponseEntity.ok(userList);
+    }
 
     //관리자 : 유저 검색
 

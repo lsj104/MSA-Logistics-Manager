@@ -1,5 +1,6 @@
 package com.team12.user.service;
 
+import com.team12.common.customPage.CustomPageResponse;
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
 import com.team12.user.domain.User;
@@ -7,6 +8,10 @@ import com.team12.user.dto.*;
 import com.team12.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 //import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,7 +30,7 @@ public class UserService {
         // Todo : password 인코딩 (객체 생성 전)
         //String encodedPassword = passwordEncoder.encode(signUpRequestDto.getPassword());
         // Todo : entity 변환
-        User user = new User(signUpRequestDto, "1234");
+        User user = new User(signUpRequestDto, "asdfff");
         // db 저장
         userRepository.save(user);
         // dto 변환
@@ -66,5 +71,17 @@ public class UserService {
         //dto 변환
         UserDataForRegisterDto userDataForRegisterDto = new UserDataForRegisterDto(user);
         return new UserResponseForRegisterDto<UserDataForRegisterDto>(200, "유저 상세 정보 조회 성공", userDataForRegisterDto);
+    }
+
+    // 관리자 : 유저 리스트 조회
+    public CustomPageResponse<UserDataForRegisterDto> getUsers(int page, int size, String sort) {
+        //sort
+        Sort sortBy = Sort.by(Sort.Direction.DESC, sort);
+        Pageable pageable = PageRequest.of(page, size, sortBy);
+        // repository 검색
+        Page<User> userList = userRepository.findAll(pageable);
+        // Dto 변환
+        Page<UserDataForRegisterDto> dtoPage = userList.map(UserDataForRegisterDto:: new);
+        return new CustomPageResponse<>(200, "유저 리스트 조회 성공", dtoPage);
     }
 }
