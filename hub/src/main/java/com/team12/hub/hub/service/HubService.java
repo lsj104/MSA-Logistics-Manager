@@ -1,5 +1,7 @@
 package com.team12.hub.hub.service;
 
+import com.team12.common.exception.BusinessLogicException;
+import com.team12.common.exception.ExceptionCode;
 import com.team12.hub.hub.domain.Hub;
 import com.team12.hub.hub.domain.HubSpecification;
 import com.team12.hub.hub.dto.HubRequestDto;
@@ -42,7 +44,7 @@ public class HubService {
 
     public HubResponseDto updateHub(UUID hubId, HubRequestDto hubRequestDto) {
         Hub hub = hubRepository.findByIdAndIsDeleted(hubId,false)
-                .orElseThrow(() -> new IllegalArgumentException(hubId + "해당 허브를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         if(hubRequestDto.getName() != null){
             hub.setName(hubRequestDto.getName());
         }
@@ -63,7 +65,7 @@ public class HubService {
 
         // 허브 논리적 삭제
         Hub hub = hubRepository.findByIdAndIsDeleted(hubId, false)
-                .orElseThrow(() -> new IllegalArgumentException("해당 허브를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         hub.setIsDeleted(true);
         hub.setDeletedAt(LocalDateTime.now());
         hub.setDeletedBy(0L);
@@ -73,7 +75,7 @@ public class HubService {
 
     public HubResponseDto getHub(UUID hubId) {
         Hub hub = hubRepository.findByIdAndIsDeleted(hubId, false)
-                .orElseThrow(() -> new IllegalArgumentException("해당 허브를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         HubResponseDto hubResponseDto = new HubResponseDto(hub.getId(), hub.getName(), hub.getAddress(), hub.getLatitude(), hub.getLongitude());
         return hubResponseDto;
     }
@@ -86,7 +88,7 @@ public class HubService {
 
     public UUID checkHub(UUID hubId) {
         Hub hub = hubRepository.findByIdAndIsDeleted(hubId, false)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 Hub 입니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         return hub.getId();
     }
 }

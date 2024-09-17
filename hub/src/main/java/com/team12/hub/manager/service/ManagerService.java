@@ -1,5 +1,7 @@
 package com.team12.hub.manager.service;
 
+import com.team12.common.exception.BusinessLogicException;
+import com.team12.common.exception.ExceptionCode;
 import com.team12.hub.hub.domain.Hub;
 import com.team12.hub.hub.repository.HubRepository;
 import com.team12.hub.manager.domain.Manager;
@@ -31,7 +33,7 @@ public class ManagerService {
         로그인 유저 ID가 userId와 동일한지 확인
          */
         Hub hub = hubRepository.findByIdAndIsDeleted(managerRequestDto.getHubId(), false)
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 허브를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         Manager manager = new Manager(1357L, hub, managerRequestDto.getType());
         managerRepository.save(manager);
         return new ManagerResponseDto(manager);
@@ -46,10 +48,10 @@ public class ManagerService {
         로그인 유저 ID가 managerId와 동일한지 확인
          */
         Manager manager = managerRepository.findByIdAndIsDeleted(managerId, false)
-                .orElseThrow(() -> new IllegalArgumentException(managerId + " ID를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MANAGER_NOT_FOUND));
         if(managerRequestDto.getHubId() != null){
             Hub hub = hubRepository.findByIdAndIsDeleted(managerRequestDto.getHubId(), false)
-                    .orElseThrow(() -> new IllegalArgumentException("해당하는 허브가 없습니다."));
+                    .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
             manager.setHub(hub);
         }
         if(managerRequestDto.getType() != null){
@@ -62,7 +64,7 @@ public class ManagerService {
 
     public Long deleteManager(Long managerId) {
         Manager manager = managerRepository.findByIdAndIsDeleted(managerId, false)
-                .orElseThrow(() -> new IllegalArgumentException(managerId + " ID를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MANAGER_NOT_FOUND));
         manager.setIsDeleted(true);
         managerRepository.save(manager);
         return managerId;
@@ -70,7 +72,7 @@ public class ManagerService {
 
     public ManagerResponseDto getManager(Long managerId) {
         Manager manager =  managerRepository.findByIdAndIsDeleted(managerId, false)
-                .orElseThrow(() -> new IllegalArgumentException(managerId + " ID를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MANAGER_NOT_FOUND));
         return new ManagerResponseDto(manager.getId(), manager.getHub().getId(), manager.getType());
     }
 
