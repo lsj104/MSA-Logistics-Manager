@@ -35,6 +35,7 @@ public class HubPathService {
     // 캐시 이름을 'hubPaths'로 설정
     private static final String CACHE_NAME = "hubPaths";
 
+
     @Transactional
     public HubPathResponseDto createHubPath(HubPathCreateRequestDto hubPathRequestDto) {
         Hub fromHub = hubRepository.findByIdAndIsDeleted(hubPathRequestDto.getFromHubId(), false)
@@ -49,7 +50,7 @@ public class HubPathService {
         return hubPathResponseDto;
     }
     @Transactional
-    public HubPath updateHubPath(UUID hubPathId, HubPathUpdateRequestDto hubPathRequestDto) {
+    public HubPathResponseDto updateHubPath(UUID hubPathId, HubPathUpdateRequestDto hubPathRequestDto) {
         HubPath hubPath = hubPathRepository.findById(hubPathId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 HubPath 를 찾지 못했습니다."));
         if (hubPathRequestDto.getDistance() != null){
@@ -58,7 +59,8 @@ public class HubPathService {
         if (hubPathRequestDto.getDuration() != null){
             hubPath.setDuration(hubPathRequestDto.getDuration());
         }
-        return hubPathRepository.save(hubPath);
+        hubPathRepository.save(hubPath);
+        return new HubPathResponseDto(hubPath);
     }
 
 
@@ -75,10 +77,10 @@ public class HubPathService {
     }
 
     @Transactional
-    public HubPath getHubPath(UUID hubPathId) {
+    public HubPathResponseDto getHubPath(UUID hubPathId) {
         HubPath hubPath = hubPathRepository.findByIdAndIsDeleted(hubPathId, false)
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 허브 간 이동 정보가 없습니다."));
-        return hubPath;
+        return new HubPathResponseDto(hubPath);
     }
 
     @Transactional

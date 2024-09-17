@@ -16,7 +16,8 @@ public record GetProductResponseDto(
         LocalDateTime updatedAt,
         Long updatedBy,
         LocalDateTime deletedAt,
-        Long deletedBy
+        Long deletedBy,
+        Long quantity
 ) {
 
     public static GetProductResponseDto from(Product product) {
@@ -32,6 +33,7 @@ public record GetProductResponseDto(
                 .updatedBy(product.getUpdatedBy())
                 .deletedAt(product.getDeletedAt())
                 .deletedBy(product.getDeletedBy())
+                .quantity(product.getQuantity())
                 .build();
     }
 }

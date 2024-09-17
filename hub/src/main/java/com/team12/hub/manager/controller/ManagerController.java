@@ -1,11 +1,14 @@
 package com.team12.hub.manager.controller;
 
+import com.team12.common.exception.response.SuccessResponse;
+import com.team12.hub.manager.domain.Manager;
 import com.team12.hub.manager.dto.ManagerRequestDto;
 import com.team12.hub.manager.dto.ManagerResponseDto;
 import com.team12.hub.manager.dto.ManagerSearchRequestDto;
 import com.team12.hub.manager.repository.ManagerRepositoy;
 import com.team12.hub.manager.service.ManagerService;
 import com.team12.hub.manager.type.ManagerType;
+import com.team12.hub.util.SuccessMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,32 +30,30 @@ public class ManagerController {
     private final ManagerRepositoy managerRepositoy;
 
     @PostMapping
-    public ManagerResponseDto createManager(@RequestBody ManagerRequestDto managerRequestDto){
-        return managerService.createManager(managerRequestDto);
+    public SuccessResponse<?> createManager(@RequestBody ManagerRequestDto managerRequestDto){
+        ManagerResponseDto createdManager = managerService.createManager(managerRequestDto);
+        return SuccessResponse.success(SuccessMessage.CREATE_MANAGER.getHttpStatus().value(), SuccessMessage.CREATE_MANAGER.getMessage(), createdManager);
     }
 
     @PutMapping("/{managerId}")
-    public ManagerResponseDto updateManager(@PathVariable Long managerId, @RequestBody ManagerRequestDto managerRequestDto) {
-        try {
-            return managerService.updateManager(managerId, managerRequestDto);
-
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
+    public SuccessResponse<?> updateManager(@PathVariable Long managerId, @RequestBody ManagerRequestDto managerRequestDto) {
+        ManagerResponseDto updatedManager = managerService.updateManager(managerId, managerRequestDto);
+        return SuccessResponse.success(SuccessMessage.UPDATE_MANAGER.getHttpStatus().value(), SuccessMessage.UPDATE_MANAGER.getMessage(), updatedManager);
     }
     @DeleteMapping("/{managerId}")
-    public Long deleteManager(@PathVariable Long managerId){
-        return managerService.deleteManager(managerId);
+    public SuccessResponse<?> deleteManager(@PathVariable Long managerId){
+        Long deletedManagerID =  managerService.deleteManager(managerId);
+        return SuccessResponse.success(SuccessMessage.DELETE_MANAGER.getHttpStatus().value(), SuccessMessage.DELETE_MANAGER.getMessage(), deletedManagerID);
     }
 
     @GetMapping("/{managerId}")
-    public ManagerResponseDto getManager(@PathVariable Long managerId){
-        return managerService.getManager(managerId);
+    public SuccessResponse<?> getManager(@PathVariable Long managerId){
+        ManagerResponseDto managerResponseDto = managerService.getManager(managerId);
+        return SuccessResponse.success(SuccessMessage.GET_MANAGER.getHttpStatus().value(), SuccessMessage.GET_MANAGER.getMessage(), managerResponseDto);
     }
 
     @GetMapping
-    public Page<ManagerResponseDto> getManagers(@RequestParam(required = false) Long managerId,
+    public SuccessResponse<?> getManagers(@RequestParam(required = false) Long managerId,
                                                 @RequestParam(required = false) UUID hubId,
                                                 @RequestParam(required = false) ManagerType type,
                                                 @RequestParam(required = false, defaultValue = "1") int page,
@@ -69,8 +70,6 @@ public class ManagerController {
         }
         Pageable pageable = PageRequest.of(page - 1, size, sortOption);
         Page<ManagerResponseDto> managerResponseDtoPage = managerService.getManagers(searchRequestDto, pageable);
-
-
-        return managerResponseDtoPage;
+        return SuccessResponse.success(SuccessMessage.GET_MANAGERS.getHttpStatus().value(), SuccessMessage.GET_MANAGERS.getMessage(), managerResponseDtoPage);
     }
 }
