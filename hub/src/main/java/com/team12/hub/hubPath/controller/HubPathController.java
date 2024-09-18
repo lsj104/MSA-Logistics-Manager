@@ -68,7 +68,7 @@ public class HubPathController {
             size = 10;
         }
         Pageable pageable = PageRequest.of(page - 1, size, sortOption);
-        Page<HubPathResponseDto> hubPathResponsDtoPage = hubPathService.getHubs(searchRequestDto, pageable);
+        Page<HubPathResponseDto> hubPathResponsDtoPage = hubPathService.getHubPaths(searchRequestDto, pageable);
         return SuccessResponse.success(SuccessMessage.GET_HUB_PATHS.getHttpStatus().value(), SuccessMessage.GET_HUB_PATHS.getMessage(), hubPathResponsDtoPage);
     }
 
