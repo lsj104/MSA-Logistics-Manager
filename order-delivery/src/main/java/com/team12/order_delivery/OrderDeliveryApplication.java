@@ -10,11 +10,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @ComponentScan(basePackages = "com.team12")
 @EnableFeignClients
-@EnableJpaAuditing
 public class OrderDeliveryApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(OrderDeliveryApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(OrderDeliveryApplication.class, args);
+    }
 
 }
