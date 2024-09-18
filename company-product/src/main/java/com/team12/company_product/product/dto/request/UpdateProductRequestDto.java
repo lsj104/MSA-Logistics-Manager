@@ -1,8 +1,10 @@
 package com.team12.company_product.product.dto.request;
 
+import java.util.UUID;
+
 public record UpdateProductRequestDto(
         String productName,
-        String hub_id,
+        UUID hubId,
         String companyId
 ) {
 

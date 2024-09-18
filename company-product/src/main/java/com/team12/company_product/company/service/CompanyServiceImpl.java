@@ -9,7 +9,9 @@ import com.team12.company_product.company.dto.request.UpdateCompanyRequestDto;
 import com.team12.company_product.company.dto.response.UpdateCompanyResponseDto;
 import com.team12.company_product.company.exception.CompanyException;
 import com.team12.company_product.company.exception.ExceptionMessage;
+import com.team12.company_product.company.hub.HubClient;
 import com.team12.company_product.company.repository.CompanyRepository;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,10 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
+    private final HubClient hubClient;
 
     // 업체 생성
     @Transactional
     public CreateCompanyResponseDto createCompany(CreateCompanyRequestDto requestDto) {
+
+        checkHubIfPresent(requestDto.hubId());
 
         Company company = Company.of(requestDto);
         companyRepository.save(company);
@@ -51,6 +56,8 @@ public class CompanyServiceImpl implements CompanyService {
     public UpdateCompanyResponseDto updateCompany(UpdateCompanyRequestDto requestDto,
             String companyId) {
 
+        checkHubIfPresent(requestDto.hubId());
+        
         Company company = findById(companyId);
         company.update(requestDto);
         return UpdateCompanyResponseDto.from(company);
@@ -100,5 +107,17 @@ public class CompanyServiceImpl implements CompanyService {
     public Company findById(String companyId) {
         return companyRepository.findById(companyId)
                 .orElseThrow(() -> new CompanyException(ExceptionMessage.COMPANY_NOT_FOUND));
+    }
+
+    // 허브 검증
+    private void checkHubIfPresent(UUID hubId) {
+        if (hubId != null) {
+            try {
+                hubClient.checkHub(hubId);
+            } catch (Exception e) {
+                throw new CompanyException(
+                        com.team12.company_product.company.exception.ExceptionMessage.HUB_NOT_FOUND);
+            }
+        }
     }
 }

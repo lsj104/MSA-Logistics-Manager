@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,28 +23,26 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Product extends AuditingEntity {
 
-// TODO: nullable = false 추가
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String productId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id")
+    @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
-    @Column(name = "hubId")
-    private String hubId;
+    @Column(name = "hubId", nullable = false)
+    private UUID hubId;
 
-    @Column(name = "product_name")
+    @Column(name = "product_name", nullable = false)
     private String productName;
 
-    @Column(name = "quantity")
+    @Column(name = "quantity", nullable = false)
     private Long quantity;
 
 
     @Builder
-    public Product(String productId, Company company, String hubId, String productName,
+    public Product(String productId, Company company, UUID hubId, String productName,
             Long quantity) {
         this.productId = productId;
         this.company = company;
@@ -65,7 +64,7 @@ public class Product extends AuditingEntity {
         this.company = company != null ? company : this.company;
         this.productName =
                 requestDto.productName() != null ? requestDto.productName() : this.productName;
-        this.hubId = requestDto.hub_id() != null ? requestDto.hub_id() : this.hubId;
+        this.hubId = requestDto.hubId() != null ? requestDto.hubId() : this.hubId;
     }
 
     public void delete(Long userId) {
