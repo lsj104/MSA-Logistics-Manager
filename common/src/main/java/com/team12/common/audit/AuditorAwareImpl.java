@@ -6,11 +6,11 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component("auditorProvider")
-public class AuditorAwareImpl implements AuditorAware<String> {
+public class AuditorAwareImpl implements AuditorAware<Long> {
     @Override
-    public Optional<String> getCurrentAuditor() {
-        // 실제 인증된 사용자를 반환하도록 수정
-        // 예: SecurityContextHolder.getContext().getAuthentication().getName()
-        return Optional.of("system");  // 여기서 'system'은 임시 사용자
+    public Optional<Long> getCurrentAuditor() {
+        // 실제 인증된 사용자의 ID를 반환하도록 수정
+        // 예: 현재는 임시로 1L을 반환
+        return Optional.of(1L);
     }
 }

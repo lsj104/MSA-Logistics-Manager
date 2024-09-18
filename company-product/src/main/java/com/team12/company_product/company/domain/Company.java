@@ -67,13 +67,11 @@ public class Company extends AuditingEntity {
         this.companyName =
                 requestDto.companyName() != null ? requestDto.companyName() : this.companyName;
         this.companyType =
-                requestDto.companyType() != null ? CompanyType.valueOf(requestDto.companyType())
-                        : this.companyType;
+                requestDto.companyType() != null ? requestDto.companyType() : this.companyType;
         this.hubId = requestDto.hubId() != null ? requestDto.hubId() : this.hubId;
         this.address = requestDto.address() != null ? requestDto.address() : this.address;
     }
 
-    // TODO: user추가
     // 업체 삭제
     public void delete(Long userId) {
         super.setIsDeleted(true);

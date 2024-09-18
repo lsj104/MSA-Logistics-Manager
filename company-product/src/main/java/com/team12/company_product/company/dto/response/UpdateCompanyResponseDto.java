@@ -1,6 +1,7 @@
 package com.team12.company_product.company.dto.response;
 
 import com.team12.company_product.company.domain.Company;
+import com.team12.company_product.company.domain.CompanyType;
 import java.time.LocalDateTime;
 import lombok.Builder;
 
@@ -9,7 +10,7 @@ public record UpdateCompanyResponseDto(
 
         String companyId,
         String companyName,
-        String companyType,
+        CompanyType companyType,
         String hubId,
         String address,
         LocalDateTime updatedAt,
@@ -19,9 +20,9 @@ public record UpdateCompanyResponseDto(
 
     public static UpdateCompanyResponseDto from(Company company) {
         return UpdateCompanyResponseDto.builder()
-                .companyId(String.valueOf(company.getCompanyId()))
+                .companyId(company.getCompanyId())
                 .companyName(company.getCompanyName())
-                .companyType(builder().companyType)
+                .companyType(company.getCompanyType())
                 .hubId(company.getHubId())
                 .address(company.getAddress())
                 .isDelete(company.getIsDeleted())
