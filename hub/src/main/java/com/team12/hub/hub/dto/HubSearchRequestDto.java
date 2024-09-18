@@ -13,4 +13,13 @@ public class HubSearchRequestDto {
     private UUID id;
     private String name;
     private String address;
+
+    @Override
+    public String toString() {
+        return "HubPathSearchRequestDto{" +
+                "id=" + id +
+                ", name=" + name +
+                ", address=" + address +
+                '}';
+    }
 }
