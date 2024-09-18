@@ -38,7 +38,7 @@ public class UserRepository {
         userJpaRepository.save(user);
     }
 
-    //findBy
+    //findById (존재 여부 확인)
     public User findById(Long userId) {
         return userJpaRepository.findById(userId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_EXIST_USER));

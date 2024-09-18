@@ -3,6 +3,7 @@ package com.team12.user.service;
 import com.team12.common.customPage.CustomPageResponse;
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
+import com.team12.common.exception.test.BusinessException;
 import com.team12.user.domain.User;
 import com.team12.user.dto.*;
 import com.team12.user.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.config.JpaRepositoryNameSpaceHandler;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,7 +24,7 @@ public class UserService {
     //private final PasswordEncoder passwordEncoder;
 
     //회원가입
-    public UserResponseDto signUp(UserRequestDto signUpRequestDto) {
+    public UserResponseDto signUp(UserSignUpRequestDto signUpRequestDto) {
         // username 중복 확인 Todo : Exception
         userRepository.findByUsername(signUpRequestDto.getUsername());
         // Todo : password 인코딩 (객체 생성 전)
@@ -92,5 +94,27 @@ public class UserService {
         Page<UserDataForRegisterDto> userList = searchUsers.map(UserDataForRegisterDto::new);
         return new CustomPageResponse<>(userList);
 
+    }
+
+    //관리자 : 유저 수정
+    public UserResponseForRegisterDto<UserDataForRegisterDto> patchUser(Long userId, UserPatchRequestForRegisterDto patchDto) {
+        //repository 검색
+        User user = userRepository.findById(userId);
+        //수정 및 유효성 검사(unique 값)
+        if(patchDto.getName() == null || patchDto.getUsername() == null ||
+        patchDto.getSlackEmail() == null || patchDto.getUserRoleEnum() == null) {
+            throw new BusinessLogicException(ExceptionCode.NOT_PROVIDE_LANGUAGE);
+        }
+        user.setName(patchDto.getName());
+        user.setUsername(patchDto.getUsername());
+        user.setSlackEmail(patchDto.getSlackEmail());
+        user.setUserRoleEnum(patchDto.getUserRoleEnum());
+        user.setConfirmed(patchDto.isConfirmed());
+        //db 저장
+        userRepository.save(user);
+        //to dto
+        UserDataForRegisterDto patchedUserDto = new UserDataForRegisterDto(user);
+        //return
+        return new UserResponseForRegisterDto<UserDataForRegisterDto> (200, "유저 정보 수정 완료", patchedUserDto);
     }
 }

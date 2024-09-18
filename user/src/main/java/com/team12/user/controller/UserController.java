@@ -1,17 +1,12 @@
 package com.team12.user.controller;
 
 import com.team12.common.customPage.CustomPageResponse;
-import com.team12.user.dto.UserDataForRegisterDto;
-import com.team12.user.dto.UserRequestDto;
-import com.team12.user.dto.UserResponseDto;
-import com.team12.user.dto.UserResponseForRegisterDto;
+import com.team12.user.dto.*;
 import com.team12.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.awt.print.Pageable;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,7 +17,7 @@ public class UserController {
 
     //회원가입
     @PostMapping("/sign-up")
-    public ResponseEntity signUp(@RequestBody UserRequestDto userRequestDto) throws Exception {
+    public ResponseEntity signUp(@RequestBody UserSignUpRequestDto userRequestDto) throws Exception {
         UserResponseDto userResponseDto = userService.signUp(userRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDto);
     }
@@ -69,7 +64,13 @@ public class UserController {
     }
 
     //관리자 : 유저 정보 수정
-
+    @PatchMapping("/{userId}")
+    public ResponseEntity patchUser(@PathVariable("userId") Long userId,
+                                    @RequestBody UserPatchRequestForRegisterDto patchDto) {
+        UserResponseForRegisterDto<UserDataForRegisterDto> patchUser =
+                userService.patchUser(userId, patchDto);
+        return ResponseEntity.ok(patchUser);
+    }
     //관리자 : 유저 삭제
 
 

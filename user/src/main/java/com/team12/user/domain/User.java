@@ -1,7 +1,7 @@
 package com.team12.user.domain;
 
 import com.team12.common.audit.AuditingEntity;
-import com.team12.user.dto.UserRequestDto;
+import com.team12.user.dto.UserSignUpRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,7 +37,7 @@ public class User extends AuditingEntity {
     @Column(nullable = false)
     private boolean isConfirmed;
 
-    public User(UserRequestDto signUpRequestDto, String password) {
+    public User(UserSignUpRequestDto signUpRequestDto, String password) {
         this.username = signUpRequestDto.getUsername();
         this.password = password;
         this.slackEmail = signUpRequestDto.getSlackEmail();
