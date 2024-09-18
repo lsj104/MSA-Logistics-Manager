@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.team12"})
+@EnableDiscoveryClient
 public class UserApplication {
 
 	public static void main(String[] args) {
