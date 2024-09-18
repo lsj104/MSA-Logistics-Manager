@@ -3,6 +3,7 @@ package com.team12.company_product.company.dto.response;
 import com.team12.company_product.company.domain.Company;
 import com.team12.company_product.company.domain.CompanyType;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Builder;
 
 @Builder
@@ -11,7 +12,7 @@ public record UpdateCompanyResponseDto(
         String companyId,
         String companyName,
         CompanyType companyType,
-        String hubId,
+        UUID hubId,
         String address,
         LocalDateTime updatedAt,
         Long updatedBy,

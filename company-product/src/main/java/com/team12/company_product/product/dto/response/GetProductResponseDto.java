@@ -2,13 +2,14 @@ package com.team12.company_product.product.dto.response;
 
 import com.team12.company_product.product.domain.Product;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Builder;
 
 @Builder
 public record GetProductResponseDto(
         String productId,
         String companyId,
-        String hub_id,
+        UUID hub_id,
         String productName,
         Boolean isDelete,
         LocalDateTime createdAt,
