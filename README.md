@@ -17,18 +17,6 @@ sparta-team-12-msa-ai-project
 - [🐙 API docs](#-api-docs)
 - [🐬 인프라 구조](#-인프라-구조)
 
-## 🐥 컨벤션 가이드
-
-- [여기](./conventions)를 참고해주세요.
-
-## 🐶 템플릿 사용 방법
-
-![템플릿 사용 방법](./docs/images/conventions/create-template.png)
-
-1. `Use this template` 버튼을 누릅니다.
-2. `Create a new repository` 버튼을 누릅니다.
-3. 새로운 리포지토리 이름을 입력하고 생성합니다.
-
 ## 🐸 실행 방법
 
 1. 아래의 환경 변수 설정 (프로젝트에 맞게 수정)
@@ -68,12 +56,23 @@ sparta-team-12-msa-ai-project
 - mapStruct 1.5.5.Final
 - Lombok
 - JUnit
-- Swagger 2.6.0
-- Jacoco
+- Eureka
+- OpenFeign
+- Prometheus
 
 ## 🐰 프로젝트 상세
 
-> 여기에 프로젝트 상세 소개를 작성하시면 됩니다.
+> 대규모 물류 시스템
+- ㅇㅇ
+> 기본 기능
+- ㅇㅇ
+
+>추가 기능
+- 허브 생성 시 KakaoMap API를 통해 위도, 경도 자동 등록 
+- 허브 생성 시 AI를 연동하여 새 허브에 최적 간선을 추가
+- 허브 간 이동 생성 시 KakaoNavi API를 통해 이동 거리, 이동 시간 자동 등록
+- 다익스트라 알고리즘을 사용하여 허브 간 이동 최적 경로 계산하여 자동으로 배송 경로 등록
+- 
 
 ## 🐳 ERD
 
