@@ -1,6 +1,7 @@
 package com.team12.user.controller;
 
 import com.team12.common.customPage.CustomPageResponse;
+import com.team12.common.exception.response.CommonResponse;
 import com.team12.user.dto.*;
 import com.team12.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +73,11 @@ public class UserController {
         return ResponseEntity.ok(patchUser);
     }
     //관리자 : 유저 삭제
+    @DeleteMapping("/{userId}")
+    public ResponseEntity deleteUser(@PathVariable("userId") Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
 
 
 }

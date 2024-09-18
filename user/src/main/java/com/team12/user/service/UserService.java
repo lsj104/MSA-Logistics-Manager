@@ -97,7 +97,7 @@ public class UserService {
     }
 
     //관리자 : 유저 수정
-    public UserResponseForRegisterDto<UserDataForRegisterDto> patchUser(Long userId, UserPatchRequestForRegisterDto patchDto) {
+    public UserResponseForRegisterDto patchUser(Long userId, UserPatchRequestForRegisterDto patchDto) {
         //repository 검색
         User user = userRepository.findById(userId);
         //수정 및 유효성 검사(unique 값)
@@ -115,6 +115,16 @@ public class UserService {
         //to dto
         UserDataForRegisterDto patchedUserDto = new UserDataForRegisterDto(user);
         //return
-        return new UserResponseForRegisterDto<UserDataForRegisterDto> (200, "유저 정보 수정 완료", patchedUserDto);
+        return new UserResponseForRegisterDto<> (200, "유저 정보 수정 완료", patchedUserDto);
+    }
+
+    //관리자 : 유저 삭제
+    public void deleteUser(Long userId) {
+        //repository 찾기
+        User user = userRepository.findById(userId);
+        //논리적 삭제 -> isDeleted = true
+        user.setIsDeleted(true);
+        //db 저장
+        userRepository.save(user);
     }
 }
