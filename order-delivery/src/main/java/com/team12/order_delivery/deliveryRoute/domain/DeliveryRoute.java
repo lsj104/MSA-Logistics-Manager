@@ -1,5 +1,6 @@
 package com.team12.order_delivery.deliveryRoute.domain;
 
+import com.team12.common.audit.AuditingEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,15 +16,15 @@ import java.util.UUID;
 @Entity
 @Builder
 @Table(name = "p_delivery_route", schema = "s_order_delivery")
-public class DeliveryRoute {
+public class DeliveryRoute extends AuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     @CollectionTable(name = "p_delivery", joinColumns = @JoinColumn(name = "id"))
     private UUID deliveryId;
     private int sequence;
-    private UUID fromHubId;
-    private UUID toHubId;
+    private String startPoint;
+    private String endPoint;
     private Double estimatedDistance;
     private Double estimatedTime;
     private Double actualDistance;
@@ -33,7 +34,7 @@ public class DeliveryRoute {
 
     @Enumerated(EnumType.STRING)
     private RouteStatus status;
-//    private int deliveryPersonId;
+    private Long deliveryPersonId;
 
     public enum RouteStatus {
         // 대기중, 배송중, 도착 완료

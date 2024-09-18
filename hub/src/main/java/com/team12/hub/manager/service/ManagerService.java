@@ -10,12 +10,16 @@ import com.team12.hub.manager.dto.ManagerRequestDto;
 import com.team12.hub.manager.dto.ManagerResponseDto;
 import com.team12.hub.manager.dto.ManagerSearchRequestDto;
 import com.team12.hub.manager.repository.ManagerRepositoy;
+import com.team12.hub.manager.type.ManagerType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -82,5 +86,17 @@ public class ManagerService {
     public Page<ManagerResponseDto> getManagers(ManagerSearchRequestDto searchRequestDto, Pageable pageable) {
         Page<Manager> managerPage = managerRepository.findAll(ManagerSpecification.searchWith(searchRequestDto), pageable);
         return managerPage.map(ManagerResponseDto::new);
+    }
+
+    public List<ManagerResponseDto> getHubToHubManagers() {
+        List<Manager> managers = managerRepository.findByType(ManagerType.HUB_TO_HUB_DELIVERY);
+        return managers.stream().map(ManagerResponseDto::new).collect(Collectors.toList());
+    }
+
+    public List<ManagerResponseDto> getHubToCompanyManagers(UUID hubId) {
+        Hub hub = hubRepository.findByIdAndIsDeleted(hubId, false)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 허브가 없습니다."));
+        List<Manager> managers = managerRepository.findByHubAndType(hub, ManagerType.TO_COMPANY_DELIVERY);
+        return managers.stream().map(ManagerResponseDto::new).collect(Collectors.toList());
     }
 }

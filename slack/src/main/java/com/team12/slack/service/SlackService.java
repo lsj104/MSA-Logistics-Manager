@@ -39,6 +39,7 @@ public class SlackService {
             SlackRequestDto request = objectMapper.readValue(message, SlackRequestDto.class);
             sendMessageToUser(request);
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
 
@@ -47,16 +48,11 @@ public class SlackService {
 
     public void sendMessageToUser(SlackRequestDto request) {
         try {
-            // todo : Feign Client로 user 정보 가져오기
-//            User user = userRepository.findById(Long.parseLong(email)).orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
-//            String slackUserId = getSlackUserId(user.getSlackEmail());
-
-
             String slackUserId = getSlackUserId(request.getEmail());
             if (slackUserId.isEmpty()) {
+                log.error("User not found");
                 throw new BusinessLogicException(ExceptionCode.USER_NOT_FOUND);
             }
-//            Message message = new Message(user, request.getContent());
             Message message = new Message(request.getEmail(), request.getContent());
             slackRepository.save(message);
 
@@ -69,6 +65,7 @@ public class SlackService {
 
             ResponseEntity<String> response = restTemplate.postForEntity(SLACK_API_URL, entity, String.class);
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
@@ -93,28 +90,30 @@ public class SlackService {
                     return root.path("user").path("id").asText();
                 }
             }
+            log.error("User not found");
             throw new BusinessLogicException(ExceptionCode.USER_NOT_FOUND);
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
 
     public Page<SlackResDto> getSlackAll(String email, Pageable pageable) {
-        // return slackRepository.findById(targetUserId, pageable).map(SlackDto::new);
         try {
             return slackRepository.findByEmail(email, pageable)
-                    .map(SlackResDto::new); // Message를 SlackResDto로 변환
+                    .map(SlackResDto::new);
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
 
-    public Object getSlack(UUID messageId, Pageable pageable) {
-        // return slackRepository.findById(targetUserId, pageable).map(SlackDto::new);
+    public Object getSlack(UUID messageId) {
         try {
             return slackRepository.findById(messageId)
-                    .map(SlackResDto::new); // Message를 SlackResDto로 변환
+                    .map(SlackResDto::new);
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }

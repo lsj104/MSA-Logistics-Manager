@@ -11,6 +11,7 @@ import com.team12.order_delivery.delivery.domain.Delivery;
 import com.team12.order_delivery.delivery.dto.DeliveryReqDto;
 import com.team12.order_delivery.delivery.dto.DeliveryResDto;
 import com.team12.order_delivery.delivery.repository.DeliveryRespository;
+import com.team12.order_delivery.deliveryRoute.client.HubClient;
 import com.team12.order_delivery.deliveryRoute.domain.DeliveryRoute;
 import com.team12.order_delivery.deliveryRoute.dto.RouteResDto;
 import com.team12.order_delivery.deliveryRoute.repository.DeliveryRouteRepository;
@@ -19,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,11 +32,13 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@EnableAsync
 public class DeliveryService {
     private final DeliveryRespository deliveryRepository;
     private final DeliveryRouteRepository deliveryRouteRepository;
     private final DeliveryRouteService deliveryRouteService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final HubClient hubClient;
 
     @Transactional
     public DeliveryResDto createDelivery(DeliveryReqDto deliveryReqDto) {
@@ -47,7 +52,6 @@ public class DeliveryService {
                     .receiverEmail(deliveryReqDto.getReceiverEmail())
                     .deliveryStatus(Delivery.DeliveryStatus.PREPARING)
                     .build();
-            delivery.setCreatedBy(0L);
             deliveryRepository.save(delivery);
             deliveryRouteService.createDeliveryRoutes(delivery);
             return new DeliveryResDto(delivery);
@@ -133,8 +137,10 @@ public class DeliveryService {
 
             return new RouteResDto(deliveryRoute);
         } catch (BusinessLogicException e) {
+            log.error("##### BusinessLogicException ##### "+e.getMessage());
             throw e;
         } catch (Exception e) {
+            log.error("##### Exception ##### "+e.getMessage());
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
@@ -185,13 +191,14 @@ public class DeliveryService {
         } else if (isLastRoute(deliveryRoute) && newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
             return SlackTemplate.endDelivery(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
         } else if (newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
-            return SlackTemplate.arrivedAtHub(deliveryRoute.getDeliveryId().toString(), newStatus.toString(), deliveryRoute.getFromHubId().toString());
+            return SlackTemplate.arrivedAtHub(deliveryRoute.getDeliveryId().toString(), newStatus.toString(), deliveryRoute.getEndPoint());
         } else {
             return SlackTemplate.updateDeliveryStatus(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
         }
     }
 
-    private void sendSlackNotification(String receiverEmail, String content) {
+    @Async
+    public void sendSlackNotification(String receiverEmail, String content) {
         SlackRequestDto slackRequestDto = SlackRequestDto.builder()
                 .email(receiverEmail)
                 .content(content)
@@ -202,6 +209,8 @@ public class DeliveryService {
             kafkaTemplate.send("delivery-status-update", jsonMessage);
         } catch (JsonProcessingException e) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
+        } catch (Exception e) {
+            throw new BusinessLogicException(ExceptionCode.SLACK_NOTIFICATION_FAILED);
         }
     }
 
