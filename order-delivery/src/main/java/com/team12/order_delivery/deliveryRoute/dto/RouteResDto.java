@@ -18,6 +18,7 @@ public class RouteResDto {
     private Double actualDistance;
     private Double actualTime;
     private String status;
+    private Long deliveryPersonId;
 
     public RouteResDto(DeliveryRoute deliveryRoute) {
         this.id = deliveryRoute.getId();
@@ -29,5 +30,6 @@ public class RouteResDto {
         this.actualDistance = deliveryRoute.getActualDistance();
         this.actualTime = deliveryRoute.getActualTime();
         this.status = deliveryRoute.getStatus().name();
+        this.deliveryPersonId = deliveryRoute.getDeliveryPersonId();
     }
 }

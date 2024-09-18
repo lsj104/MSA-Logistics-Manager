@@ -34,7 +34,7 @@ public class DeliveryRoute extends AuditingEntity {
 
     @Enumerated(EnumType.STRING)
     private RouteStatus status;
-//    private int deliveryPersonId;
+    private Long deliveryPersonId;
 
     public enum RouteStatus {
         // 대기중, 배송중, 도착 완료

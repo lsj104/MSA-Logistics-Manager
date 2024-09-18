@@ -2,6 +2,8 @@ package com.team12.order_delivery.deliveryRoute.service;
 
 import com.team12.common.dto.hub.HubPathDetailsResponseDto;
 import com.team12.common.dto.hub.HubPathOptimalRequestDto;
+import com.team12.common.dto.hub.HubResponseDto;
+import com.team12.common.dto.hub.ManagerResponseDto;
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
 import com.team12.order_delivery.delivery.domain.Delivery;
@@ -31,10 +33,12 @@ public class DeliveryRouteService {
         hubPathOptimalRequestDto.setDepartureHubID(delivery.getDepartmentId());
         hubPathOptimalRequestDto.setArrivalHubID(delivery.getArrivalHubId());
         List<HubPathDetailsResponseDto> hubMovments = hubClient.findOptimalPath(hubPathOptimalRequestDto);
+        List<ManagerResponseDto> managers = hubClient.getHubToHubManagers();
 
         try {
             int sequence = 1;
             for (HubPathDetailsResponseDto movement : hubMovments) {
+                log.info("movement: {}", movement.getToHubId());
                 String fromHubName = findHubNameById(movement.getFromHubId());
                 String toHubName = findHubNameById(movement.getToHubId());
                 DeliveryRoute deliveryRoute = DeliveryRoute.builder()
@@ -45,6 +49,7 @@ public class DeliveryRouteService {
                         .status(DeliveryRoute.RouteStatus.WAITING)
                         .estimatedTime((double) movement.getDuration())
                         .estimatedDistance((double) movement.getDistance())
+                        .deliveryPersonId(managers.get(0).getId())
                         .build();
                 deliveryRouteRepository.save(deliveryRoute);
                 sequence++;
@@ -58,6 +63,7 @@ public class DeliveryRouteService {
                     .status(DeliveryRoute.RouteStatus.WAITING)
                     .estimatedTime(0.0)
                     .estimatedDistance(0.0)
+                    .deliveryPersonId(hubClient.getHubToCompanyManagers(delivery.getArrivalHubId()).get(0).getId())
                     .build();
             deliveryRouteRepository.save(lastRoute);
 
@@ -113,10 +119,12 @@ public class DeliveryRouteService {
 
     public DeliveryRoute findById(UUID deliveryRouteId) {
         return deliveryRouteRepository.findById(deliveryRouteId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 배송 경로를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.INVALID_PARAMETER));
     }
 
     public String findHubNameById(UUID hubId) {
-        return hubClient.getHub(hubId).getName();
+        HubResponseDto hub = hubClient.getHub(hubId).data();
+        log.info("hub: {}", hub.getName());
+        return hub.getName();
     }
 }
