@@ -37,14 +37,14 @@ public class SlackController {
     }
 
     @GetMapping("")
-    public SuccessResponse<?> getSlack(@RequestParam(value= "messageId", required = true) UUID messageId,Pageable pageable) {
+    public SuccessResponse<?> getSlack(@RequestParam(value= "messageId", required = true) UUID messageId) {
 
         // if(!userId.equals(targetUserId) && !role.equals("MANAGER")) {
         //     return ResponseEntity.status(403).body("권한이 없습니다.");
         // }
         // return ResponseEntity.status(200).body(slackService.getSlack(targetUserId, pageable));
 
-        return SuccessResponse.success(SuccessMessage.GET_MESSAGE.getHttpStatus().value(), SuccessMessage.GET_MESSAGE.getMessage(), slackService.getSlack(messageId, pageable));
+        return SuccessResponse.success(SuccessMessage.GET_MESSAGE.getHttpStatus().value(), SuccessMessage.GET_MESSAGE.getMessage(), slackService.getSlack(messageId));
 
     }
 
