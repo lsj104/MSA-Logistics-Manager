@@ -24,9 +24,7 @@ public class UserService {
     //회원가입
     public UserResponseDto signUp(UserRequestDto signUpRequestDto) {
         // username 중복 확인 Todo : Exception
-        if(userRepository.findByUsername(signUpRequestDto.getUsername()).isPresent()) {
-            throw new BusinessLogicException(ExceptionCode.EXIST_PRODUCT);
-        }
+        userRepository.findByUsername(signUpRequestDto.getUsername());
         // Todo : password 인코딩 (객체 생성 전)
         //String encodedPassword = passwordEncoder.encode(signUpRequestDto.getPassword());
         // Todo : entity 변환
@@ -42,8 +40,7 @@ public class UserService {
     //관리자 : 유저 가입 승인
     public UserResponseForRegisterDto approve(Long userId, boolean isConfirmed) {
         //repository 찾기
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_EXIST_USER));
+        User user = userRepository.findById(userId);
         // true로 변경
         user.setConfirmed(isConfirmed);
         //User 승인 여부 db 저장
@@ -56,8 +53,7 @@ public class UserService {
     // 유저 : 개인의 상세 정보 조회
     public UserResponseDto getUserDetail(Long userId) {
         // repository 찾기
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_EXIST_USER));
+        User user = userRepository.findById(userId);
         // dto 변환
         UserDataDto userDataDto = new UserDataDto(user);
         return new UserResponseDto<UserDataDto>(200, "유저의 개인 상세 정보 조회 성공", userDataDto);
@@ -66,8 +62,7 @@ public class UserService {
     // 관리자 : 유저의 상세 정보 조회
     public UserResponseForRegisterDto getUserDetailForRegister(Long userId) {
         //repository 찾기
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_EXIST_USER));
+        User user = userRepository.findById(userId);
         //dto 변환
         UserDataForRegisterDto userDataForRegisterDto = new UserDataForRegisterDto(user);
         return new UserResponseForRegisterDto<UserDataForRegisterDto>(200, "유저 상세 정보 조회 성공", userDataForRegisterDto);
@@ -82,6 +77,20 @@ public class UserService {
         Page<User> userList = userRepository.findAll(pageable);
         // Dto 변환
         Page<UserDataForRegisterDto> dtoPage = userList.map(UserDataForRegisterDto:: new);
-        return new CustomPageResponse<>(200, "유저 리스트 조회 성공", dtoPage);
+        return new CustomPageResponse<>(dtoPage);
+    }
+
+    // 관리자 : 유저 검색
+    public CustomPageResponse<UserDataForRegisterDto> searchUsers(
+            String searchText, int page, int size, String sort) {
+        //sort
+        Sort sortBy = Sort.by(Sort.Direction.DESC, sort);
+        Pageable pageable = PageRequest.of(page, size, sortBy);
+
+        Page<User> searchUsers = userRepository.search(searchText, pageable);
+        // to Dto
+        Page<UserDataForRegisterDto> userList = searchUsers.map(UserDataForRegisterDto::new);
+        return new CustomPageResponse<>(userList);
+
     }
 }

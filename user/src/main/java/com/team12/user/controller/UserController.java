@@ -59,6 +59,14 @@ public class UserController {
     }
 
     //관리자 : 유저 검색
+    @GetMapping("/search")
+    public ResponseEntity searchUser(@RequestParam(name="text") String searchText,
+                                     @RequestParam(name = "page", defaultValue = "1") int page,
+                                     @RequestParam(name = "size", defaultValue = "10") int size,
+                                     @RequestParam(value = "sort", defaultValue = "createdAt") String sort) {
+        CustomPageResponse<UserDataForRegisterDto> userList = userService.searchUsers(searchText, page-1, size, sort);
+        return ResponseEntity.ok(userList);
+    }
 
     //관리자 : 유저 정보 수정
 
