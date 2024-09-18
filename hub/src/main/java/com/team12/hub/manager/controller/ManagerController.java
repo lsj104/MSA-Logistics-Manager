@@ -72,4 +72,14 @@ public class ManagerController {
         Page<ManagerResponseDto> managerResponseDtoPage = managerService.getManagers(searchRequestDto, pageable);
         return SuccessResponse.success(SuccessMessage.GET_MANAGERS.getHttpStatus().value(), SuccessMessage.GET_MANAGERS.getMessage(), managerResponseDtoPage);
     }
+
+    @GetMapping("/hub-to-hub")
+    public List<ManagerResponseDto> getHubToHubManagers() {
+        return managerService.getHubToHubManagers();
+    }
+
+    @GetMapping("/hub-to-company")
+    public List<ManagerResponseDto> getHubToCompanyManagers(@RequestParam UUID hubId) {
+        return managerService.getHubToCompanyManagers(hubId);
+    }
 }

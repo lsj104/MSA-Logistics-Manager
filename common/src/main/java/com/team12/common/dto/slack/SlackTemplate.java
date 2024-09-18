@@ -50,7 +50,7 @@ public class SlackTemplate {
             """, orderNumber, status);
     }
 
-    public static String arrivedAtHub(String deliveryId, String status, String fromHubId) {
+    public static String arrivedAtHub(String deliveryId, String status, String fromHubName) {
         return String.format("""
             :package: *경유지 도착*
             
@@ -58,14 +58,14 @@ public class SlackTemplate {
             
             :memo: 주문 번호: `%s`
             :truck: 현재 상태: *%s*
-            :factory: 도착 경유지: `%s`
+            :factory: 도착 경유지: %s
             
             배송 상태가 변경될 때마다 업데이트해 드리겠습니다.
             
             문의사항이 있으시면 언제든 고객센터로 연락 주세요.
             
             감사합니다!
-            """, deliveryId, status, fromHubId);
+            """, deliveryId, status, fromHubName);
 
     }
 }
