@@ -21,60 +21,62 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class GeminiApiService {
 
-  private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
-  @Value("${API_KEY}")
-  private String apiKey;
-  private static final String baseURL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=";
+    @Value("${API_KEY}")
+    private String apiKey;
 
-  public String generateContent(String question)  {
-    String url = baseURL + apiKey;
+    @Value("${gemini.base-url}")
+    private static String baseURL;
 
-    AiRequest request = AiRequest.generateBody(question);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<AiRequest> requestEntity = new HttpEntity<>(request, headers);
+    public String question(String question) {
+        String url = baseURL + apiKey;
 
-    ResponseEntity<String> response = restTemplate.exchange(
-        url,
-        HttpMethod.POST,
-        requestEntity,
-        String.class
-    );
+        AiRequest request = AiRequest.generateBody(question);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<AiRequest> requestEntity = new HttpEntity<>(request, headers);
 
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      AiResponse aiResponse = mapper.readValue(response.getBody(), AiResponse.class);
-      if (response.getStatusCode().is2xxSuccessful()) {
-        return extractTextFromAiResponse(aiResponse);
-      }else{
-        throw new RuntimeException("Failed to generate content");
-      }
-    } catch (JsonProcessingException e) {
-      log.error(e.getMessage());
-      return null;
-    }
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                requestEntity,
+                String.class
+        );
 
-  }
-
-  public String extractTextFromAiResponse(AiResponse aiResponse) {
-    // candidates 리스트가 비어 있지 않은지 확인
-    List<AiResponse.Candidate> candidates = aiResponse.getCandidates();
-    if (candidates != null && !candidates.isEmpty()) {
-      AiResponse.Candidate firstCandidate = candidates.get(0);
-
-      // content의 parts 리스트가 비어 있지 않은지 확인
-      AiResponse.Candidate.Content content = firstCandidate.getContent();
-      if (content != null) {
-        List<AiResponse.Candidate.Content.Part> parts = content.getParts();
-        if (parts != null && !parts.isEmpty()) {
-          // 첫 번째 파트의 텍스트 값 추출
-          return parts.get(0).getText();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            AiResponse aiResponse = mapper.readValue(response.getBody(), AiResponse.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return extractCheck(aiResponse);
+            } else {
+                throw new RuntimeException("Failed to generate content");
+            }
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            return null;
         }
-      }
+
     }
-    // 만약 candidates 리스트가 비어 있거나, content 또는 parts가 비어 있으면 null 반환
-    return null;
-  }
+
+    public String extractCheck(AiResponse aiResponse) {
+        // candidates 리스트가 비어 있지 않은지 확인
+        List<AiResponse.Candidate> candidates = aiResponse.getCandidates();
+        if (candidates != null && !candidates.isEmpty()) {
+            AiResponse.Candidate firstCandidate = candidates.get(0);
+
+            // content의 parts 리스트가 비어 있지 않은지 확인
+            AiResponse.Candidate.Content content = firstCandidate.getContent();
+            if (content != null) {
+                List<AiResponse.Candidate.Content.Part> parts = content.getParts();
+                if (parts != null && !parts.isEmpty()) {
+                    // 첫 번째 파트의 텍스트 값 추출
+                    return parts.get(0).getText();
+                }
+            }
+        }
+        // 만약 candidates 리스트가 비어 있거나, content 또는 parts가 비어 있으면 null 반환
+        return null;
+    }
 
 }
