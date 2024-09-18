@@ -34,6 +34,8 @@ public enum ExceptionCode {
 
     // HUB_PATH 3200~
     HUB_PATH_NOT_FOUND(3201, "해당 허브 간 이동이 존재하지 않습니다."),
+    FROM_HUB_NOT_FOUND(3202, "입력하신 출발 허브가 존재하지 않습니다."),
+    TO_HUB_NOT_FOUND(3203, "입력하신 도착 허브가 존재하지 않습니다."),
 
     // MANAGER 3300~
     MANAGER_NOT_FOUND(3301, "해당 담당자가 존재하지 않습니다."),
