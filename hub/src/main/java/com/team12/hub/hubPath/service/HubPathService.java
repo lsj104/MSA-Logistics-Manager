@@ -191,15 +191,8 @@ public class HubPathService {
             }
         }
         Collections.reverse(optimalPathDetails); // 출발 허브부터 도착 허브까지 순서로 정렬
-
-        return putOptimalPathToCache(departureHubID, arrivalHubID, optimalPathDetails);
-
-
-    }
-
-    // findOptimalPath 결과 캐시에 저장
-    @CachePut(value = "optimalPaths", key = "{#departureHubID, #arrivalHubID}")
-    public List<HubPathDetailsResponseDto> putOptimalPathToCache(UUID departureHubID, UUID arrivalHubID, List<HubPathDetailsResponseDto> optimalPathDetails) {
         return optimalPathDetails;
+
     }
+
 }
