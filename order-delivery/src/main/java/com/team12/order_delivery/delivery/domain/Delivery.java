@@ -45,6 +45,19 @@ public class Delivery extends AuditingEntity {
         PREPARING, DELIVERING, DELIVERED
     }
 
+    // 주문 수정
+    public void updateDeliveryInfo(String address, String receiver, String receiverEmail) {
+        if (address != null) {
+            this.address = address;
+        }
+        if (receiver != null) {
+            this.receiver = receiver;
+        }
+        if (receiverEmail != null) {
+            this.receiverEmail = receiverEmail;
+        }
+    }
+
 
 }
 
