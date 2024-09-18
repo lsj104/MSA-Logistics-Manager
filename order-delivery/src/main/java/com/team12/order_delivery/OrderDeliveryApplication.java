@@ -11,8 +11,8 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableFeignClients
 public class OrderDeliveryApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(OrderDeliveryApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(OrderDeliveryApplication.class, args);
+    }
 
 }
