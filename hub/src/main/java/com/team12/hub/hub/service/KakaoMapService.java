@@ -23,7 +23,7 @@ public class KakaoMapService {
 
     private static final String GEOCODING_API_URL = "https://dapi.kakao.com/v2/local/search/address.json?query=%s";
 
-    public List<BigDecimal> getLatLongFromAddress(String address) {
+    public List<String> getLatLongFromAddress(String address) {
         String url = String.format(GEOCODING_API_URL, address);
 
         RestTemplate restTemplate = new RestTemplate();
@@ -37,8 +37,8 @@ public class KakaoMapService {
 
         if (documents.length() > 0) {
             JSONObject location = documents.getJSONObject(0).getJSONObject("address");
-            BigDecimal latitude = location.getBigDecimal("y");
-            BigDecimal longitude = location.getBigDecimal("x");
+            String latitude = location.getString("y");
+            String longitude = location.getString("x");
             return Arrays.asList(latitude, longitude);
         } else {
             throw new RuntimeException("No results found for the address: " + address);

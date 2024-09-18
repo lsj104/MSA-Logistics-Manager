@@ -13,8 +13,8 @@ public class HubResponseDto {
     private UUID id;
     private String name;
     private String address;
-    private BigDecimal latitude;
-    private BigDecimal longitude;
+    private String latitude;
+    private String longitude;
 
     public HubResponseDto(Hub hub){
         this.id = hub.getId();

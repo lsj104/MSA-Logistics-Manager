@@ -1,10 +1,12 @@
 package com.team12.company_product.company.dto.request;
 
 
+import com.team12.company_product.company.domain.CompanyType;
+
 public record UpdateCompanyRequestDto(
 
         String companyName,
-        String companyType,
+        CompanyType companyType,
         String hubId,
         String address
 

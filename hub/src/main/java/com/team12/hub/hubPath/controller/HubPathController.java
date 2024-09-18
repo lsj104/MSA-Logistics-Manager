@@ -1,11 +1,16 @@
 package com.team12.hub.hubPath.controller;
 
+import com.team12.common.dto.hub.HubPathDetailsResponseDto;
+import com.team12.common.dto.hub.HubPathOptimalRequestDto;
+import com.team12.common.exception.response.SuccessResponse;
 import com.team12.hub.hub.dto.HubResponseDto;
 import com.team12.hub.hubPath.domain.HubPath;
-import com.team12.hub.hubPath.dto.HubPathRequestDto;
+import com.team12.hub.hubPath.dto.HubPathCreateRequestDto;
 import com.team12.hub.hubPath.dto.HubPathResponseDto;
 import com.team12.hub.hubPath.dto.HubPathSearchRequestDto;
+import com.team12.hub.hubPath.dto.HubPathUpdateRequestDto;
 import com.team12.hub.hubPath.service.HubPathService;
+import com.team12.hub.util.SuccessMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -22,27 +28,31 @@ public class HubPathController {
     private final HubPathService hubPathService;
 
     @PostMapping
-    public HubPathResponseDto createHubPath(@RequestBody HubPathRequestDto hubPathRequestDto) {
-        return hubPathService.createHubPath(hubPathRequestDto);
+    public SuccessResponse<?> createHubPath(@RequestBody HubPathCreateRequestDto hubPathCreateRequestDto) {
+        HubPathResponseDto createdHubPath = hubPathService.createHubPath(hubPathCreateRequestDto);
+        return SuccessResponse.success(SuccessMessage.CREATE_HUB_PATH.getHttpStatus().value(), SuccessMessage.CREATE_HUB_PATH.getMessage(), createdHubPath);
     }
 
     @PutMapping("/{hubPathId}")
-    public HubPath updateHubPath(@PathVariable UUID hubPathId, @RequestBody HubPathRequestDto hubPathRequestDto) {
-        return hubPathService.updateHubPath(hubPathId, hubPathRequestDto);
+    public SuccessResponse<?> updateHubPath(@PathVariable UUID hubPathId, @RequestBody HubPathUpdateRequestDto hubPathUpdateRequestDto) {
+        HubPathResponseDto updatedHubPath = hubPathService.updateHubPath(hubPathId, hubPathUpdateRequestDto);
+        return SuccessResponse.success(SuccessMessage.UPDATE_HUB_PATH.getHttpStatus().value(), SuccessMessage.UPDATE_HUB_PATH.getMessage(), updatedHubPath);
     }
 
     @DeleteMapping("/{hubPathId}")
-    public UUID deleteHubPath(@PathVariable UUID hubPathId) {
-        return hubPathService.deleteHubPath(hubPathId);
+    public SuccessResponse<?> deleteHubPath(@PathVariable UUID hubPathId) {
+        UUID deletedHubPathId = hubPathService.deleteHubPath(hubPathId);
+        return SuccessResponse.success(SuccessMessage.DELETE_HUB_PATH.getHttpStatus().value(), SuccessMessage.DELETE_HUB_PATH.getMessage(), deletedHubPathId);
     }
 
     @GetMapping("/{hubPathId}")
-    public HubPath getHubPath(@PathVariable UUID hubPathId) {
-        return hubPathService.getHubPath(hubPathId);
+    public SuccessResponse<?> getHubPath(@PathVariable UUID hubPathId) {
+        HubPathResponseDto hubPathResponseDto = hubPathService.getHubPath(hubPathId);
+        return SuccessResponse.success(SuccessMessage.GET_HUB_PATH.getHttpStatus().value(), SuccessMessage.GET_HUB_PATH.getMessage(), hubPathResponseDto);
     }
 
     @GetMapping
-    public Page<HubPathResponseDto> getHubPaths(@RequestParam(required = false) UUID fromHubID,
+    public SuccessResponse<?> getHubPaths(@RequestParam(required = false) UUID fromHubID,
                                                 @RequestParam(required = false) UUID toHubID,
                                                 @RequestParam(defaultValue = "1") int page,
                                                 @RequestParam(defaultValue = "10") int size,
@@ -58,7 +68,12 @@ public class HubPathController {
             size = 10;
         }
         Pageable pageable = PageRequest.of(page - 1, size, sortOption);
-        Page<HubPathResponseDto> hubPathResponsDtoPage = hubPathService.getHubs(searchRequestDto, pageable);
-        return hubPathResponsDtoPage;
+        Page<HubPathResponseDto> hubPathResponsDtoPage = hubPathService.getHubPaths(searchRequestDto, pageable);
+        return SuccessResponse.success(SuccessMessage.GET_HUB_PATHS.getHttpStatus().value(), SuccessMessage.GET_HUB_PATHS.getMessage(), hubPathResponsDtoPage);
+    }
+
+    @PostMapping("/findOptimalPath")
+    public List<HubPathDetailsResponseDto> findOptimalPath(@RequestBody HubPathOptimalRequestDto hubPathOptimalRequestDto) {
+        return hubPathService.findOptimalPath(hubPathOptimalRequestDto.getDepartureHubID(), hubPathOptimalRequestDto.getArrivalHubID());
     }
 }
