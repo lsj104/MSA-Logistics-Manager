@@ -1,11 +1,51 @@
+server:
+  port: 19093
+
 spring:
   application:
     name: hub
-  server:
-    port: 19093
 
+  data:
+    redis:
+      host: localhost  # Redis 서버의 호스트명
+      port: 6379       # Redis 서버 포트
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: hub
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  hikari:
+    # 추가적인 HikariCP 설정
+    maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        default_schema: s_hub
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:19090/eureka/
+
+
+kakao:
+  api:
+    key: ${KAKAO_API_KEY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
