@@ -1,6 +1,6 @@
 package com.team12.auth.dto;
 
-import com.team12.common.auth.UserRoleEnum;
+import com.team12.common.enums.UserRoleEnum;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -40,6 +40,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/client/**").permitAll()
+                        .requestMatchers("/api/products").permitAll()
+                        .requestMatchers("/api/companies").permitAll()
+                        .requestMatchers("/api/hubs").permitAll()
+                        .requestMatchers("/api/hub-paths").permitAll()
+                        .requestMatchers("/api/managers").permitAll()
+                        .requestMatchers("/delivery").permitAll()
+                        .requestMatchers("route").permitAll()
+                        .requestMatchers("/api/orders").permitAll()
+                        .requestMatchers("slack").permitAll()
                         .anyRequest().authenticated() // 그 외 모든 요청 인증처리
                 )
                 .sessionManagement((session) ->
