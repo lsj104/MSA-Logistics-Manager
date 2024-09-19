@@ -1,4 +1,4 @@
-package com.team12.user.dto;
+package com.team12.common.dto.user;
 
 import com.team12.common.auth.UserRoleEnum;
 import lombok.AllArgsConstructor;
@@ -10,10 +10,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSignUpRequestDto {
+public class UserDetailsDto {
+    private Long userId;
     private String username;
     private String password;
-    private String slackEmail;
-    private String name;
-    private UserRoleEnum userRoleEnum;
+    private UserRoleEnum role;
+
 }
