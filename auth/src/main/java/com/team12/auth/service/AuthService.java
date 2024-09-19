@@ -46,4 +46,32 @@ public class AuthService {
             return new JwtAuthenticationResponse(accessToken, refreshToken, userId, username, role);
         }
 
+    //refreshToken
+    public JwtAuthenticationResponse refreshToken(String refreshToken) {
+        //refreshToken 유효성 확인
+        if (jwtTokenProvider.validateToken(refreshToken)) {
+            String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
+            //Redis에서 refreshToken 확인
+            String storedToken = redisService.getRefreshToken(username);
+            if (storedToken != null && storedToken.equals(refreshToken)) {
+                //new accessToken
+                Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, null);
+                String newAccessToken = jwtTokenProvider.generateAccessToken(authentication);
+                //userDetails
+                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+                Long userId = userDetails.getId();
+                String userDetailsUsername = userDetails.getUsername();
+                String role = userDetails.getAuthorities().iterator().next().getAuthority().substring(5);
+                //return 새로운 accessToken과 기존 refreshToken
+                return new JwtAuthenticationResponse(newAccessToken, refreshToken, userId, userDetailsUsername, role);
+            } else {
+                //Todo : exception
+                throw new IllegalArgumentException("Invalid refresh Token");
+            }
+        }else {
+            throw new IllegalArgumentException("Refresh token is expired or invalid");
+        }
+    }
+
 }
+
