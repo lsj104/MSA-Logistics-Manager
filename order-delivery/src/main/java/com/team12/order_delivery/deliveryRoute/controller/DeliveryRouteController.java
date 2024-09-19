@@ -30,8 +30,8 @@ public class DeliveryRouteController {
     }
 
     @DeleteMapping("")
-    public SuccessResponse<?> deleteDeliveryRoute(@RequestParam String deliveryRouteId) {
-        deliveryRouteService.deleteDeliveryRoute(deliveryRouteId);
+    public SuccessResponse<?> deleteDeliveryRoute(@RequestParam String deliveryRouteId, @RequestHeader Long userId) {
+        deliveryRouteService.deleteDeliveryRoute(deliveryRouteId, userId);
         return SuccessResponse.success(SuccessMessage.DELETE_DELIVERY_ROUTE.getHttpStatus().value(), SuccessMessage.DELETE_DELIVERY_ROUTE.getMessage());
     }
 

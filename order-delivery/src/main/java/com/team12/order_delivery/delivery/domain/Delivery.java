@@ -21,6 +21,7 @@ public class Delivery extends AuditingEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private UUID orderId;
+    private Long userId;
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
     private UUID departmentId;

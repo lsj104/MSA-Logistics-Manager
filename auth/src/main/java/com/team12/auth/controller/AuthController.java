@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
+    @Autowired
     private AuthenticationManager authenticationManager;
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisService redisService;
 
 
     //login
