@@ -1,8 +1,10 @@
 package com.team12.user.controller;
 
 import com.team12.common.customPage.CustomPageResponse;
+import com.team12.common.dto.user.UserDetailsDto;
 import com.team12.common.exception.response.CommonResponse;
 import com.team12.user.dto.*;
+import com.team12.user.service.ClientService;
 import com.team12.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final ClientService clientService;
 
     //회원가입
     @PostMapping("/sign-up")

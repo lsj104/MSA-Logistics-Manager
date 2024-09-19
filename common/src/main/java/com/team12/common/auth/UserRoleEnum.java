@@ -1,4 +1,4 @@
-package com.team12.auth.domain;
+package com.team12.common.auth;
 
 import lombok.Getter;
 
