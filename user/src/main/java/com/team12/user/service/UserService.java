@@ -3,17 +3,15 @@ package com.team12.user.service;
 import com.team12.common.customPage.CustomPageResponse;
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
-import com.team12.common.exception.test.BusinessException;
 import com.team12.user.domain.User;
 import com.team12.user.dto.*;
 import com.team12.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-//import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.config.JpaRepositoryNameSpaceHandler;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,16 +19,16 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-    //private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     //회원가입
     public UserResponseDto signUp(UserSignUpRequestDto signUpRequestDto) {
         // username 중복 확인 Todo : Exception
         userRepository.findByUsername(signUpRequestDto.getUsername());
         // Todo : password 인코딩 (객체 생성 전)
-        //String encodedPassword = passwordEncoder.encode(signUpRequestDto.getPassword());
+        String encodedPassword = passwordEncoder.encode(signUpRequestDto.getPassword());
         // Todo : entity 변환
-        User user = new User(signUpRequestDto, "asdfff");
+        User user = new User(signUpRequestDto, encodedPassword);
         // db 저장
         userRepository.save(user);
         // dto 변환
