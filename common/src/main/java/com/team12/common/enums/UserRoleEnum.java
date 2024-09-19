@@ -1,4 +1,4 @@
-package com.team12.common.auth;
+package com.team12.common.enums;
 
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package com.team12.user.dto;
 
-import com.team12.common.auth.UserRoleEnum;
+import com.team12.common.enums.UserRoleEnum;
 import com.team12.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
