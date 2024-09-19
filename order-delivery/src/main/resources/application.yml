@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/${POSTGRESQL_URL}
-    username: ${POSTGRESQL_USERNAME}
-    password: ${POSTGRESQL_PW}
+    url: jdbc:postgresql://localhost:5432/odl
+    username: odl
+    password: 1234
 
   jpa:
     hibernate:
@@ -27,8 +27,6 @@ spring:
       port: 6379
       username: default
       password: default
-  profiles:
-    include: private
 server:
   port: 19094
 
