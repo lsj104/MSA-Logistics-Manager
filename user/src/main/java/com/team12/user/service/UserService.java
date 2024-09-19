@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.JpaRepositoryNameSpaceHandler;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,16 +22,16 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-    //private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     //회원가입
     public UserResponseDto signUp(UserSignUpRequestDto signUpRequestDto) {
         // username 중복 확인 Todo : Exception
         userRepository.findByUsername(signUpRequestDto.getUsername());
         // Todo : password 인코딩 (객체 생성 전)
-        //String encodedPassword = passwordEncoder.encode(signUpRequestDto.getPassword());
+        String encodedPassword = passwordEncoder.encode(signUpRequestDto.getPassword());
         // Todo : entity 변환
-        User user = new User(signUpRequestDto, "asdfff");
+        User user = new User(signUpRequestDto, encodedPassword);
         // db 저장
         userRepository.save(user);
         // dto 변환
