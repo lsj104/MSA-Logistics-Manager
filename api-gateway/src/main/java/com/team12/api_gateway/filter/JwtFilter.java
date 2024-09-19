@@ -72,12 +72,14 @@ public class JwtFilter implements GlobalFilter {
     //id 추출
     private String getUserId(String token) {
         Claims claims = getClaimsFromToken(token);
-        return claims.get("id", String.class);
+        Integer id = claims.get("id", Integer.class);
+        return id.toString();
     }
 
     //Claims 추출
     private Claims getClaimsFromToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secretKey));
+        byte[] bytes = secretKey.getBytes();
+        SecretKey key = Keys.hmacShaKeyFor(bytes);
         Jws<Claims> claimsJws = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -98,6 +100,8 @@ public class JwtFilter implements GlobalFilter {
     //토큰 검증
     private boolean validateToken(String token, ServerWebExchange exchange) {
         try {
+            byte[] bytes = secretKey.getBytes();
+            SecretKey secretKey = Keys.hmacShaKeyFor(bytes);
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
