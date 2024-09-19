@@ -1,4 +1,4 @@
-package com.team12.hub.hubPath.config;
+package com.team12.hub.config;
 
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
