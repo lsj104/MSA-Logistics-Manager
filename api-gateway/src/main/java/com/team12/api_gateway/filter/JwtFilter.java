@@ -6,6 +6,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -18,6 +19,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
+import java.security.Key;
 
 @Component
 @Slf4j
@@ -30,7 +32,7 @@ public class JwtFilter implements GlobalFilter {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
         if (path.equals("/api/auth/login") || path.equals("/api/users/sign-up") || path.equals("api/auth/refresh-token")) {
-            return chain.filter(exchange);  // /signIn 경로는 필터를 적용하지 않음
+            return chain.filter(exchange);
         }
 
         String token = extractToken(exchange);
@@ -41,9 +43,51 @@ public class JwtFilter implements GlobalFilter {
             return onError(exchange, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED);
         }
 
-        return chain.filter(exchange);
+        String role = getRole(token);
+        String userId = getUserId(token);  // ID 추출 메서드
+        String username = getUsername(token);  // 사용자명 추출 메서드
+
+        ServerWebExchange modifiedExchange = exchange.mutate()
+                .request(r -> r.headers(headers -> {
+                    headers.add("X-User-Id", userId);
+                    headers.add("X-User-Name", username);
+                    headers.add("X-User-Role", role);
+                }))
+                .build();
+
+        return chain.filter(modifiedExchange);
     }
 
+    //username 추출
+    private String getUsername(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims.getSubject();
+    }
+    //권한 추출
+    private String getRole(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims.get("role", String.class);
+    }
+
+    //id 추출
+    private String getUserId(String token) {
+        Claims claims = getClaimsFromToken(token);
+        Integer id = claims.get("id", Integer.class);
+        return id.toString();
+    }
+
+    //Claims 추출
+    private Claims getClaimsFromToken(String token) {
+        byte[] bytes = secretKey.getBytes();
+        SecretKey key = Keys.hmacShaKeyFor(bytes);
+        Jws<Claims> claimsJws = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token);
+        return claimsJws.getBody();
+    }
+
+    // 토큰 헤더에서 추출
     private String extractToken(ServerWebExchange exchange) {
         ServerHttpRequest request = exchange.getRequest();
         String authHeader = request.getHeaders().getFirst("Authorization");
@@ -53,34 +97,16 @@ public class JwtFilter implements GlobalFilter {
         return null;
     }
 
+    //토큰 검증
     private boolean validateToken(String token, ServerWebExchange exchange) {
         try {
+            byte[] bytes = secretKey.getBytes();
+            SecretKey secretKey = Keys.hmacShaKeyFor(bytes);
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-//            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
-//        try {
-//            SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secretKey));
-//            Jws<Claims> claimsJws = Jwts.parserBuilder()
-//                    .setSigningKey(key)
-//                    .build()
-//                    .parseClaimsJws(token);
-//            Claims claims = claimsJws.getBody();
-//            String userId = claims.get("userId", String.class);
-//            String username = claims.get("username", String.class);
-//            String role = claims.get("role", String.class);
-//            exchange.getRequest().mutate()
-//                    .header("X-User-Id", userId)
-//                    .header("X-User-Name",username)
-//                    .header("X-User-Role", role)
-//                    .build();
-//            return true;
-//        } catch (Exception e) {
-//            log.error(e.getMessage());
-//            return false;
-//        }
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, String errorMsg, HttpStatus status) {
