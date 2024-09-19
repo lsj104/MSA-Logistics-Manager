@@ -56,7 +56,8 @@ public enum ExceptionCode {
     SLACK Module 5로 시작
      */
     // SLACK 5100~
-    SLACK_NOT_FOUND(5101, "해당 슬랙이 존재하지 않습니다.");
+    SLACK_NOT_FOUND(5101, "해당 슬랙이 존재하지 않습니다."),
+    SLACK_NOTIFICATION_FAILED(5102, "슬랙 알림 전송에 실패하였습니다."),;
 
 
 
