@@ -93,10 +93,11 @@ public class DeliveryRouteService {
         }
     }
 
-    public void deleteDeliveryRoute(String deliveryRouteId) {
+    public void deleteDeliveryRoute(String deliveryRouteId, Long userId) {
         try {
             DeliveryRoute deliveryRoute = findById(UUID.fromString(deliveryRouteId));
             deliveryRouteRepository.delete(deliveryRoute);
+            deliveryRoute.setDeletedBy(userId);
         } catch (Exception e) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }

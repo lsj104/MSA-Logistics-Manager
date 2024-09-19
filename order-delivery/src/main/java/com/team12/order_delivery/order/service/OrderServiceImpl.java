@@ -39,12 +39,12 @@ public class OrderServiceImpl implements OrderService {
 
     // 주문 생성
     @Transactional
-    public CreateOrderResponseDto createOrder(CreateOrderRequestDto requestDto) {
+    public CreateOrderResponseDto createOrder(CreateOrderRequestDto requestDto, Long userId) {
         validateCompanies(requestDto);
         validateProduct(requestDto.productId());
 
         Order order = createAndSaveOrder(requestDto);
-        createAndAssignDelivery(order, requestDto);
+        createAndAssignDelivery(order, requestDto, userId);
 
         return CreateOrderResponseDto.from(order);
     }
@@ -115,7 +115,7 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 
-    private void createAndAssignDelivery(Order order, CreateOrderRequestDto requestDto) {
+    private void createAndAssignDelivery(Order order, CreateOrderRequestDto requestDto, Long userId) {
         CompanyResponseDto producerCompany = companyService.getCompany(
                 requestDto.producerCompany());
         CompanyResponseDto receiverCompany = companyService.getCompany(
@@ -132,7 +132,7 @@ public class OrderServiceImpl implements OrderService {
 
         log.info(deliveryReqDto.toString());
 
-        DeliveryResDto deliveryResDto = deliveryService.createDelivery(deliveryReqDto);
+        DeliveryResDto deliveryResDto = deliveryService.createDelivery(deliveryReqDto, userId);
         Delivery delivery = deliveryService.findById(deliveryResDto.getDeliveryId());
         order.assignDelivery(delivery);
         orderRepository.save(order);

@@ -25,14 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "주문", description = "주문 API")
 @RestController
@@ -45,12 +38,13 @@ public class OrderController {
     @Operation(summary = "주문 생성")
     @PostMapping
     public ResponseEntity<SuccessResponse<CreateOrderResponseDto>> createOrder(
-            @RequestBody CreateOrderRequestDto requestDto) {
+            @RequestBody CreateOrderRequestDto requestDto,
+            @RequestHeader(value = "X-user-Id") Long userId) {
 
         return ResponseEntity.status(CREATE_ORDER.getHttpStatus())
                 .body(success(CREATE_ORDER.getHttpStatus().value(),
                         CREATE_ORDER.getMessage(),
-                        orderService.createOrder(requestDto)));
+                        orderService.createOrder(requestDto, userId)));
 
     }
 
