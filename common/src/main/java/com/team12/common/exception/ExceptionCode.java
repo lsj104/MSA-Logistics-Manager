@@ -16,7 +16,9 @@ public enum ExceptionCode {
     */
     // USER 1100~
     USER_NOT_FOUND(1101, "해당 사용자가 존재하지 않습니다."),
-
+    ALREADY_EXIST_USER(1102, "이미 존재하는 사용자입니다."),
+    DELETED_USER(1103, "삭제된 사용자입니다."),
+    NOT_PROVIDE_LANGUAGE(1104, "Null은 허용하지 않습니다."),
     /*
     COMPANY_PRODUCT Module 2로 시작
      */

@@ -44,7 +44,7 @@ public class UserRepository {
     //findById (존재 여부 확인)
     public User findById(Long userId) {
         User user =  userJpaRepository.findById(userId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_EXIST_USER));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.USER_NOT_FOUND));
         if(user.getIsDeleted()) throw new BusinessLogicException(ExceptionCode.DELETED_USER);
         return user;
     }
@@ -90,7 +90,7 @@ public class UserRepository {
 
     public User findByUsernameForAuth(String username) {
         return userJpaRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_EXIST_USER));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.USER_NOT_FOUND));
     };
 
 
