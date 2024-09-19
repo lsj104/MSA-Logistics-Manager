@@ -81,14 +81,14 @@ public class JwtFilter implements ServerSecurityContextRepository {
         }
     }
 
-    private Mono<Void> onError(ServerWebExchange exchange, String errorMsg, HttpStatus status) {
-        exchange.getResponse().setStatusCode(status);
-        exchange.getResponse().getHeaders().add("Content-Type", "application/json");
-        String body = "{\"error\": \"" + errorMsg + "\"}";
-        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
-                .bufferFactory()
-                .wrap(body.getBytes())));
-    }
+//    private Mono<Void> onError(ServerWebExchange exchange, String errorMsg, HttpStatus status) {
+//        exchange.getResponse().setStatusCode(status);
+//        exchange.getResponse().getHeaders().add("Content-Type", "application/json");
+//        String body = "{\"error\": \"" + errorMsg + "\"}";
+//        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
+//                .bufferFactory()
+//                .wrap(body.getBytes())));
+//    }
 
     @Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {

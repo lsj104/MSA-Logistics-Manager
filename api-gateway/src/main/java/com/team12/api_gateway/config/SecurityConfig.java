@@ -25,6 +25,7 @@ public class SecurityConfig {
                         .pathMatchers("/api/users/reg/**").hasAuthority("MASTER")
 //                        "COMPANY","HUB_MANAGER", "HUB_TO_HUB_DELIVERY", "TO_COMPANY_DELIVERY"
                         .pathMatchers("/api/users/usr").hasAnyAuthority("COMPANY","HUB_MANAGER", "HUB_TO_HUB_DELIVERY", "TO_COMPANY_DELIVERY")
+                        .pathMatchers("/api/auth/logout").authenticated()
                         .pathMatchers("/api/auth/**").permitAll()
                         .pathMatchers("/client/**").permitAll()
                         .pathMatchers("/api/products").permitAll()
