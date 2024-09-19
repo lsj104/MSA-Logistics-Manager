@@ -1,7 +1,5 @@
 package com.team12.auth.config;
 
-import com.team12.auth.jwt.JwtAuthenticationFilter;
-import com.team12.auth.jwt.JwtTokenProvider;
 import com.team12.auth.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
