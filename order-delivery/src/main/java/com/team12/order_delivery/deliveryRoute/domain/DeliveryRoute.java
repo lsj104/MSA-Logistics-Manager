@@ -1,6 +1,7 @@
 package com.team12.order_delivery.deliveryRoute.domain;
 
 import com.team12.common.audit.AuditingEntity;
+import com.team12.order_delivery.delivery.domain.Delivery;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,8 +21,9 @@ public class DeliveryRoute extends AuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    @CollectionTable(name = "p_delivery", joinColumns = @JoinColumn(name = "id"))
-    private UUID deliveryId;
+    @ManyToOne
+    @JoinColumn(name = "delivery_id")
+    private Delivery delivery;
     private int sequence;
     private String startPoint;
     private String endPoint;

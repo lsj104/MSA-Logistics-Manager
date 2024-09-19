@@ -26,7 +26,7 @@ public class DeliveryRouteController {
 
     @PutMapping("")
     public SuccessResponse<?> updateDeliveryRoute(@RequestParam String deliveryRouteId, @RequestParam String deliveryId, @RequestParam String sequence, @RequestParam String hubId) {
-        return SuccessResponse.success(SuccessMessage.UPDATE_DELIVERY_ROUTE.getHttpStatus().value(), SuccessMessage.UPDATE_DELIVERY_ROUTE.getMessage(), deliveryRouteService.updateDeliveryRoute(deliveryRouteId, deliveryId, sequence, hubId));
+        return SuccessResponse.success(SuccessMessage.UPDATE_DELIVERY_ROUTE.getHttpStatus().value(), SuccessMessage.UPDATE_DELIVERY_ROUTE.getMessage(), deliveryRouteService.updateDeliveryRoute(deliveryRouteId,sequence, hubId));
     }
 
     @DeleteMapping("")

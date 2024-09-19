@@ -11,7 +11,6 @@ import com.team12.order_delivery.deliveryRoute.client.HubClient;
 import com.team12.order_delivery.deliveryRoute.domain.DeliveryRoute;
 import com.team12.order_delivery.deliveryRoute.dto.RouteResDto;
 import com.team12.order_delivery.deliveryRoute.repository.DeliveryRouteRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,11 +37,10 @@ public class DeliveryRouteService {
         try {
             int sequence = 1;
             for (HubPathDetailsResponseDto movement : hubMovments) {
-                log.info("movement: {}", movement.getToHubId());
                 String fromHubName = findHubNameById(movement.getFromHubId());
                 String toHubName = findHubNameById(movement.getToHubId());
                 DeliveryRoute deliveryRoute = DeliveryRoute.builder()
-                        .deliveryId(delivery.getId())
+                        .delivery(delivery)
                         .sequence(sequence)
                         .startPoint(fromHubName)
                         .endPoint(toHubName)
@@ -56,7 +54,7 @@ public class DeliveryRouteService {
             }
 
             DeliveryRoute lastRoute = DeliveryRoute.builder()
-                    .deliveryId(delivery.getId())
+                    .delivery(delivery)
                     .sequence(sequence)
                     .startPoint(findHubNameById(hubMovments.get(hubMovments.size() - 1).getToHubId()))
                     .endPoint(delivery.getAddress())
@@ -104,10 +102,9 @@ public class DeliveryRouteService {
         }
     }
 
-    public RouteResDto updateDeliveryRoute(String deliveryRouteId, String deliveryId, String sequence, String hubId) {
+    public RouteResDto updateDeliveryRoute(String deliveryRouteId, String sequence, String hubId) {
         try {
             DeliveryRoute deliveryRoute = findById(UUID.fromString(deliveryRouteId));
-            deliveryRoute.setDeliveryId(UUID.fromString(deliveryId));
             deliveryRoute.setSequence(Integer.parseInt(sequence));
             deliveryRoute.setStartPoint(findHubNameById(UUID.fromString(hubId)));
             deliveryRouteRepository.save(deliveryRoute);
@@ -124,7 +121,6 @@ public class DeliveryRouteService {
 
     public String findHubNameById(UUID hubId) {
         HubResponseDto hub = hubClient.getHub(hubId).data();
-        log.info("hub: {}", hub.getName());
         return hub.getName();
     }
 }
