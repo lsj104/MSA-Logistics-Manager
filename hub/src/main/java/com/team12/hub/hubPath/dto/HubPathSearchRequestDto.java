@@ -12,4 +12,12 @@ import java.util.UUID;
 public class HubPathSearchRequestDto {
     private UUID fromHubId;
     private UUID toHubId;
+
+    @Override
+    public String toString() {
+        return "HubPathSearchRequestDto{" +
+                "fromHubId=" + fromHubId +
+                ", toHubId=" + toHubId +
+                '}';
+    }
 }

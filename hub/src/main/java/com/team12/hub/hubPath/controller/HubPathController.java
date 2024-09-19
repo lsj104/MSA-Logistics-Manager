@@ -68,11 +68,15 @@ public class HubPathController {
             size = 10;
         }
         Pageable pageable = PageRequest.of(page - 1, size, sortOption);
-        Page<HubPathResponseDto> hubPathResponsDtoPage = hubPathService.getHubs(searchRequestDto, pageable);
+
+        List<HubPathResponseDto> cachedHubPaths = hubPathService.getHubPaths(searchRequestDto, pageable);
+        // List를 다시 Page로 변환 (totalElements 사용하지 않음)
+        Page<HubPathResponseDto> hubPathResponsDtoPage = hubPathService.convertListToPage(cachedHubPaths, pageable);
+
         return SuccessResponse.success(SuccessMessage.GET_HUB_PATHS.getHttpStatus().value(), SuccessMessage.GET_HUB_PATHS.getMessage(), hubPathResponsDtoPage);
     }
 
-    @GetMapping("/findOptimalPath")
+    @PostMapping("/findOptimalPath")
     public List<HubPathDetailsResponseDto> findOptimalPath(@RequestBody HubPathOptimalRequestDto hubPathOptimalRequestDto) {
         return hubPathService.findOptimalPath(hubPathOptimalRequestDto.getDepartureHubID(), hubPathOptimalRequestDto.getArrivalHubID());
     }

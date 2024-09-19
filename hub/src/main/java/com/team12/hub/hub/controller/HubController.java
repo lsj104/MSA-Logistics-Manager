@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -61,7 +62,13 @@ public class HubController {
             size = 10;
         }
         Pageable pageable = PageRequest.of(page - 1, size, sortOption);
-        Page<HubResponseDto> hubResponsDtoPage = hubService.getHubs(searchRequestDto, pageable);
+        // 캐시에서 List<HubResponseDto>를 가져온 후 Page로 변환
+        List<HubResponseDto> cachedHubs = hubService.getHubs(searchRequestDto, pageable);
+
+        // List를 다시 Page로 변환 (totalElements 사용하지 않음)
+        Page<HubResponseDto> hubResponsDtoPage = hubService.convertListToPage(cachedHubs, pageable);
+
+
         return SuccessResponse.success(SuccessMessage.GET_HUBS.getHttpStatus().value(), SuccessMessage.GET_HUBS.getMessage(), hubResponsDtoPage);
     }
     @GetMapping("/{hubId}/check")
@@ -69,4 +76,5 @@ public class HubController {
         UUID checkedHubId = hubService.checkHub(hubId);
         return SuccessResponse.success(SuccessMessage.CHECK_HUB.getHttpStatus().value(), SuccessMessage.CHECK_HUB.getMessage(), checkedHubId);
     }
+
 }

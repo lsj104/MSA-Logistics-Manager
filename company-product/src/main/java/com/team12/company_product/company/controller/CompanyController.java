@@ -42,7 +42,6 @@ public class CompanyController {
 
     private final CompanyService companyService;
 
-    // TODO: user, hub 작업
     @Operation(summary = "업체 생성")
     @PostMapping
     public ResponseEntity<SuccessResponse<CreateCompanyResponseDto>> createCompany(

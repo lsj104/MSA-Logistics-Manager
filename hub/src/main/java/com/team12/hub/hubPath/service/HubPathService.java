@@ -1,7 +1,10 @@
 package com.team12.hub.hubPath.service;
 
 import com.team12.common.dto.hub.HubPathDetailsResponseDto;
+import com.team12.common.exception.BusinessLogicException;
+import com.team12.common.exception.ExceptionCode;
 import com.team12.hub.hub.domain.Hub;
+import com.team12.hub.hub.dto.HubResponseDto;
 import com.team12.hub.hub.repository.HubRepository;
 import com.team12.hub.hubPath.domain.HubNode;
 import com.team12.hub.hubPath.domain.HubPath;
@@ -16,6 +19,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,16 +36,16 @@ public class HubPathService {
     private final HubPathRepository hubPathRepository;
     private final HubRepository hubRepository;
     private final KakaoNaviService kakaoNaviService;
-    // 캐시 이름을 'hubPaths'로 설정
-    private static final String CACHE_NAME = "hubPaths";
 
 
     @Transactional
+    @CachePut(value = "hubPath", key = "#result.id")
+    @CacheEvict(value = "hubPathAll", allEntries = true)
     public HubPathResponseDto createHubPath(HubPathCreateRequestDto hubPathRequestDto) {
         Hub fromHub = hubRepository.findByIdAndIsDeleted(hubPathRequestDto.getFromHubId(), false)
-                .orElseThrow(() -> new IllegalArgumentException("해당 출발 허브가 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.FROM_HUB_NOT_FOUND));
         Hub toHub = hubRepository.findByIdAndIsDeleted(hubPathRequestDto.getToHubId(), false)
-                .orElseThrow(() -> new IllegalArgumentException("해당 도착 허브가 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.TO_HUB_NOT_FOUND));
 
         List<Integer> distanceAndDuration = kakaoNaviService.getDistanceAndDuration(fromHub.getLatitude(), fromHub.getLongitude(), toHub.getLatitude(), toHub.getLongitude());
         HubPath hubPath = new HubPath(UUID.randomUUID(), fromHub, toHub, distanceAndDuration.get(0), distanceAndDuration.get(1), false);
@@ -50,9 +54,11 @@ public class HubPathService {
         return hubPathResponseDto;
     }
     @Transactional
+    @CacheEvict(value = {"hubPath", "hubPathAll"}, allEntries = true)
+    @CachePut(value = "hubPath", key = "#hubPathId")
     public HubPathResponseDto updateHubPath(UUID hubPathId, HubPathUpdateRequestDto hubPathRequestDto) {
         HubPath hubPath = hubPathRepository.findById(hubPathId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 HubPath 를 찾지 못했습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_PATH_NOT_FOUND));
         if (hubPathRequestDto.getDistance() != null){
             hubPath.setDistance(hubPathRequestDto.getDistance());
         }
@@ -65,10 +71,11 @@ public class HubPathService {
 
 
     @Transactional
+    @CacheEvict(value = {"hubPath", "hubPathAll"}, allEntries = true)
     public UUID deleteHubPath(UUID hubPathId) {
 
         HubPath hubPath = hubPathRepository.findByIdAndIsDeleted(hubPathId, false)
-                .orElseThrow(() -> new IllegalArgumentException("해당 허브 간 이동을 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_PATH_NOT_FOUND));
         hubPath.setIsDeleted(true);
         hubPath.setDeletedAt(LocalDateTime.now());
         hubPath.setDeletedBy(0L);
@@ -77,19 +84,32 @@ public class HubPathService {
     }
 
     @Transactional
+    @Cacheable(value = "hubPath", key = "#hubPathId")
     public HubPathResponseDto getHubPath(UUID hubPathId) {
         HubPath hubPath = hubPathRepository.findByIdAndIsDeleted(hubPathId, false)
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 허브 간 이동 정보가 없습니다."));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_PATH_NOT_FOUND));
         return new HubPathResponseDto(hubPath);
     }
 
+    @Cacheable(value = "hubPathAll", key = "#searchRequestDto")
+    public List<HubPathResponseDto> getHubPaths(HubPathSearchRequestDto searchRequestDto, Pageable pageable) {
+        Page<HubPath> hubPathPage = hubPathRepository.findAll(HubPathSpecification.searchWith(searchRequestDto), pageable);
+        List<HubPathResponseDto> hubPathResponseDtoList = hubPathPage.map(hubPath -> new HubPathResponseDto(hubPath)).getContent();
+        return hubPathResponseDtoList;
+    }
+    // 캐시된 List<HubResponseDto>를 다시 Page로 변환하는 메서드 (totalElements 사용하지 않음)
+    public Page<HubPathResponseDto> convertListToPage(List<HubPathResponseDto> hubPathResponseDtoList, Pageable pageable) {
+        return new PageImpl<>(hubPathResponseDtoList, pageable, hubPathResponseDtoList.size());
+    }
+
     @Transactional
+    @CacheEvict(value = {"hubPath", "hubPathAll"}, allEntries = true)
     public List<UUID> deleteHubPathsByHubId(UUID hubId) {
         List<UUID> hubPathIds = hubPathRepository.findHubPathsByHubId(hubId);
 
         for (UUID hubPathId : hubPathIds) {
             HubPath hubPath = hubPathRepository.findByIdAndIsDeleted(hubPathId, false)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 간선을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_PATH_NOT_FOUND));
             hubPath.setIsDeleted(true);
             hubPath.setDeletedAt(LocalDateTime.now());
             hubPath.setDeletedBy(0L);
@@ -97,12 +117,8 @@ public class HubPathService {
         return hubPathIds;
     }
 
-    public Page<HubPathResponseDto> getHubs(HubPathSearchRequestDto searchRequestDto, Pageable pageable) {
-        Page<HubPath> hubPathPage = hubPathRepository.findAll(HubPathSpecification.searchWith(searchRequestDto), pageable);
-        Page<HubPathResponseDto> hubPathResponseDtoPage = hubPathPage.map(hubPath -> new HubPathResponseDto(hubPath));
-        return hubPathResponseDtoPage;
-    }
-
+    @Transactional
+    @Cacheable(value = "optimalPaths", key = "{#departureHubID, #arrivalHubID}")
     public List<HubPathDetailsResponseDto> findOptimalPath(UUID departureHubID, UUID arrivalHubID) {
         List<HubPath> hubPathList = hubPathRepository.findByIsDeleted(false);
 
@@ -181,7 +197,6 @@ public class HubPathService {
             }
         }
         Collections.reverse(optimalPathDetails); // 출발 허브부터 도착 허브까지 순서로 정렬
-
         return optimalPathDetails;
 
     }
