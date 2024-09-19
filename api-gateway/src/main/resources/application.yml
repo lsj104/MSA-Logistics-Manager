@@ -1,0 +1,73 @@
+
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+#        user
+        - id: user
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+#        auth
+        - id: auth
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+#        company-product
+        - id: company
+          uri: lb://company-product
+          predicates:
+            - Path=/api/companies/**
+        - id: product
+          uri: lb://company-product
+          predicates:
+            - Path=/api/products/**
+#        hub
+        - id: hub
+          uri: lb://hub
+          predicates:
+            - Path=/api/hubs/**
+        - id: hub-path
+          uri: lb://hub
+          predicates:
+            - Path=/api/hub-paths/**
+        - id: manage
+          uri: lb://hub
+          predicates:
+            - Path=/api/managers/**
+#        order-delivery
+        - id: delivery
+          uri: lb://order-delivery
+          predicates:
+            - Path=/delivery/**
+        - id: route
+          uri: lb://order-delivery
+          predicates:
+            - Path=/route/**
+        - id: order
+          uri: lb://order-delivery
+          predicates:
+            - Path=/api/orders/**
+#        slack
+        - id: slack
+          uri: lb://slack
+          predicates:
+            - Path=/slack/**
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  key : ${jwt-key}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
+server:
+  port: 19091
