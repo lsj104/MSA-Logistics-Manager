@@ -56,7 +56,7 @@ public class AuthController {
         boolean isExpired = jwtTokenProvider.isTokenExpired(accessToken);
         if(isExpired) {
         JwtAuthenticationResponse response = authService.refreshToken(refreshToken);
-        LoginResponseDto loginResponseDto = new LoginResponseDto(response.getAccessToken(), response.getRefreshToken());
+        LoginResponseDto loginResponseDto = new LoginResponseDto(response.getAccessToken().substring(7), response.getRefreshToken());
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-User-Id", String.valueOf(response.getUserId()));
