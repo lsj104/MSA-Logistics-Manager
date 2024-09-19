@@ -5,6 +5,7 @@ import com.team12.auth.dto.JwtAuthenticationResponse;
 import com.team12.auth.jwt.JwtTokenProvider;
 import com.team12.common.dto.auth.LoginRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
+    @Autowired
     private AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
