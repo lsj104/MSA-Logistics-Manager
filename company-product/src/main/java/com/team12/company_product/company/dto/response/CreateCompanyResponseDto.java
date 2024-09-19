@@ -1,15 +1,17 @@
 package com.team12.company_product.company.dto.response;
 
 import com.team12.company_product.company.domain.Company;
+import com.team12.company_product.company.domain.CompanyType;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Builder;
 
 @Builder
 public record CreateCompanyResponseDto(
         String companyId,
         String companyName,
-        String companyType,
-        String hubId,
+        CompanyType companyType,
+        UUID hubId,
         String address,
         Boolean isDelete,
         LocalDateTime createdAt,
@@ -18,9 +20,9 @@ public record CreateCompanyResponseDto(
 
     public static CreateCompanyResponseDto from(Company company) {
         return CreateCompanyResponseDto.builder()
-                .companyId(String.valueOf(company.getCompanyId()))
+                .companyId(company.getCompanyId())
                 .companyName(company.getCompanyName())
-                .companyType(company.getCompanyType().getDescription())
+                .companyType(company.getCompanyType())
                 .hubId(company.getHubId())
                 .address(company.getAddress())
                 .isDelete(company.getIsDeleted())

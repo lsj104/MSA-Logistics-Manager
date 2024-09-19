@@ -1,5 +1,8 @@
 package com.team12.user.repository;
 
+//import com.querydsl.core.types.dsl.BooleanExpression;
+//import com.querydsl.core.types.dsl.StringPath;
+//import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -23,7 +26,7 @@ public class UserRepository {
 
     private final UserJpaRepository userJpaRepository;
 
-    @Autowired
+//    @Autowired
     private JPAQueryFactory queryFactory;
 
     //username 중복 확인
@@ -41,10 +44,11 @@ public class UserRepository {
     //findById (존재 여부 확인)
     public User findById(Long userId) {
         User user =  userJpaRepository.findById(userId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.NOT_EXIST_USER));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.USER_NOT_FOUND));
         if(user.getIsDeleted()) throw new BusinessLogicException(ExceptionCode.DELETED_USER);
         return user;
     }
+
 
     //findAll
     public Page<User> findAll(Pageable pageable) {
@@ -84,5 +88,11 @@ public class UserRepository {
         return text != null ? path.contains(text) : null;
     }
 
+    public User findByUsernameForAuth(String username) {
+        return userJpaRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.USER_NOT_FOUND));
+    };
+
 
 }
+

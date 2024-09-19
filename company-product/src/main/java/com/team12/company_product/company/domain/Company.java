@@ -11,39 +11,42 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 // TODO: nullable = false 추가
 @Entity(name = "p_company")
 @Getter
 @NoArgsConstructor
+@Slf4j
 public class Company extends AuditingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String companyId;
 
-    @Column(name = "company_name")
+    @Column(name = "company_name", nullable = false)
     private String companyName;
 
-    @Column(name = "company_type")
+    @Column(name = "company_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private CompanyType companyType;
 
-    @Column(name = "hubId")
-    private String hubId;
+    @Column(name = "hub_id", nullable = false)
+    private UUID hubId;
 
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "address")
+    @Column(name = "address", nullable = false)
     private String address;
 
     @Builder
-    public Company(String companyId, String companyName, CompanyType companyType, String hubId,
+    public Company(String companyId, String companyName, CompanyType companyType, UUID hubId,
             Long userId, String address) {
         this.companyId = companyId;
         this.companyName = companyName;
@@ -53,7 +56,10 @@ public class Company extends AuditingEntity {
         this.address = address;
     }
 
+
     public static Company of(CreateCompanyRequestDto requestDto) {
+
+        log.info(String.valueOf(requestDto.hubId()));
         return Company.builder()
                 .companyName(requestDto.companyName())
                 .companyType(requestDto.companyType())
@@ -62,18 +68,17 @@ public class Company extends AuditingEntity {
                 .build();
     }
 
+
     // 업체 수정
     public void update(UpdateCompanyRequestDto requestDto) {
         this.companyName =
                 requestDto.companyName() != null ? requestDto.companyName() : this.companyName;
         this.companyType =
-                requestDto.companyType() != null ? CompanyType.valueOf(requestDto.companyType())
-                        : this.companyType;
+                requestDto.companyType() != null ? requestDto.companyType() : this.companyType;
         this.hubId = requestDto.hubId() != null ? requestDto.hubId() : this.hubId;
         this.address = requestDto.address() != null ? requestDto.address() : this.address;
     }
 
-    // TODO: user추가
     // 업체 삭제
     public void delete(Long userId) {
         super.setIsDeleted(true);

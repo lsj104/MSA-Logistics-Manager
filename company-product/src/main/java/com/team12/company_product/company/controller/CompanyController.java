@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -43,7 +42,6 @@ public class CompanyController {
 
     private final CompanyService companyService;
 
-    // TODO: user, hub 작업
     @Operation(summary = "업체 생성")
     @PostMapping
     public ResponseEntity<SuccessResponse<CreateCompanyResponseDto>> createCompany(

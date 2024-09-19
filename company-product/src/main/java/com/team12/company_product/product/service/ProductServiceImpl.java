@@ -2,6 +2,8 @@ package com.team12.company_product.product.service;
 
 
 import com.team12.company_product.company.domain.Company;
+import com.team12.company_product.company.exception.CompanyException;
+import com.team12.company_product.company.hub.HubClient;
 import com.team12.company_product.company.service.CompanyService;
 import com.team12.company_product.product.domain.Product;
 import com.team12.company_product.product.dto.request.CreateProductRequestDto;
@@ -13,6 +15,7 @@ import com.team12.company_product.product.dto.response.UpdateProductResponseDto;
 import com.team12.company_product.product.exception.ExceptionMessage;
 import com.team12.company_product.product.exception.ProductException;
 import com.team12.company_product.product.repository.ProductRepository;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+
     private final CompanyService companyService;
+
+    private final HubClient hubClient;
 
 
     // 상품 생성
@@ -36,11 +42,15 @@ public class ProductServiceImpl implements ProductService {
             company = companyService.findById(requestDto.companyId());
         }
 
+        checkHubIfPresent(requestDto.hubId());
+
+        // Product 생성 및 저장
         Product product = Product.of(requestDto, company);
         productRepository.save(product);
 
         return CreateProductResponseDto.from(product);
     }
+
 
     // 상품 상세 조회
     @Transactional(readOnly = true)
@@ -66,6 +76,8 @@ public class ProductServiceImpl implements ProductService {
         if (requestDto.companyId() != null) {
             company = companyService.findById(requestDto.companyId());
         }
+
+        checkHubIfPresent(requestDto.hubId());
 
         Product product = findById(productId);
         product.update(requestDto, company);
@@ -119,5 +131,17 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ProductException(ExceptionMessage.PRODUCT_NOT_FOUND));
     }
 
+
+    // 허브 검증
+    private void checkHubIfPresent(UUID hubId) {
+        if (hubId != null) {
+            try {
+                hubClient.checkHub(hubId);
+            } catch (Exception e) {
+                throw new CompanyException(
+                        com.team12.company_product.company.exception.ExceptionMessage.HUB_NOT_FOUND);
+            }
+        }
+    }
 
 }

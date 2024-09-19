@@ -1,6 +1,7 @@
 package com.team12.user.domain;
 
 import com.team12.common.audit.AuditingEntity;
+import com.team12.common.enums.UserRoleEnum;
 import com.team12.user.dto.UserSignUpRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;

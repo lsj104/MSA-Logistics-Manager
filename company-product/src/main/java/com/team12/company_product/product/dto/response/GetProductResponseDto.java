@@ -2,13 +2,14 @@ package com.team12.company_product.product.dto.response;
 
 import com.team12.company_product.product.domain.Product;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Builder;
 
 @Builder
 public record GetProductResponseDto(
         String productId,
         String companyId,
-        String hub_id,
+        UUID hub_id,
         String productName,
         Boolean isDelete,
         LocalDateTime createdAt,
@@ -16,7 +17,8 @@ public record GetProductResponseDto(
         LocalDateTime updatedAt,
         Long updatedBy,
         LocalDateTime deletedAt,
-        Long deletedBy
+        Long deletedBy,
+        Long quantity
 ) {
 
     public static GetProductResponseDto from(Product product) {
@@ -32,6 +34,7 @@ public record GetProductResponseDto(
                 .updatedBy(product.getUpdatedBy())
                 .deletedAt(product.getDeletedAt())
                 .deletedBy(product.getDeletedBy())
+                .quantity(product.getQuantity())
                 .build();
     }
 }

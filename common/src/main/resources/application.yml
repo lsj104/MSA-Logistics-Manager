@@ -1,0 +1,23 @@
+server:
+  port: 19099
+
+spring:
+  application:
+    name: common
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: hub
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  hikari:
+    # 추가적인 HikariCP 설정
+    maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+

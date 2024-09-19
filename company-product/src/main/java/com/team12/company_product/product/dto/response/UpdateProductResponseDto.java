@@ -2,12 +2,13 @@ package com.team12.company_product.product.dto.response;
 
 import com.team12.company_product.product.domain.Product;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Builder;
 
 @Builder
 public record UpdateProductResponseDto(
         String productName,
-        String hub_id,
+        UUID hub_id,
         String companyId,
         LocalDateTime updatedAt,
         Long updatedBy,
