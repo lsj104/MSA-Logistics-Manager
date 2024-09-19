@@ -4,6 +4,7 @@ import com.team12.common.dto.hub.HubPathDetailsResponseDto;
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
 import com.team12.hub.hub.domain.Hub;
+import com.team12.hub.hub.dto.HubResponseDto;
 import com.team12.hub.hub.repository.HubRepository;
 import com.team12.hub.hubPath.domain.HubNode;
 import com.team12.hub.hubPath.domain.HubPath;
@@ -18,6 +19,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,10 +92,14 @@ public class HubPathService {
     }
 
     @Cacheable(value = "hubPathAll", key = "#searchRequestDto")
-    public Page<HubPathResponseDto> getHubPaths(HubPathSearchRequestDto searchRequestDto, Pageable pageable) {
+    public List<HubPathResponseDto> getHubPaths(HubPathSearchRequestDto searchRequestDto, Pageable pageable) {
         Page<HubPath> hubPathPage = hubPathRepository.findAll(HubPathSpecification.searchWith(searchRequestDto), pageable);
-        Page<HubPathResponseDto> hubPathResponseDtoPage = hubPathPage.map(hubPath -> new HubPathResponseDto(hubPath));
-        return hubPathResponseDtoPage;
+        List<HubPathResponseDto> hubPathResponseDtoList = hubPathPage.map(hubPath -> new HubPathResponseDto(hubPath)).getContent();
+        return hubPathResponseDtoList;
+    }
+    // 캐시된 List<HubResponseDto>를 다시 Page로 변환하는 메서드 (totalElements 사용하지 않음)
+    public Page<HubPathResponseDto> convertListToPage(List<HubPathResponseDto> hubPathResponseDtoList, Pageable pageable) {
+        return new PageImpl<>(hubPathResponseDtoList, pageable, hubPathResponseDtoList.size());
     }
 
     @Transactional

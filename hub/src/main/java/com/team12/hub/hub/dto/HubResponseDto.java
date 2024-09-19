@@ -3,11 +3,13 @@ package com.team12.hub.hub.dto;
 import com.team12.hub.hub.domain.Hub;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class HubResponseDto {
     private UUID id;
