@@ -76,4 +76,5 @@ public class HubController {
         UUID checkedHubId = hubService.checkHub(hubId);
         return SuccessResponse.success(SuccessMessage.CHECK_HUB.getHttpStatus().value(), SuccessMessage.CHECK_HUB.getMessage(), checkedHubId);
     }
+
 }
