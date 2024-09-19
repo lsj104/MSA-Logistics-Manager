@@ -1,6 +1,7 @@
 package com.team12.auth.dto;
 
 import com.team12.common.auth.UserRoleEnum;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,14 +9,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-public class UserPrincipal implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 
     private Long id;
     private String username;
     private String password;
+    // 단일 권한 반환
+    @Getter
     private GrantedAuthority authority;
 
-    public UserPrincipal(Long id, String username, String password, UserRoleEnum role) {
+    public CustomUserDetails(Long id, String username, String password, UserRoleEnum role) {
         this.id = id;
         this.username = username;
         this.password = password;

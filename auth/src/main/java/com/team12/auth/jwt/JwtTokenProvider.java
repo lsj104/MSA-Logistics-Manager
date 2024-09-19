@@ -1,5 +1,6 @@
 package com.team12.auth.jwt;
 
+import com.team12.auth.dto.CustomUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -8,12 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 //util 클래스: 특정한 매개변수, 파라미터에 대한 작업을 수행하는 메서드들이 존재하는 클래스, 다른 객체에 의존하지 않고 하나의 모듈로서 동작하는 클래스
 @Component
@@ -48,10 +53,19 @@ public class JwtTokenProvider {
     public String generateAccessToken(Authentication authentication) {
         Date date = new Date();
         Date expireDate = new Date(date.getTime() + ACCESS_TOKEN_TIME);
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String role = userDetails.getAuthorities().stream()
+                .findFirst()  // 단일 권한만 가져옴
+                .map(GrantedAuthority::getAuthority)  // 권한 이름 추출
+                .orElseThrow(() -> new IllegalArgumentException("사용자에게 권한이 없습니다."));
+
         //암호화
         return BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(authentication.getName()) // 사용자 식별자값
+                        .setSubject(authentication.getName()) // 사용자 식별자값 username
+                        .claim("id", userDetails.getId())
+                        .claim("role", role)
                         .setIssuedAt(date) //발급일
                         .setExpiration(expireDate) // 만료 시간
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘
@@ -62,10 +76,19 @@ public class JwtTokenProvider {
     public String generateRefreshToken(Authentication authentication) {
         Date date = new Date();
         Date expireDate = new Date(date.getTime() + REFRESH_TOKEN_TIME);
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String role = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("권한이 존재하지 않습니다."));
+
         //암호화
         return BEARER_PREFIX +
                 Jwts.builder()
                         .setSubject(authentication.getName()) // 사용자 식별자값
+                        .claim("id", userDetails.getId())
+                        .claim("role", role)
                         .setIssuedAt(date) //발급일
                         .setExpiration(expireDate) // 만료 시간
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘
@@ -117,14 +140,32 @@ public class JwtTokenProvider {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 
-    //JWT에서 사용자 ID 추출
-    public String getUserIdFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
+    //
+    public Claims getAllClaimsFromToken(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    //JWT에서 username 추출
+    public String getUsernameFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
         return claims.getSubject();
+    }
+
+    //id 추출
+    public Long getUserIdFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        return claims.get("id", Long.class);  // 사용자 ID 추출
+    }
+
+    //role
+    public String getRolesFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        return claims.get("role", String.class);
+
     }
 
 }
