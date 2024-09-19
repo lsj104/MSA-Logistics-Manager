@@ -8,6 +8,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class ManagerRequestDto {
+    private Long userId;
     private UUID hubId;
     private ManagerType type;
 }

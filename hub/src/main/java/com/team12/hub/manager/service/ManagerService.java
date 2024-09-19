@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class ManagerService {
     private final ManagerRepositoy managerRepository;
     private final HubRepository hubRepository;
 
-    public ManagerResponseDto createManager(ManagerRequestDto managerRequestDto) {
+    public ManagerResponseDto createManager(ManagerRequestDto managerRequestDto, Long loginUserId) {
         /*(허브 별) 관리자 HUB_MANAGER 라면
         매니저가 해당 허브 소속 매니저인지 확인
         List<Manager> managers = managerRepository.findByHub(managerRequestDto)
@@ -40,13 +41,13 @@ public class ManagerService {
 
         Hub hub = hubRepository.findByIdAndIsDeleted(managerRequestDto.getHubId(), false)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
-        Manager manager = new Manager(1357L, hub, managerRequestDto.getType());
+        Manager manager = new Manager(managerRequestDto.getUserId(), hub, managerRequestDto.getType());
+        manager.setCreatedBy(loginUserId);
         managerRepository.save(manager);
         return new ManagerResponseDto(manager);
-
     }
 
-    public ManagerResponseDto updateManager(Long managerId, ManagerRequestDto managerRequestDto) {
+    public ManagerResponseDto updateManager(Long managerId, ManagerRequestDto managerRequestDto, Long loginUserId) {
         /*(허브 별) 관리자 HUB_MANAGER 라면
         매니저가 해당 허브 소속 매니저인지 확인
         List<Manager> managers = managerRepository.findByHub(managerRequestDto)
@@ -64,15 +65,18 @@ public class ManagerService {
         if(managerRequestDto.getType() != null){
             manager.setType(managerRequestDto.getType());
         }
+        manager.setUpdatedBy(loginUserId);
         managerRepository.save(manager);
         ManagerResponseDto managerResponseDto =  new ManagerResponseDto(manager);
         return managerResponseDto;
     }
 
-    public Long deleteManager(Long managerId) {
+    public Long deleteManager(Long managerId, Long loginUserId) {
         Manager manager = managerRepository.findByIdAndIsDeleted(managerId, false)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.MANAGER_NOT_FOUND));
         manager.setIsDeleted(true);
+        manager.setDeletedAt(LocalDateTime.now());
+        manager.setDeletedBy(loginUserId);
         managerRepository.save(manager);
         return managerId;
     }
@@ -98,5 +102,12 @@ public class ManagerService {
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 허브가 없습니다."));
         List<Manager> managers = managerRepository.findByHubAndType(hub, ManagerType.TO_COMPANY_DELIVERY);
         return managers.stream().map(ManagerResponseDto::new).collect(Collectors.toList());
+    }
+
+    public UUID findHubIdByUserId(Long userId) {
+        Manager manager = managerRepository.findByIdAndIsDeleted(userId, false)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.USER_MANAGER_NOT_FOUND));
+        UUID hubId = manager.getHub().getId();
+        return hubId;
     }
 }

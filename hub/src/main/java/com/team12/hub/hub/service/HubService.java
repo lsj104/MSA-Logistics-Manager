@@ -2,6 +2,7 @@ package com.team12.hub.hub.service;
 
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
+import com.team12.hub.client.AIClient;
 import com.team12.hub.hub.domain.Hub;
 import com.team12.hub.hub.domain.HubSpecification;
 import com.team12.hub.hub.dto.HubRequestDto;
@@ -21,8 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -30,10 +33,11 @@ public class HubService {
     private final HubRepository hubRepository;
     private final HubPathService hubPathService;
     private final KakaoMapService kakaoMapService;
+//    private final AIClient aiClient;
 
     @CachePut(value = "hub", key = "#result.id")
     @CacheEvict(value = "hubAll", allEntries = true)
-    public HubResponseDto createHub(HubRequestDto hubRequestDto) {
+    public HubResponseDto createHub(HubRequestDto hubRequestDto, Long loginUserId) {
         // 새 허브가 등록될 때, Google Map API와 연동해 위도, 경도 받아오기
         List<String> latitudeAndLongitude = kakaoMapService.getLatLongFromAddress(hubRequestDto.getAddress());
 
@@ -44,13 +48,14 @@ public class HubService {
                 , latitudeAndLongitude.get(0)
                 , latitudeAndLongitude.get(1)
                 , false);
+        hub.setCreatedBy(loginUserId);
         hubRepository.save(hub);
         return new HubResponseDto(hub);
     }
 
     @CacheEvict(value = {"hub", "hubAll"}, allEntries = true)
     @CachePut(value = "hub", key = "#hubId")
-    public HubResponseDto updateHub(UUID hubId, HubRequestDto hubRequestDto) {
+    public HubResponseDto updateHub(UUID hubId, HubRequestDto hubRequestDto, Long loginUserId) {
         Hub hub = hubRepository.findByIdAndIsDeleted(hubId,false)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         if(hubRequestDto.getName() != null){
@@ -59,6 +64,7 @@ public class HubService {
         if(hubRequestDto.getAddress() != null){
             hub.setAddress(hubRequestDto.getAddress());
         }
+        hub.setUpdatedBy(loginUserId);
         hubRepository.save(hub);
         return new HubResponseDto(hub);
     }
@@ -66,7 +72,7 @@ public class HubService {
     // 허브 삭제 메서드 (허브 삭제 시 HubPath도 삭제)
     @Transactional
     @CacheEvict(value = {"hub", "hubAll"}, allEntries = true)
-    public UUID deleteHub(UUID hubId) {
+    public UUID deleteHub(UUID hubId, Long loginUserId) {
 
         // 삭제될 허브와 연결된 모든 hubPath 논리적 삭제
         List<UUID> deletedHubPaths = hubPathService.deleteHubPathsByHubId(hubId);
@@ -77,7 +83,7 @@ public class HubService {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         hub.setIsDeleted(true);
         hub.setDeletedAt(LocalDateTime.now());
-        hub.setDeletedBy(0L);
+        hub.setDeletedBy(loginUserId);
         hubRepository.save(hub);
         return hubId;
     }
@@ -111,4 +117,21 @@ public class HubService {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         return hub.getId();
     }
+
+//    public String hubPathsRecommendFromAIByAllHubs() {
+//        List<Hub> hubList = hubRepository.findAllByIsDeleted(false);
+//        List<HubResponseDto> hubResponseDtoList = hubList.stream()
+//                .map(hub -> new HubResponseDto(hub))
+//                .toList();
+//
+//        // request 작성
+//        StringBuilder requestContetns = new StringBuilder("다음 허브들의 위도와 경도 정보를 바탕으로 (fromHubId, toHubId)의 리스트 형태로 최적 간선을 추천해줘. ");
+//        for (HubResponseDto hubResponseDto : hubResponseDtoList) {
+//            requestContetns.append(hubResponseDto.toString());
+//        }
+//        String response = aiClient.askQuestion(requestContetns.toString());
+//        return response;
+//    }
+
+
 }

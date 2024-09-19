@@ -1,5 +1,6 @@
 package com.team12.hub.hub.controller;
 
+import com.team12.common.enums.UserRoleEnum;
 import com.team12.common.exception.response.SuccessResponse;
 import com.team12.hub.hub.dto.HubRequestDto;
 import com.team12.hub.hub.dto.HubResponseDto;
@@ -11,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,22 +22,24 @@ import java.util.UUID;
 @RestController
 public class HubController {
     private final HubService hubService;
+
     @PostMapping
-    public SuccessResponse<?> createHub(@RequestBody HubRequestDto hubRequestDto){
-        HubResponseDto createdHub = hubService.createHub(hubRequestDto);
+    public SuccessResponse<?> createHub(@RequestBody HubRequestDto hubRequestDto, @RequestHeader("X-User-Id") Long loginUserId){
+        HubResponseDto createdHub = hubService.createHub(hubRequestDto, loginUserId);
         return SuccessResponse.success(SuccessMessage.CREATE_HUB.getHttpStatus().value(), SuccessMessage.CREATE_HUB.getMessage(), createdHub);
     }
     @PutMapping("/{hubId}")
-    public SuccessResponse<?> updateHub(@PathVariable UUID hubId, @RequestBody HubRequestDto hubRequestDto){
-        HubResponseDto updatedHub = hubService.updateHub(hubId, hubRequestDto);
+    public SuccessResponse<?> updateHub(@PathVariable UUID hubId, @RequestBody HubRequestDto hubRequestDto, @RequestHeader("X-User-Id") Long loginUserId){
+        HubResponseDto updatedHub = hubService.updateHub(hubId, hubRequestDto, loginUserId);
         return SuccessResponse.success(SuccessMessage.UPDATE_HUB.getHttpStatus().value(), SuccessMessage.UPDATE_HUB.getMessage(), updatedHub);
     }
     @DeleteMapping("/{hubId}")
-    public SuccessResponse<?> deleteHub(@PathVariable UUID hubId){
+    public SuccessResponse<?> deleteHub(@PathVariable UUID hubId, @RequestHeader("X-User-Id") Long loginUserId){
 
-        UUID deletedHubId = hubService.deleteHub(hubId);
+        UUID deletedHubId = hubService.deleteHub(hubId, loginUserId);
         return SuccessResponse.success(SuccessMessage.DELETE_HUB.getHttpStatus().value(), SuccessMessage.DELETE_HUB.getMessage(), deletedHubId);
     }
+
     @GetMapping("/{hubId}")
     public SuccessResponse<?> getHub(@PathVariable UUID hubId){
 
@@ -71,10 +73,15 @@ public class HubController {
 
         return SuccessResponse.success(SuccessMessage.GET_HUBS.getHttpStatus().value(), SuccessMessage.GET_HUBS.getMessage(), hubResponsDtoPage);
     }
+
     @GetMapping("/{hubId}/check")
     public SuccessResponse<?> checkHub(@PathVariable UUID hubId){
         UUID checkedHubId = hubService.checkHub(hubId);
         return SuccessResponse.success(SuccessMessage.CHECK_HUB.getHttpStatus().value(), SuccessMessage.CHECK_HUB.getMessage(), checkedHubId);
     }
+//    @GetMapping("/hub-paths-recommend-from-AI-by-all-hubs")
+//    public String hubPathsRecommendFromAIByAllHubs(){
+//        return hubService.hubPathsRecommendFromAIByAllHubs();
+//    }
 
 }

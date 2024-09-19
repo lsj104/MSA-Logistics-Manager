@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "P_USER")
+@Table(name = "P_USER", schema = "s_user")
 public class User extends AuditingEntity {
 
     @Id
