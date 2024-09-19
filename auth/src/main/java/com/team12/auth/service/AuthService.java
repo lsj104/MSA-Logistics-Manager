@@ -4,30 +4,20 @@ import com.team12.auth.dto.CustomUserDetails;
 import com.team12.auth.dto.JwtAuthenticationResponse;
 import com.team12.auth.jwt.JwtTokenProvider;
 import com.team12.common.dto.auth.LoginRequestDto;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
-
-import javax.crypto.SecretKey;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    @Autowired
     private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-    @Autowired
-    private RedisService redisService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisService redisService;
     private final CustomUserDetailsService customUserDetailsService;
 
 
@@ -46,7 +36,7 @@ public class AuthService {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             Long userId = userDetails.getId();  // Long 타입의 ID
             String username = userDetails.getUsername();  // 사용자 이름
-            String role = userDetails.getAuthorities().iterator().next().getAuthority().substring(5);
+            String role = userDetails.getAuthorities().iterator().next().getAuthority();
 
 
             // Redis에 RefreshToken 저장
@@ -73,7 +63,7 @@ public class AuthService {
                 CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
                 Long userId = userDetails.getId();
                 String userDetailsUsername = userDetails.getUsername();
-                String role = userDetails.getAuthorities().iterator().next().getAuthority().substring(5);
+                String role = userDetails.getAuthorities().iterator().next().getAuthority();
                 //return 새로운 accessToken과 기존 refreshToken
                 return new JwtAuthenticationResponse(newAccessToken, refreshToken, userId, userDetailsUsername, role);
             } else {
@@ -85,5 +75,8 @@ public class AuthService {
         }
     }
 
+    public void logout(String username) {
+        redisService.deleteRefreshToken(username);
+    }
 }
 

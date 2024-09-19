@@ -27,29 +27,30 @@ public class UserController {
     }
 
     //관리자 : 유저 가입 승인
-    @PatchMapping("/{userId}/approve")
-    public ResponseEntity approve(@PathVariable(name = "userId") Long userId,
+    @PatchMapping("/reg/{userId}/approve")
+    public ResponseEntity approve(
+            @PathVariable(name = "userId") Long userId,
                                   @RequestParam(name = "isConfirmed") boolean isConfirmed) {
         UserResponseForRegisterDto userResponseForRegisterDto = userService.approve(userId, isConfirmed);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userResponseForRegisterDto);
     }
     //유저 : 개인 상세 정보 조회
-    @GetMapping
-    public ResponseEntity getUserDetail() {
+    @GetMapping("/usr")
+    public ResponseEntity getUserDetail(@RequestHeader("X-User-Id") Long tokenUserId) {
         //Todo : header 토큰 받아서 처리하기
-        Long userId = 1L;
+        Long userId = tokenUserId;
         UserResponseDto userResponseDto = userService.getUserDetail(userId);
         return ResponseEntity.ok(userResponseDto);
     }
 
     //관리자 : 유저 상세 정보 조회
-    @GetMapping("/{userId}")
+    @GetMapping("/reg/{userId}")
     public ResponseEntity getUserDetailForRegister(@PathVariable("userId") Long userId) {
         UserResponseForRegisterDto userResponseForRegisterDto = userService.getUserDetailForRegister(userId);
         return ResponseEntity.ok(userResponseForRegisterDto);
     }
     //관리자 : 유저 리스트 조회
-    @GetMapping("/list")
+    @GetMapping("/reg/list")
     public ResponseEntity getUsers(@RequestParam("page") int page,
                                    @RequestParam("size") int size,
                                    @RequestParam("sort") String sort) {
@@ -58,7 +59,7 @@ public class UserController {
     }
 
     //관리자 : 유저 검색
-    @GetMapping("/search")
+    @GetMapping("/reg/search")
     public ResponseEntity searchUser(@RequestParam(name="text") String searchText,
                                      @RequestParam(name = "page", defaultValue = "1") int page,
                                      @RequestParam(name = "size", defaultValue = "10") int size,
@@ -68,7 +69,7 @@ public class UserController {
     }
 
     //관리자 : 유저 정보 수정
-    @PatchMapping("/{userId}")
+    @PatchMapping("/reg/{userId}")
     public ResponseEntity patchUser(@PathVariable("userId") Long userId,
                                     @RequestBody UserPatchRequestForRegisterDto patchDto) {
         UserResponseForRegisterDto<UserDataForRegisterDto> patchUser =
@@ -76,7 +77,7 @@ public class UserController {
         return ResponseEntity.ok(patchUser);
     }
     //관리자 : 유저 삭제
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/reg/{userId}")
     public ResponseEntity deleteUser(@PathVariable("userId") Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
