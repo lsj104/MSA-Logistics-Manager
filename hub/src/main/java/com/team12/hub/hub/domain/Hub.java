@@ -22,7 +22,7 @@ public class Hub extends AuditingEntity {
     @Column(name = "hub_id")
     private UUID id;  // 허브 ID(UUID)
 
-    @Column(name = "hub_name", nullable = false)
+    @Column(name = "hub_name", nullable = false, unique = true)
     private String name;  // 허브 이름
 
     @Column(name = "address", nullable = false)
