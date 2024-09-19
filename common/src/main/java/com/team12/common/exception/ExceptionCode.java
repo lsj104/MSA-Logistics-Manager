@@ -41,6 +41,8 @@ public enum ExceptionCode {
 
     // MANAGER 3300~
     MANAGER_NOT_FOUND(3301, "해당 담당자가 존재하지 않습니다."),
+    USER_MANAGER_NOT_FOUND(3302, "해당 사용자는 담당자가 아닙니다."),
+    NOT_YOUR_HUB(3303, "담당 허브에 소속해 있지 않은 담당자를 조회할 수 없습니다."),
 
     /*
     ORDER_DELIVERY Module 4로 시작
@@ -59,7 +61,7 @@ public enum ExceptionCode {
      */
     // SLACK 5100~
     SLACK_NOT_FOUND(5101, "해당 슬랙이 존재하지 않습니다."),
-    SLACK_NOTIFICATION_FAILED(5102, "슬랙 알림 전송에 실패하였습니다."),;
+    SLACK_NOTIFICATION_FAILED(5102, "슬랙 알림 전송에 실패하였습니다.");
 
 
 

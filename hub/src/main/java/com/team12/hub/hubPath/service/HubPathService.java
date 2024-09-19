@@ -41,7 +41,7 @@ public class HubPathService {
     @Transactional
     @CachePut(value = "hubPath", key = "#result.id")
     @CacheEvict(value = "hubPathAll", allEntries = true)
-    public HubPathResponseDto createHubPath(HubPathCreateRequestDto hubPathRequestDto) {
+    public HubPathResponseDto createHubPath(HubPathCreateRequestDto hubPathRequestDto, Long loginUserId) {
         Hub fromHub = hubRepository.findByIdAndIsDeleted(hubPathRequestDto.getFromHubId(), false)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.FROM_HUB_NOT_FOUND));
         Hub toHub = hubRepository.findByIdAndIsDeleted(hubPathRequestDto.getToHubId(), false)
@@ -49,6 +49,7 @@ public class HubPathService {
 
         List<Integer> distanceAndDuration = kakaoNaviService.getDistanceAndDuration(fromHub.getLatitude(), fromHub.getLongitude(), toHub.getLatitude(), toHub.getLongitude());
         HubPath hubPath = new HubPath(UUID.randomUUID(), fromHub, toHub, distanceAndDuration.get(0), distanceAndDuration.get(1), false);
+        hubPath.setCreatedBy(loginUserId);
         hubPathRepository.save(hubPath);
         HubPathResponseDto hubPathResponseDto = new HubPathResponseDto(hubPath);
         return hubPathResponseDto;
@@ -56,7 +57,7 @@ public class HubPathService {
     @Transactional
     @CacheEvict(value = {"hubPath", "hubPathAll"}, allEntries = true)
     @CachePut(value = "hubPath", key = "#hubPathId")
-    public HubPathResponseDto updateHubPath(UUID hubPathId, HubPathUpdateRequestDto hubPathRequestDto) {
+    public HubPathResponseDto updateHubPath(UUID hubPathId, HubPathUpdateRequestDto hubPathRequestDto, Long loginUserId) {
         HubPath hubPath = hubPathRepository.findById(hubPathId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_PATH_NOT_FOUND));
         if (hubPathRequestDto.getDistance() != null){
@@ -65,6 +66,7 @@ public class HubPathService {
         if (hubPathRequestDto.getDuration() != null){
             hubPath.setDuration(hubPathRequestDto.getDuration());
         }
+        hubPath.setUpdatedBy(loginUserId);
         hubPathRepository.save(hubPath);
         return new HubPathResponseDto(hubPath);
     }
@@ -72,13 +74,13 @@ public class HubPathService {
 
     @Transactional
     @CacheEvict(value = {"hubPath", "hubPathAll"}, allEntries = true)
-    public UUID deleteHubPath(UUID hubPathId) {
+    public UUID deleteHubPath(UUID hubPathId, Long loginUserId) {
 
         HubPath hubPath = hubPathRepository.findByIdAndIsDeleted(hubPathId, false)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_PATH_NOT_FOUND));
         hubPath.setIsDeleted(true);
         hubPath.setDeletedAt(LocalDateTime.now());
-        hubPath.setDeletedBy(0L);
+        hubPath.setDeletedBy(loginUserId);
         hubPathRepository.save(hubPath);
         return hubPathId;
     }

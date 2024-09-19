@@ -37,7 +37,7 @@ public class HubService {
 
     @CachePut(value = "hub", key = "#result.id")
     @CacheEvict(value = "hubAll", allEntries = true)
-    public HubResponseDto createHub(HubRequestDto hubRequestDto) {
+    public HubResponseDto createHub(HubRequestDto hubRequestDto, Long loginUserId) {
         // 새 허브가 등록될 때, Google Map API와 연동해 위도, 경도 받아오기
         List<String> latitudeAndLongitude = kakaoMapService.getLatLongFromAddress(hubRequestDto.getAddress());
 
@@ -48,13 +48,14 @@ public class HubService {
                 , latitudeAndLongitude.get(0)
                 , latitudeAndLongitude.get(1)
                 , false);
+        hub.setCreatedBy(loginUserId);
         hubRepository.save(hub);
         return new HubResponseDto(hub);
     }
 
     @CacheEvict(value = {"hub", "hubAll"}, allEntries = true)
     @CachePut(value = "hub", key = "#hubId")
-    public HubResponseDto updateHub(UUID hubId, HubRequestDto hubRequestDto) {
+    public HubResponseDto updateHub(UUID hubId, HubRequestDto hubRequestDto, Long loginUserId) {
         Hub hub = hubRepository.findByIdAndIsDeleted(hubId,false)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         if(hubRequestDto.getName() != null){
@@ -63,6 +64,7 @@ public class HubService {
         if(hubRequestDto.getAddress() != null){
             hub.setAddress(hubRequestDto.getAddress());
         }
+        hub.setUpdatedBy(loginUserId);
         hubRepository.save(hub);
         return new HubResponseDto(hub);
     }
@@ -70,7 +72,7 @@ public class HubService {
     // 허브 삭제 메서드 (허브 삭제 시 HubPath도 삭제)
     @Transactional
     @CacheEvict(value = {"hub", "hubAll"}, allEntries = true)
-    public UUID deleteHub(UUID hubId) {
+    public UUID deleteHub(UUID hubId, Long loginUserId) {
 
         // 삭제될 허브와 연결된 모든 hubPath 논리적 삭제
         List<UUID> deletedHubPaths = hubPathService.deleteHubPathsByHubId(hubId);
@@ -81,7 +83,7 @@ public class HubService {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         hub.setIsDeleted(true);
         hub.setDeletedAt(LocalDateTime.now());
-        hub.setDeletedBy(0L);
+        hub.setDeletedBy(loginUserId);
         hubRepository.save(hub);
         return hubId;
     }

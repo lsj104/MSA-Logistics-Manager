@@ -10,8 +10,8 @@ spring:
       port: 6379
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/test
-    username: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: usr
     password: 1234
     driver-class-name: org.postgresql.Driver
 
