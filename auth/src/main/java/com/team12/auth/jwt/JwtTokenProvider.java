@@ -47,7 +47,7 @@ public class JwtTokenProvider {
 
     @PostConstruct // 딱 한번만 호출하면 되는 자원에 씀. 또 호출하는 것 방지
     public void init() {
-        byte[] bytes = Base64.getDecoder().decode(secretKey);
+        byte[] bytes = secretKey.getBytes();
         key = Keys.hmacShaKeyFor(bytes);
     }
 
