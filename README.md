@@ -15,7 +15,7 @@
 
 ### 추가 기능
 - 허브 간 이동 정보는 선형 리스트 형태가 아닌 그래프 형태입니다.
-- 허브를 생성 시 주소를 기반으로 위도와 경도가 자동 등록 됩니다.
+- 허브를 생성 시 위도/경도를 기반으로 위도와 경도가 자동 등록 됩니다.
 - 허브 간 이동 생성 시 출발 허브와 목적 허브를 입력하면 이동 시간과 이동 거리가 자동으로 등록됩니다.
 - 주문 생성 시 허브 간 이동 최적 경로(다익스트라 알고리즘 사용)가 계산되어 배송 경로 테이블에 자동 저장 됩니다.
 - 슬랙 메시지를 통해 배송 현황을 알림으로 받을 수 있습니다.
@@ -72,14 +72,17 @@
 
 ## 🐹 개발 환경
 
-| 분류         | 상세                                  |
-|------------|:------------------------------------|
-| IDE        | IntelliJ                            |
-| Language   | Java 17                             |
-| Framework  | Spring Boot 3.3.3                   |
-| Repository | PostgreSQL 16.4, H2 In-memory(Test) |
-| Build Tool | Gradle 8.8                          |
-| Infra      | EC2, Docker, Github Actions         |
+| 분류             | 상세                                          |
+|----------------|:--------------------------------------------|
+| IDE            | IntelliJ                                    |
+| Language       | Java 17                                     |
+| Framework      | Spring Boot 3.3.3                           |
+| Repository     | PostgreSQL 16.4, H2 In-memory(Test)         |
+| Build Tool     | Gradle 8.8                                  |
+| Infra          | EC2, Docker, Github Actions                 |
+
+![tech_stack.png](tech_stack.png)
+
 
 ## 👻 상세 개발 환경
 
@@ -107,13 +110,12 @@
 
 ## 🐳 ERD
 
-![ERD](./docs/images/sample-squirrel.jpg)
-
 - [ErdCloud](https://www.google.co.kr/)
+![erd.png](erd.png)
 
 ## 🐙 API docs
 
-- [Swagger UI](https://www.google.co.kr/)
+- [Postman API docs](https://documenter.getpostman.com/view/38424997/2sAXqs7haC)
 
 ## 🐬 Infra
 <img width="742" alt="스크린샷 2024-09-19 오전 6 10 00" src="https://github.com/user-attachments/assets/70d3603c-0beb-4551-a272-9a9c7e0df188">
