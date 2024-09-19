@@ -129,7 +129,7 @@ public class DeliveryService {
         try {
             DeliveryRoute deliveryRoute = findDeliveryRouteById(deliveryRouteId);
             DeliveryRoute.RouteStatus newStatus = DeliveryRoute.RouteStatus.valueOf(deliveryRouteStatus);
-            Delivery delivery = findDeliveryById(deliveryRoute.getDeliveryId());
+            Delivery delivery = findDeliveryById(deliveryRoute.getDelivery().getId());
 
             updateRouteStatus(deliveryRoute, newStatus);
             String slackContent = generateSlackContent(deliveryRoute, newStatus);
@@ -160,12 +160,12 @@ public class DeliveryService {
 
         if (newStatus == DeliveryRoute.RouteStatus.DELIVERING) {
             if (deliveryRoute.getSequence() == 1 || deliveryRoute.getStartAt() == null) {
-                updateDeliveryStatus(deliveryRoute.getDeliveryId(), Delivery.DeliveryStatus.DELIVERING);
+                updateDeliveryStatus(deliveryRoute.getDelivery().getId(), Delivery.DeliveryStatus.DELIVERING);
                 deliveryRoute.setStartAt(now);
             }
         } else if (newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
             if (isLastRoute(deliveryRoute)) {
-                updateDeliveryStatus(deliveryRoute.getDeliveryId(), Delivery.DeliveryStatus.DELIVERED);
+                updateDeliveryStatus(deliveryRoute.getDelivery().getId(), Delivery.DeliveryStatus.DELIVERED);
                 deliveryRoute.setEndAt(now);
                 calculateAndSetActualTime(deliveryRoute, now);
             } else {
@@ -187,13 +187,13 @@ public class DeliveryService {
 
     private String generateSlackContent(DeliveryRoute deliveryRoute, DeliveryRoute.RouteStatus newStatus) {
         if (deliveryRoute.getSequence() == 1 && newStatus == DeliveryRoute.RouteStatus.DELIVERING) {
-            return SlackTemplate.startDelivery(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
+            return SlackTemplate.startDelivery(deliveryRoute.getDelivery().getId().toString(), newStatus.toString());
         } else if (isLastRoute(deliveryRoute) && newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
-            return SlackTemplate.endDelivery(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
+            return SlackTemplate.endDelivery(deliveryRoute.getDelivery().getId().toString(), newStatus.toString());
         } else if (newStatus == DeliveryRoute.RouteStatus.ARRIVED) {
-            return SlackTemplate.arrivedAtHub(deliveryRoute.getDeliveryId().toString(), newStatus.toString(), deliveryRoute.getEndPoint());
+            return SlackTemplate.arrivedAtHub(deliveryRoute.getDelivery().getId().toString(), newStatus.toString(), deliveryRoute.getEndPoint());
         } else {
-            return SlackTemplate.updateDeliveryStatus(deliveryRoute.getDeliveryId().toString(), newStatus.toString());
+            return SlackTemplate.updateDeliveryStatus(deliveryRoute.getDelivery().getId().toString(), newStatus.toString());
         }
     }
 
@@ -221,7 +221,7 @@ public class DeliveryService {
     }
 
     private boolean isLastRoute(DeliveryRoute route) {
-        int totalRoutes = deliveryRouteRepository.countByDeliveryId(route.getDeliveryId());
+        int totalRoutes = deliveryRouteRepository.countByDeliveryId(route.getDelivery().getId());
         return totalRoutes == route.getSequence();
     }
 
