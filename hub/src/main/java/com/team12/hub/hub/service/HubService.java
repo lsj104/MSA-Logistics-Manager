@@ -2,6 +2,7 @@ package com.team12.hub.hub.service;
 
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
+import com.team12.hub.client.AIClient;
 import com.team12.hub.hub.domain.Hub;
 import com.team12.hub.hub.domain.HubSpecification;
 import com.team12.hub.hub.dto.HubRequestDto;
@@ -21,8 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +33,7 @@ public class HubService {
     private final HubRepository hubRepository;
     private final HubPathService hubPathService;
     private final KakaoMapService kakaoMapService;
+//    private final AIClient aiClient;
 
     @CachePut(value = "hub", key = "#result.id")
     @CacheEvict(value = "hubAll", allEntries = true)
@@ -111,4 +115,21 @@ public class HubService {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.HUB_NOT_FOUND));
         return hub.getId();
     }
+
+//    public String hubPathsRecommendFromAIByAllHubs() {
+//        List<Hub> hubList = hubRepository.findAllByIsDeleted(false);
+//        List<HubResponseDto> hubResponseDtoList = hubList.stream()
+//                .map(hub -> new HubResponseDto(hub))
+//                .toList();
+//
+//        // request 작성
+//        StringBuilder requestContetns = new StringBuilder("다음 허브들의 위도와 경도 정보를 바탕으로 (fromHubId, toHubId)의 리스트 형태로 최적 간선을 추천해줘. ");
+//        for (HubResponseDto hubResponseDto : hubResponseDtoList) {
+//            requestContetns.append(hubResponseDto.toString());
+//        }
+//        String response = aiClient.askQuestion(requestContetns.toString());
+//        return response;
+//    }
+
+
 }
