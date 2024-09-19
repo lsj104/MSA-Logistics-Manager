@@ -20,13 +20,8 @@ public class Manager extends AuditingEntity {
     @Column(name = "manager_id")  // DeliveryPerson의 ID로 사용
     private Long id;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @MapsId("managerId")  // manager_id를 DeliveryPerson의 ID로 사용하고, User의 user_id와 매핑
-//    @JoinColumn(name = "user_id")  // USER 엔티티의 user_id를 외래 키로 참조
-//    private User user;  // USER 엔티티와 일대일 연관관계
-
     @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn(name = "hub_id", referencedColumnName = "hub_id")
+    @JoinColumn(name = "hub_id", referencedColumnName = "hub_id", nullable = false)
     private Hub hub;
 
     @Enumerated(EnumType.STRING)
