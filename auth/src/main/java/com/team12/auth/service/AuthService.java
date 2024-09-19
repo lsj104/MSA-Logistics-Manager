@@ -36,7 +36,8 @@ public class AuthService {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             Long userId = userDetails.getId();  // Long 타입의 ID
             String username = userDetails.getUsername();  // 사용자 이름
-            String role = userDetails.getAuthorities().iterator().next().getAuthority();
+            String role = userDetails.getAuthorities().iterator().next().getAuthority().substring(5);
+
 
             // Redis에 RefreshToken 저장
             redisService.saveRefreshToken(authentication.getName(), refreshToken);
