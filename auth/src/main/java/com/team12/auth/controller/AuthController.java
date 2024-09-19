@@ -1,9 +1,8 @@
 package com.team12.auth.controller;
 
 import com.team12.auth.dto.JwtAuthenticationResponse;
+import com.team12.auth.dto.RefreshTokenRequest;
 import com.team12.auth.jwt.JwtTokenProvider;
-import com.team12.auth.service.CustomUserDetailsService;
-import com.team12.auth.service.RedisService;
 import com.team12.auth.service.AuthService;
 import com.team12.common.dto.auth.LoginRequestDto;
 import com.team12.common.dto.auth.LoginResponseDto;
@@ -23,16 +22,9 @@ public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-    @Autowired
-    private RedisService redisService;
-    private final CustomUserDetailsService customUserDetailsService;
     private final AuthService authService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-    private final JwtTokenProvider jwtUtil;
 
     //login
     @PostMapping("/login")
@@ -51,6 +43,30 @@ public class AuthController {
             return ResponseEntity.ok().headers(headers).body(loginResponseDto);
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
+        }
+    }
+
+    //refreshToken refresh
+    @PostMapping("/refresh-token")
+    public ResponseEntity refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+         String accessToken = refreshTokenRequest.getAccessToken();
+        String refreshToken = refreshTokenRequest.getRefreshToken();
+
+        //accessToken 만료 검증
+        boolean isExpired = jwtTokenProvider.isTokenExpired(accessToken);
+        if(isExpired) {
+        JwtAuthenticationResponse response = authService.refreshToken(refreshToken);
+        LoginResponseDto loginResponseDto = new LoginResponseDto(response.getAccessToken(), response.getRefreshToken());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-User-Id", String.valueOf(response.getUserId()));
+        headers.set("X-User-Name", response.getUsername());
+        headers.set("X-User-Role", response.getRole());
+
+
+        return ResponseEntity.ok().headers(headers).body(loginResponseDto);
+        } else {
+            return ResponseEntity.ok("Token is still valid");
         }
     }
 
