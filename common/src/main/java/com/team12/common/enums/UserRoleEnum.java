@@ -18,10 +18,10 @@ public enum UserRoleEnum {
     }
 
     public static class Authority {
-        public static final String COMPANY = "ROLE_COMPANY";
-        public static final String MASTER = "ROLE_MASTER";
-        public static final String HUB_MANAGER = "ROLE_HUB_MANAGER";
-        public static final String HUB_TO_HUB_DELIVERY = "ROLE_HUB_TO_HUB_DELIVERY";
-        public static final String TO_COMPANY_DELIVERY = "ROLE_TO_COMPANY_DELIVERY";
+        public static final String COMPANY = "COMPANY";
+        public static final String MASTER = "MASTER";
+        public static final String HUB_MANAGER = "HUB_MANAGER";
+        public static final String HUB_TO_HUB_DELIVERY = "HUB_TO_HUB_DELIVERY";
+        public static final String TO_COMPANY_DELIVERY = "TO_COMPANY_DELIVERY";
     }
 }

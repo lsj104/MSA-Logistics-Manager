@@ -1,10 +1,9 @@
 package com.team12.hub.hubPath.controller;
 
+
 import com.team12.common.dto.hub.HubPathDetailsResponseDto;
 import com.team12.common.dto.hub.HubPathOptimalRequestDto;
 import com.team12.common.exception.response.SuccessResponse;
-import com.team12.hub.hub.dto.HubResponseDto;
-import com.team12.hub.hubPath.domain.HubPath;
 import com.team12.hub.hubPath.dto.HubPathCreateRequestDto;
 import com.team12.hub.hubPath.dto.HubPathResponseDto;
 import com.team12.hub.hubPath.dto.HubPathSearchRequestDto;
@@ -28,20 +27,20 @@ public class HubPathController {
     private final HubPathService hubPathService;
 
     @PostMapping
-    public SuccessResponse<?> createHubPath(@RequestBody HubPathCreateRequestDto hubPathCreateRequestDto) {
-        HubPathResponseDto createdHubPath = hubPathService.createHubPath(hubPathCreateRequestDto);
+    public SuccessResponse<?> createHubPath(@RequestBody HubPathCreateRequestDto hubPathCreateRequestDto, @RequestHeader("X-User-Id") Long loginUserId) {
+        HubPathResponseDto createdHubPath = hubPathService.createHubPath(hubPathCreateRequestDto, loginUserId);
         return SuccessResponse.success(SuccessMessage.CREATE_HUB_PATH.getHttpStatus().value(), SuccessMessage.CREATE_HUB_PATH.getMessage(), createdHubPath);
     }
 
     @PutMapping("/{hubPathId}")
-    public SuccessResponse<?> updateHubPath(@PathVariable UUID hubPathId, @RequestBody HubPathUpdateRequestDto hubPathUpdateRequestDto) {
-        HubPathResponseDto updatedHubPath = hubPathService.updateHubPath(hubPathId, hubPathUpdateRequestDto);
+    public SuccessResponse<?> updateHubPath(@PathVariable UUID hubPathId, @RequestBody HubPathUpdateRequestDto hubPathUpdateRequestDto, @RequestHeader("X-User-Id") Long loginUserId) {
+        HubPathResponseDto updatedHubPath = hubPathService.updateHubPath(hubPathId, hubPathUpdateRequestDto, loginUserId);
         return SuccessResponse.success(SuccessMessage.UPDATE_HUB_PATH.getHttpStatus().value(), SuccessMessage.UPDATE_HUB_PATH.getMessage(), updatedHubPath);
     }
 
     @DeleteMapping("/{hubPathId}")
-    public SuccessResponse<?> deleteHubPath(@PathVariable UUID hubPathId) {
-        UUID deletedHubPathId = hubPathService.deleteHubPath(hubPathId);
+    public SuccessResponse<?> deleteHubPath(@PathVariable UUID hubPathId, @RequestHeader("X-User-Id") Long loginUserId) {
+        UUID deletedHubPathId = hubPathService.deleteHubPath(hubPathId, loginUserId);
         return SuccessResponse.success(SuccessMessage.DELETE_HUB_PATH.getHttpStatus().value(), SuccessMessage.DELETE_HUB_PATH.getMessage(), deletedHubPathId);
     }
 

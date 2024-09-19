@@ -33,7 +33,10 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	// Spring Security (JWT 검증)
-	//implementation 'org.springframework.boot:spring-boot-starter-security'
+//	implementation 'org.springframework.boot:spring-boot-starter-webflux'  // Spring WebFlux
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+//	implementation 'org.springframework.security:spring-security-webflux'  // WebFlux Security 추가 필요
+
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }

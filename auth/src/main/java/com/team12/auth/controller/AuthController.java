@@ -4,6 +4,7 @@ import com.team12.auth.dto.JwtAuthenticationResponse;
 import com.team12.auth.dto.RefreshTokenRequest;
 import com.team12.auth.jwt.JwtTokenProvider;
 import com.team12.auth.service.AuthService;
+import com.team12.auth.service.RedisService;
 import com.team12.common.dto.auth.LoginRequestDto;
 import com.team12.common.dto.auth.LoginResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +21,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
     private AuthenticationManager authenticationManager;
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisService redisService;
 
 
     //login
@@ -68,6 +69,13 @@ public class AuthController {
         } else {
             return ResponseEntity.ok("Token is still valid");
         }
+    }
+
+    //로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity logout(@RequestHeader("X-User-Name") String username) {
+        authService.logout(username);
+        return ResponseEntity.noContent().build();
     }
 
 
