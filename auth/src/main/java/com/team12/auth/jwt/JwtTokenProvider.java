@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Base64;
@@ -37,6 +38,7 @@ public class JwtTokenProvider {
     @Value("${jwt.key}")
     private String secretKey;
     private Key key;
+
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     //로그 설정
@@ -45,7 +47,7 @@ public class JwtTokenProvider {
 
     @PostConstruct // 딱 한번만 호출하면 되는 자원에 씀. 또 호출하는 것 방지
     public void init() {
-        byte[] bytes = Base64.getDecoder().decode(secretKey);
+        byte[] bytes = secretKey.getBytes();
         key = Keys.hmacShaKeyFor(bytes);
     }
 
@@ -117,6 +119,24 @@ public class JwtTokenProvider {
         }
         logger.error("Not Found Token");
         throw new NullPointerException("Not Found Token");
+    }
+
+    //토큰 만료 여부 확인
+    public boolean isTokenExpired(String accessToken) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(accessToken)
+                    .getBody();
+            Date expirationDate = claims.getExpiration();
+            return expirationDate.before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        } catch (Exception e) {
+            //토큰이 유효하지 않을 때
+            return true;
+        }
     }
 
     // JWT 검증
