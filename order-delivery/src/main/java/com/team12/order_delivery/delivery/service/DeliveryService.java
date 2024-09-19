@@ -18,6 +18,7 @@ import com.team12.order_delivery.deliveryRoute.repository.DeliveryRouteRepositor
 import com.team12.order_delivery.deliveryRoute.service.DeliveryRouteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -41,7 +42,7 @@ public class DeliveryService {
     private final HubClient hubClient;
 
     @Transactional
-    public DeliveryResDto createDelivery(DeliveryReqDto deliveryReqDto) {
+    public DeliveryResDto createDelivery(DeliveryReqDto deliveryReqDto, Long userId) {
         try {
             Delivery delivery = Delivery.builder()
                     .orderId(deliveryReqDto.getOrderId())
@@ -50,8 +51,10 @@ public class DeliveryService {
                     .address(deliveryReqDto.getAddress())
                     .receiver(deliveryReqDto.getReceiver())
                     .receiverEmail(deliveryReqDto.getReceiverEmail())
+                    .userId(userId)
                     .deliveryStatus(Delivery.DeliveryStatus.PREPARING)
                     .build();
+            delivery.setCreatedBy(userId);
             deliveryRepository.save(delivery);
             deliveryRouteService.createDeliveryRoutes(delivery);
             return new DeliveryResDto(delivery);
@@ -63,9 +66,12 @@ public class DeliveryService {
     }
 
 
-    public DeliveryResDto getDelivery(String deliveryId) {
+    public DeliveryResDto getDelivery(String deliveryId, Long userId, String userRole) {
         try {
             Delivery delivery = deliveryRepository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
+            if(!delivery.getUserId().equals(userId) && !userRole.equals("MASTER")) {
+                throw new BusinessLogicException(ExceptionCode.DELIVERY_NOT_AUTHORIZED);
+            }
             return new DeliveryResDto(delivery);
         } catch (BusinessLogicException e) {
             throw e;
@@ -76,18 +82,23 @@ public class DeliveryService {
     }
 
 
-    public CustomPageResponse<DeliveryResDto> getAllDelivery(Pageable pageable) {
+    public Page<DeliveryResDto> getAllDelivery(Pageable pageable, Long userId, String userRole, Long targetUserId) {
         try {
-            return new CustomPageResponse<>(deliveryRepository.findAll(pageable).map(DeliveryResDto::new));
+            if(!userId.equals(targetUserId) && !userRole.equals("MASTER")) {
+                throw new BusinessLogicException(ExceptionCode.DELIVERY_ROUTE_NOT_FOUND);
+            }
+            Page<Delivery> deliveryPage = deliveryRepository.findAllByUserId(userId, pageable);
+            return deliveryPage.map(DeliveryResDto::new);
         } catch (Exception e) {
             throw new BusinessLogicException(ExceptionCode.INVALID_PARAMETER);
         }
     }
 
-    public DeliveryResDto updateDelivery(String deliveryId, DeliveryReqDto deliveryReqDto) {
+    public DeliveryResDto updateDelivery(String deliveryId, DeliveryReqDto deliveryReqDto, Long userId) {
         try {
             Delivery delivery = deliveryRepository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
             delivery.update(deliveryReqDto);
+            delivery.setUpdatedBy(userId);
             deliveryRepository.save(delivery);
             return new DeliveryResDto(delivery);
         } catch (BusinessLogicException e) {
@@ -97,10 +108,11 @@ public class DeliveryService {
         }
     }
 
-    public void deleteDelivery(String deliveryId) {
+    public void deleteDelivery(String deliveryId, Long userId) {
         try {
             Delivery delivery = deliveryRepository.findById(UUID.fromString(deliveryId)).orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
             deliveryRepository.delete(delivery);
+            delivery.setDeletedBy(userId);
         } catch (BusinessLogicException e) {
             throw e;
         } catch (Exception e) {
@@ -109,11 +121,12 @@ public class DeliveryService {
     }
 
     @Transactional
-    public DeliveryResDto updateDeliveryStatus(String deliveryId, Delivery.DeliveryStatus deliveryStatus) {
+    public DeliveryResDto updateDeliveryStatus(String deliveryId, Delivery.DeliveryStatus deliveryStatus, Long userId) {
         try {
             Delivery delivery = deliveryRepository.findById(UUID.fromString(deliveryId))
                     .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DELIVERY_NOT_FOUND));
             delivery.setDeliveryStatus(deliveryStatus);
+            delivery.setUpdatedBy(userId);
             deliveryRepository.save(delivery);
             return new DeliveryResDto(delivery);
         } catch (BusinessLogicException e) {
@@ -125,13 +138,14 @@ public class DeliveryService {
     }
 
     @Transactional
-    public RouteResDto updateDeliveryRouteStatus(String deliveryRouteId, String deliveryRouteStatus) {
+    public RouteResDto updateDeliveryRouteStatus(String deliveryRouteId, String deliveryRouteStatus, Long userId) {
         try {
             DeliveryRoute deliveryRoute = findDeliveryRouteById(deliveryRouteId);
             DeliveryRoute.RouteStatus newStatus = DeliveryRoute.RouteStatus.valueOf(deliveryRouteStatus);
             Delivery delivery = findDeliveryById(deliveryRoute.getDelivery().getId());
 
             updateRouteStatus(deliveryRoute, newStatus);
+            delivery.setUpdatedBy(userId);
             String slackContent = generateSlackContent(deliveryRoute, newStatus);
             sendSlackNotification(delivery.getReceiverEmail(), slackContent);
 

@@ -29,21 +29,11 @@ public class SlackController {
 
     @GetMapping("/all")
     public SuccessResponse<?> getSlackAll(@RequestParam(value = "email", required = true) String email, Pageable pageable) {
-        // if(!userId.equals(targetUserId) && !role.equals("MANAGER")) {
-        //     return ResponseEntity.status(403).body("권한이 없습니다.");
-        // }
-        // return ResponseEntity.status(200).body(slackService.getSlackAll(targetUserId, pageable));
-        return SuccessResponse.success(SuccessMessage.SEND_MESSAGE.getHttpStatus().value(), SuccessMessage.SEND_MESSAGE.getMessage(), slackService.getSlackAll(email, pageable));
+        return SuccessResponse.success(SuccessMessage.SEND_MESSAGE.getHttpStatus().value(), SuccessMessage.GET_MESSAGE.getMessage(), slackService.getSlackAll(email, pageable));
     }
 
     @GetMapping("")
     public SuccessResponse<?> getSlack(@RequestParam(value= "messageId", required = true) UUID messageId) {
-
-        // if(!userId.equals(targetUserId) && !role.equals("MANAGER")) {
-        //     return ResponseEntity.status(403).body("권한이 없습니다.");
-        // }
-        // return ResponseEntity.status(200).body(slackService.getSlack(targetUserId, pageable));
-
         return SuccessResponse.success(SuccessMessage.GET_MESSAGE.getHttpStatus().value(), SuccessMessage.GET_MESSAGE.getMessage(), slackService.getSlack(messageId));
 
     }

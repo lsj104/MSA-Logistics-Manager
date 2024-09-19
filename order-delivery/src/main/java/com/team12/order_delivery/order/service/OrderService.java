@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 public interface OrderService {
 
     // 주문 생성
-    CreateOrderResponseDto createOrder(CreateOrderRequestDto requestDto);
+    CreateOrderResponseDto createOrder(CreateOrderRequestDto requestDto, Long userId);
 
     // 주문 상세조회
     GetOrderResponseDto getOrder(UUID orderId);

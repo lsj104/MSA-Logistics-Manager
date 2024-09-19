@@ -50,6 +50,9 @@ public enum ExceptionCode {
 
     // DELIVERY 4200~
     DELIVERY_NOT_FOUND(4201, "해당 배송 내역이 존재하지 않습니다."),
+    DELIVERY_NOT_AUTHORIZED(4202, "해당 배송 내역에 대한 권한이 없습니다."),
+
+
 
     // DELIVERY_ROUTE 4300~
     DELIVERY_ROUTE_NOT_FOUND(4301, "해당 배송 경로 내역이 존재하지 않습니다."),
