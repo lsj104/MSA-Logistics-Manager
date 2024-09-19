@@ -1,28 +1,15 @@
 global:
   scrape_interval: 15s
-
 scrape_configs:
-  - job_name: 'eureka'
+  - job_name: 'eureka-services'
+    eureka_sd_configs:
+      - server: 'http://host.docker.internal:19090/eureka'   # Eureka 서버 주소
     metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['host.docker.internal:19090']
-
-  - job_name: 'slack-service'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['host.docker.internal:19095']
-
-  - job_name: 'hub-service'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['host.docker.internal:19093']
-
-  - job_name: 'order-delivery-service'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['host.docker.internal:19094']
-
-  - job_name: 'company-product-service'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['host.docker.internal:19092']
+    relabel_configs:
+      - source_labels: [ '__meta_eureka_app_name' ]
+        target_label: 'job'
+      - source_labels: [ '__meta_eureka_instance_ip_addr' ]
+        target_label: 'instance'
+      - source_labels: [ '__meta_eureka_app_instance_status' ]
+        action: keep
+        regex: 'UP'  # 서비스 상태가 "UP"인 인스턴스만 스크랩
