@@ -1,4 +1,4 @@
-package com.team12.common.auth;
+package com.team12.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
