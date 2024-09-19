@@ -36,9 +36,9 @@ public class UserController {
     }
     //유저 : 개인 상세 정보 조회
     @GetMapping("/usr")
-    public ResponseEntity getUserDetail() {
+    public ResponseEntity getUserDetail(@RequestHeader("X-User-Id") Long tokenUserId) {
         //Todo : header 토큰 받아서 처리하기
-        Long userId = 1L;
+        Long userId = tokenUserId;
         UserResponseDto userResponseDto = userService.getUserDetail(userId);
         return ResponseEntity.ok(userResponseDto);
     }
