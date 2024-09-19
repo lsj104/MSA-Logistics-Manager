@@ -8,7 +8,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -22,7 +21,6 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-
   data:
     redis:
       host: localhost
@@ -34,13 +32,26 @@ spring:
 server:
   port: 19094
 
-
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:19090/eureka/
+  instance:
+    prefer-ip-address: true
 
 logging:
   level:
     com.team12.order_delivery.order.company: DEBUG
     org.springframework.cloud.openfeign: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
