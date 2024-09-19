@@ -4,6 +4,7 @@ import com.team12.api_gateway.filter.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -28,15 +29,22 @@ public class SecurityConfig {
                         .pathMatchers("/api/auth/logout").authenticated()
                         .pathMatchers("/api/auth/**").permitAll()
                         .pathMatchers("/client/**").permitAll()
-                        .pathMatchers("/api/products").permitAll()
-                        .pathMatchers("/api/companies").permitAll()
-                        .pathMatchers("/api/hubs").permitAll()
-                        .pathMatchers("/api/hub-paths").permitAll()
-                        .pathMatchers("/api/managers").permitAll()
-                        .pathMatchers("/delivery").permitAll()
-                        .pathMatchers("route").permitAll()
-                        .pathMatchers("/api/orders").permitAll()
-                        .pathMatchers("slack").permitAll()
+                        .pathMatchers("/api/products/**").permitAll()
+                        .pathMatchers("/api/companies/**").permitAll()
+                        .pathMatchers("/api/hubs/**").permitAll()
+                        .pathMatchers("/api/hub-paths/**").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/managers/**").hasAuthority("MASTER")
+                        .pathMatchers(HttpMethod.PUT, "/api/managers/**").hasAuthority("MASTER")
+                        .pathMatchers(HttpMethod.DELETE, "/api/managers/**").hasAuthority("MASTER")
+                        .pathMatchers(HttpMethod.GET, "/api/managers/{managerId}").hasAnyAuthority("MASTER","HUB_MANAGER")
+                        .pathMatchers(HttpMethod.GET, "/api/managers").hasAnyAuthority("MASTER","HUB_MANAGER")
+                        .pathMatchers("/api/managers/hub-to-hub").permitAll()
+                        .pathMatchers( "/api/managers/hub-to-company").permitAll()
+                        .pathMatchers("/api/managers/**").permitAll()
+                        .pathMatchers("/delivery/**").permitAll()
+                        .pathMatchers("/route/**").permitAll()
+                        .pathMatchers("/api/orders/**").permitAll()
+                        .pathMatchers("/slack/**").permitAll()
                         .anyExchange().authenticated()  // 그 외 모든 경로는 인증 필요
                 )
                 .securityContextRepository(jwtFilter)
