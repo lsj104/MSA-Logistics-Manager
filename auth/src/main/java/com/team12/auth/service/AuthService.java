@@ -46,7 +46,7 @@ public class AuthService {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             Long userId = userDetails.getId();  // Long 타입의 ID
             String username = userDetails.getUsername();  // 사용자 이름
-            String role = userDetails.getAuthorities().iterator().next().getAuthority().substring(5);
+            String role = userDetails.getAuthorities().iterator().next().getAuthority();
 
 
             // Redis에 RefreshToken 저장
@@ -73,7 +73,7 @@ public class AuthService {
                 CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
                 Long userId = userDetails.getId();
                 String userDetailsUsername = userDetails.getUsername();
-                String role = userDetails.getAuthorities().iterator().next().getAuthority().substring(5);
+                String role = userDetails.getAuthorities().iterator().next().getAuthority();
                 //return 새로운 accessToken과 기존 refreshToken
                 return new JwtAuthenticationResponse(newAccessToken, refreshToken, userId, userDetailsUsername, role);
             } else {

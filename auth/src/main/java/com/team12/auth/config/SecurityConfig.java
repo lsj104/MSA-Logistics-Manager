@@ -37,7 +37,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/api/user/**").permitAll()
+                        .requestMatchers("/api/users/sign-up").permitAll()
+                        .requestMatchers("/api/users/reg").hasRole("MASTER")
+                        .requestMatchers("/api/users/usr").hasAnyRole("COMPANY","HUB_MANAGER", "HUB_TO_HUB_DELIVERY", "TO_COMPANY_DELIVERY")
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/client/**").permitAll()
                         .requestMatchers("/api/products").permitAll()
