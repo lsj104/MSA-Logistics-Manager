@@ -1,8 +1,5 @@
 package com.team12.user.repository;
 
-//import com.querydsl.core.types.dsl.BooleanExpression;
-//import com.querydsl.core.types.dsl.StringPath;
-//import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -26,7 +23,7 @@ public class UserRepository {
 
     private final UserJpaRepository userJpaRepository;
 
-//    @Autowired
+    @Autowired
     private JPAQueryFactory queryFactory;
 
     //username 중복 확인
