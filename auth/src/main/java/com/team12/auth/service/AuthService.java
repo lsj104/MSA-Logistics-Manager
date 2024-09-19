@@ -1,5 +1,6 @@
 package com.team12.auth.service;
 
+import com.team12.auth.dto.CustomUserDetails;
 import com.team12.auth.dto.JwtAuthenticationResponse;
 import com.team12.auth.jwt.JwtTokenProvider;
 import com.team12.common.dto.auth.LoginRequestDto;
@@ -31,12 +32,18 @@ public class AuthService {
             // AccessToken, RefreshToken 생성
             String accessToken = jwtTokenProvider.generateAccessToken(authentication);
             String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
+            //사용자 정보
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            Long userId = userDetails.getId();  // Long 타입의 ID
+            String username = userDetails.getUsername();  // 사용자 이름
+            String role = userDetails.getAuthorities().iterator().next().getAuthority().substring(5);
+
 
             // Redis에 RefreshToken 저장
             redisService.saveRefreshToken(authentication.getName(), refreshToken);
 
             // 응답 DTO 반환
-            return new JwtAuthenticationResponse(accessToken, refreshToken);
+            return new JwtAuthenticationResponse(accessToken, refreshToken, userId, username, role);
         }
 
 }
