@@ -3,7 +3,6 @@ package com.team12.user.service;
 import com.team12.common.customPage.CustomPageResponse;
 import com.team12.common.exception.BusinessLogicException;
 import com.team12.common.exception.ExceptionCode;
-import com.team12.common.exception.test.BusinessException;
 import com.team12.user.domain.User;
 import com.team12.user.dto.*;
 import com.team12.user.repository.UserRepository;
