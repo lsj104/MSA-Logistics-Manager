@@ -4,14 +4,22 @@ import com.team12.auth.dto.CustomUserDetails;
 import com.team12.auth.dto.JwtAuthenticationResponse;
 import com.team12.auth.jwt.JwtTokenProvider;
 import com.team12.common.dto.auth.LoginRequestDto;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
+
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     @Autowired
@@ -20,6 +28,8 @@ public class AuthService {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private RedisService redisService;
+    private final CustomUserDetailsService customUserDetailsService;
+
 
     public JwtAuthenticationResponse login(LoginRequestDto loginDto) throws AuthenticationException {
             Authentication authentication = authenticationManager.authenticate(
@@ -52,10 +62,12 @@ public class AuthService {
         if (jwtTokenProvider.validateToken(refreshToken)) {
             String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
             //Redis에서 refreshToken 확인
-            String storedToken = redisService.getRefreshToken(username);
+            String storedToken = redisService.getRefreshToken(username).substring(7);
             if (storedToken != null && storedToken.equals(refreshToken)) {
                 //new accessToken
-                Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, null);
+                // CustomUserDetailsService를 이용해 사용자 정보 가져오기
+                CustomUserDetails userDetail = (CustomUserDetails) customUserDetailsService.loadUserByUsername(username);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetail, null, userDetail.getAuthorities());
                 String newAccessToken = jwtTokenProvider.generateAccessToken(authentication);
                 //userDetails
                 CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();

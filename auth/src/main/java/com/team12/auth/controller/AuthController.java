@@ -1,6 +1,8 @@
 package com.team12.auth.controller;
 
 import com.team12.auth.dto.JwtAuthenticationResponse;
+import com.team12.auth.dto.RefreshTokenRequest;
+import com.team12.auth.jwt.JwtTokenProvider;
 import com.team12.auth.service.AuthService;
 import com.team12.common.dto.auth.LoginRequestDto;
 import com.team12.common.dto.auth.LoginResponseDto;
@@ -13,8 +15,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -23,6 +23,7 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
     private final AuthService authService;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     //login
@@ -46,9 +47,14 @@ public class AuthController {
     }
 
     //refreshToken refresh
-    @GetMapping("/refresh-token")
-    public ResponseEntity refreshToken(@RequestBody Map<String, String> tokenRequest) {
-        String refreshToken = tokenRequest.get("refreshToken");
+    @PostMapping("/refresh-token")
+    public ResponseEntity refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+         String accessToken = refreshTokenRequest.getAccessToken();
+        String refreshToken = refreshTokenRequest.getRefreshToken();
+
+        //accessToken 만료 검증
+        boolean isExpired = jwtTokenProvider.isTokenExpired(accessToken);
+        if(isExpired) {
         JwtAuthenticationResponse response = authService.refreshToken(refreshToken);
         LoginResponseDto loginResponseDto = new LoginResponseDto(response.getAccessToken(), response.getRefreshToken());
 
@@ -59,6 +65,9 @@ public class AuthController {
 
 
         return ResponseEntity.ok().headers(headers).body(loginResponseDto);
+        } else {
+            return ResponseEntity.ok("Token is still valid");
+        }
     }
 
 
