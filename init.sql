@@ -27,12 +27,12 @@ CREATE TABLE S_HUB.p_hub_path
 (
     hub_path_id UUID PRIMARY KEY,
     created_at  TIMESTAMP,
-    created_by  UUID,
+    created_by  BIGINT,
     deleted_at  TIMESTAMP,
-    deleted_by  UUID,
+    deleted_by  BIGINT,
     is_deleted  BOOLEAN,
     updated_at  TIMESTAMP,
-    updated_by  UUID,
+    updated_by  BIGINT,
     distance    INT,
     duration    INT,
     from_hub_id UUID,
@@ -48,11 +48,11 @@ CREATE TABLE S_HUB.p_hub
     latitude   VARCHAR(255) NOT NULL,
     longitude  VARCHAR(255) NOT NULL,
     created_at TIMESTAMP,
-    created_by UUID,
+    created_by BIGINT,
     updated_at TIMESTAMP,
-    updated_by UUID,
+    updated_by BIGINT,
     deleted_at TIMESTAMP,
-    deleted_by UUID,
+    deleted_by BIGINT,
     is_deleted BOOLEAN
 );
 
