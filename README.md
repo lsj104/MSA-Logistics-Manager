@@ -118,5 +118,5 @@
 - [Postman API docs](https://documenter.getpostman.com/view/38424997/2sAXqs7haC)
 
 ## 🐬 Infra
-<img width="742" alt="스크린샷 2024-09-19 오전 6 10 00" src="https://github.com/user-attachments/assets/70d3603c-0beb-4551-a272-9a9c7e0df188">
+![Untitled Diagram drawio (1)](https://github.com/user-attachments/assets/93ee14c8-be26-41c8-a243-e9d1f2306816)
 
