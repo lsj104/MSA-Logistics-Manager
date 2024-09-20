@@ -35,8 +35,7 @@ spring:
       port: 6379
       username: default
       password: default
-  profiles:
-    include: private
+
 
 
 eureka:

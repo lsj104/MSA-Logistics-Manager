@@ -3,9 +3,9 @@ spring:
     name: company-product
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/logistics
-    username: postgres
-    password: ${POSTGRESQL_PW}
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: cpr
+    password: 1234
     driver-class-name: org.postgresql.Driver
 
   jpa:
