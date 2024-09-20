@@ -4,6 +4,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: s_user  # 기본 스키마 설정
   data:
     redis:
       host: localhost
@@ -14,6 +17,8 @@ spring:
     username: usr
     password: 1234
     driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: s_user
 
 jwt:
   key : ${jwt-key}
