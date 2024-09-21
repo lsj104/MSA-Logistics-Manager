@@ -10,6 +10,7 @@ import static com.team12.company_product.product.message.SuccessMessage.UPDATE_P
 import com.team12.common.customPage.CustomPageResponse;
 import com.team12.common.exception.response.SuccessResponse;
 import com.team12.company_product.product.dto.request.CreateProductRequestDto;
+import com.team12.company_product.product.dto.request.UpdateProductQuantityRequestDto;
 import com.team12.company_product.product.dto.request.UpdateProductRequestDto;
 import com.team12.company_product.product.dto.response.CreateProductResponseDto;
 import com.team12.company_product.product.dto.response.DeleteProductResponseDto;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -121,6 +123,24 @@ public class ProductController {
         return ResponseEntity.status(SEARCH_PRODUCT.getHttpStatus())
                 .body(success(SEARCH_PRODUCT.getHttpStatus().value(),
                         SEARCH_PRODUCT.getMessage(), customResponse));
+    }
+
+    @Operation(summary = "상품 수량 차감")
+    @PutMapping("/{productId}/reduce-quantity")
+    public ResponseEntity<Void> reduceQuantity(@PathVariable String productId, @RequestParam Long quantity) {
+        productService.reduceProductQuantity(productId, quantity);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{productId}/quantity")
+    public ResponseEntity<SuccessResponse<Void>> updateProductQuantity(
+            @PathVariable("productId") String productId,
+            @RequestBody UpdateProductQuantityRequestDto requestDto) {
+
+        productService.updateProductQuantity(productId, requestDto.newQuantity());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new SuccessResponse<>(HttpStatus.OK.value(), "Product quantity updated successfully", null));
     }
 
 

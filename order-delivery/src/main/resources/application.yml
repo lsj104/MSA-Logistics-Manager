@@ -39,7 +39,7 @@ eureka:
 
 logging:
   level:
-    com.team12.order_delivery.order.company: DEBUG
+    com.team12.order_delivery.order.client: DEBUG
     org.springframework.cloud.openfeign: DEBUG
 
 management:

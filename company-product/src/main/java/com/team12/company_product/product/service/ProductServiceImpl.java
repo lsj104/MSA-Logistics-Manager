@@ -44,7 +44,6 @@ public class ProductServiceImpl implements ProductService {
 
         checkHubIfPresent(requestDto.hubId());
 
-        // Product 생성 및 저장
         Product product = Product.of(requestDto, company);
         productRepository.save(product);
 
@@ -121,6 +120,39 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return productPage.map(GetProductResponseDto::from);
+    }
+
+    // 상품 재고 차감
+    @Transactional
+    @Override
+    public void reduceProductQuantity(String productId, Long quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductException(ExceptionMessage.PRODUCT_NOT_FOUND));
+
+        if (product.getQuantity() < quantity) {
+            throw new ProductException(ExceptionMessage.INSUFFICIENT_PRODUCT_QUANTITY);
+        }
+
+        product.reduceQuantity(quantity);
+        productRepository.save(product);
+    }
+
+
+    // 상품 재고 수정
+    @Override
+    public void updateProductQuantity(String productId, Long quantityChange) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductException(ExceptionMessage.PRODUCT_NOT_FOUND));
+
+        Long updatedQuantity = product.getQuantity() + quantityChange;
+
+        if (updatedQuantity < 0) {
+            throw new ProductException(ExceptionMessage.INSUFFICIENT_PRODUCT_QUANTITY);
+        }
+
+        product.setQuantity(updatedQuantity);
+
+        productRepository.save(product);
     }
 
 
