@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/odl
+    url: jdbc:postgresql://localhost:5432/postgres
     username: odl
     password: 1234
 
@@ -39,7 +39,7 @@ eureka:
 
 logging:
   level:
-    com.team12.order_delivery.order.company: DEBUG
+    com.team12.order_delivery.order.client: DEBUG
     org.springframework.cloud.openfeign: DEBUG
 
 management:

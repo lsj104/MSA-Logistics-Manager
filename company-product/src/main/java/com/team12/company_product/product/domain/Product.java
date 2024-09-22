@@ -4,6 +4,8 @@ import com.team12.common.audit.AuditingEntity;
 import com.team12.company_product.company.domain.Company;
 import com.team12.company_product.product.dto.request.CreateProductRequestDto;
 import com.team12.company_product.product.dto.request.UpdateProductRequestDto;
+import com.team12.company_product.product.exception.ExceptionMessage;
+import com.team12.company_product.product.exception.ProductException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -71,5 +73,16 @@ public class Product extends AuditingEntity {
         super.setIsDeleted(true);
         super.setDeletedAt(LocalDateTime.now());
         super.setDeletedBy(userId);
+    }
+
+    public void reduceQuantity(Long quantity) {
+        if (this.quantity < quantity) {
+            throw new ProductException(ExceptionMessage.INSUFFICIENT_PRODUCT_QUANTITY);
+        }
+        this.quantity -= quantity;
+    }
+
+    public void setQuantity(Long newQuantity) {
+        this.quantity = newQuantity;
     }
 }

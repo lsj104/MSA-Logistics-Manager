@@ -1,8 +1,9 @@
 package com.team12.order_delivery.order.service;
 
-import com.team12.order_delivery.order.company.CompanyResponseDto;
-import com.team12.order_delivery.order.company.CompanyService;
-import com.team12.order_delivery.order.company.CompanyType;
+import com.team12.common.exception.response.SuccessResponse;
+import com.team12.order_delivery.order.client.CompanyProductClient;
+import com.team12.common.dto.company.CompanyResponseDto;
+import com.team12.common.dto.company.CompanyType;
 import com.team12.order_delivery.order.domain.Order;
 import com.team12.order_delivery.order.dto.request.CreateOrderRequestDto;
 import com.team12.order_delivery.order.dto.request.UpdateOrderRequestDto;
@@ -12,13 +13,14 @@ import com.team12.order_delivery.order.dto.response.GetOrderResponseDto;
 import com.team12.order_delivery.order.dto.response.UpdateOrderResponseDto;
 import com.team12.order_delivery.order.exception.ExceptionMessage;
 import com.team12.order_delivery.order.exception.OrderException;
-import com.team12.order_delivery.order.product.ProductResponseDto;
-import com.team12.order_delivery.order.product.ProductService;
+import com.team12.common.dto.product.ProductResponseDto;
+import com.team12.common.dto.product.UpdateProductQuantityRequestDto;
 import com.team12.order_delivery.order.repository.OrderRepository;
 import com.team12.order_delivery.delivery.domain.Delivery;
 import com.team12.order_delivery.delivery.dto.DeliveryReqDto;
 import com.team12.order_delivery.delivery.dto.DeliveryResDto;
 import com.team12.order_delivery.delivery.service.DeliveryService;
+import feign.FeignException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +36,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final DeliveryService deliveryService;
-    private final CompanyService companyService;
-    private final ProductService productService;
+    private final CompanyProductClient companyProductClient;
 
     // 주문 생성
     @Transactional
@@ -43,6 +44,12 @@ public class OrderServiceImpl implements OrderService {
         validateCompanies(requestDto);
         validateProduct(requestDto.productId());
 
+        try {
+            companyProductClient.reduceProductQuantity(requestDto.productId(),
+                    requestDto.quantity());
+        } catch (FeignException e) {
+            throw new OrderException(ExceptionMessage.INSUFFICIENT_PRODUCT_QUANTITY);
+        }
         Order order = createAndSaveOrder(requestDto);
         createAndAssignDelivery(order, requestDto, userId);
 
@@ -66,10 +73,40 @@ public class OrderServiceImpl implements OrderService {
     // 주문 수정
     @Transactional
     public UpdateOrderResponseDto updateOrder(UpdateOrderRequestDto requestDto, UUID orderId) {
-        Order order = findById(orderId);
-        order.update(requestDto);
+        Order existingOrder = findById(orderId);
 
-        return UpdateOrderResponseDto.from(order, order.getDelivery());
+        Long oldQuantity = existingOrder.getQuantity();
+        Long newQuantity = requestDto.quantity();
+
+        try {
+            SuccessResponse<ProductResponseDto> productResponse = companyProductClient.fetchProductById(
+                    existingOrder.getProductId());
+
+            if (productResponse == null || productResponse.resultCode() != 200) {
+                throw new OrderException(ExceptionMessage.PRODUCT_NOT_FOUND);
+            }
+
+            ProductResponseDto product = productResponse.data();
+
+            Long updatedQuantity = product.quantity() + oldQuantity - newQuantity;
+
+            UpdateProductQuantityRequestDto updateProductRequest = new UpdateProductQuantityRequestDto(
+                    updatedQuantity - product.quantity());
+            SuccessResponse<Void> updateResponse = companyProductClient.updateProductQuantity(
+                    existingOrder.getProductId(), updateProductRequest);
+
+            if (updateResponse == null || updateResponse.resultCode() != 200) {
+                throw new OrderException(ExceptionMessage.INSUFFICIENT_PRODUCT_QUANTITY);
+            }
+        } catch (FeignException e) {
+            throw new OrderException(ExceptionMessage.INSUFFICIENT_PRODUCT_QUANTITY);
+        }
+
+        existingOrder.update(requestDto);
+
+        orderRepository.save(existingOrder);
+
+        return UpdateOrderResponseDto.from(existingOrder, existingOrder.getDelivery());
     }
 
     // 주문 삭제
@@ -88,7 +125,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void validateCompany(String companyId, CompanyType expectedType) {
-        CompanyResponseDto company = companyService.getCompany(companyId);
+
+        CompanyResponseDto company = companyProductClient.fetchCompanyById(companyId).data();
 
         if (company == null) {
             throw new OrderException(ExceptionMessage.COMPANY_NOT_FOUND);
@@ -99,7 +137,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void validateProduct(String productId) {
-        ProductResponseDto product = productService.getProduct(productId);
+        ProductResponseDto product = companyProductClient.fetchProductById(productId).data();
         if (product == null) {
             throw new OrderException(ExceptionMessage.PRODUCT_NOT_FOUND);
         }
@@ -115,11 +153,14 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 
-    private void createAndAssignDelivery(Order order, CreateOrderRequestDto requestDto, Long userId) {
-        CompanyResponseDto producerCompany = companyService.getCompany(
-                requestDto.producerCompany());
-        CompanyResponseDto receiverCompany = companyService.getCompany(
-                requestDto.receiverCompany());
+    private void createAndAssignDelivery(Order order, CreateOrderRequestDto requestDto,
+            Long userId) {
+
+        CompanyResponseDto producerCompany = companyProductClient.fetchCompanyById(
+                requestDto.producerCompany()).data();
+
+        CompanyResponseDto receiverCompany = companyProductClient.fetchCompanyById(
+                requestDto.receiverCompany()).data();
 
         DeliveryReqDto deliveryReqDto = DeliveryReqDto.builder()
                 .orderId(order.getOrderId())

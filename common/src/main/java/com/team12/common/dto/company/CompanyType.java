@@ -1,4 +1,4 @@
-package com.team12.order_delivery.order.company;
+package com.team12.common.dto.company;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

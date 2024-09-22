@@ -39,7 +39,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<SuccessResponse<CreateOrderResponseDto>> createOrder(
             @RequestBody CreateOrderRequestDto requestDto,
-            @RequestHeader(value = "X-user-Id") Long userId) {
+            @RequestHeader(value = "X-User-Id") Long userId) {
 
         return ResponseEntity.status(CREATE_ORDER.getHttpStatus())
                 .body(success(CREATE_ORDER.getHttpStatus().value(),

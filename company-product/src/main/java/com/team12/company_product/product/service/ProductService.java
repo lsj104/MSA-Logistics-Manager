@@ -32,4 +32,9 @@ public interface ProductService {
 
     // 상품 검색
     Page<GetProductResponseDto> searchProduct(String keyword, Pageable pageable);
+
+    // 상품 수량 차감
+    void reduceProductQuantity(String productId, Long quantity);
+
+    void updateProductQuantity(String productId, Long aLong);
 }
