@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 public interface ProductService {
 
     // 상품 생성
-    CreateProductResponseDto createProduct(CreateProductRequestDto requestDto);
+    CreateProductResponseDto createProduct(CreateProductRequestDto requestDto, Long userId);
 
     // 상품 조회
     GetProductResponseDto getProduct(String productId);
@@ -22,7 +22,8 @@ public interface ProductService {
     Page<GetProductResponseDto> getAllProduct(Pageable pageable);
 
     // 상품 수정
-    UpdateProductResponseDto updateProduct(UpdateProductRequestDto requestDto, String productId);
+    UpdateProductResponseDto updateProduct(UpdateProductRequestDto requestDto, String productId,
+            Long userId);
 
     // 상품 삭제
     DeleteProductResponseDto deleteProduct(String productId, Long userId);

@@ -35,7 +35,7 @@ public class ProductServiceImpl implements ProductService {
 
     // 상품 생성
     @Transactional
-    public CreateProductResponseDto createProduct(CreateProductRequestDto requestDto) {
+    public CreateProductResponseDto createProduct(CreateProductRequestDto requestDto, Long userId) {
 
         Company company = null;
         if (requestDto.companyId() != null) {
@@ -44,7 +44,9 @@ public class ProductServiceImpl implements ProductService {
 
         checkHubIfPresent(requestDto.hubId());
 
-        Product product = Product.of(requestDto, company);
+        Product product = Product.of(requestDto, company, userId);
+        product.setCreatedBy(userId);
+        product.setUpdatedBy(userId);
         productRepository.save(product);
 
         return CreateProductResponseDto.from(product);
@@ -62,14 +64,14 @@ public class ProductServiceImpl implements ProductService {
     // 모든 상품 조회
     @Transactional(readOnly = true)
     public Page<GetProductResponseDto> getAllProduct(Pageable pageable) {
-        Page<Product> products = productRepository.findAll(pageable);
+        Page<Product> products = productRepository.findByIsDeletedFalse(pageable);
         return products.map(GetProductResponseDto::from);
     }
 
     // 상품 수정
     @Transactional
     public UpdateProductResponseDto updateProduct(UpdateProductRequestDto requestDto,
-            String productId) {
+            String productId, Long userId) {
 
         Company company = null;
         if (requestDto.companyId() != null) {
@@ -79,6 +81,7 @@ public class ProductServiceImpl implements ProductService {
         checkHubIfPresent(requestDto.hubId());
 
         Product product = findById(productId);
+        product.setUpdatedBy(userId);
         product.update(requestDto, company);
         return UpdateProductResponseDto.from(product);
     }

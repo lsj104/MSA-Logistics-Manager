@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,12 +48,13 @@ public class ProductController {
     @Operation(summary = "상품 생성")
     @PostMapping
     public ResponseEntity<SuccessResponse<CreateProductResponseDto>> createProduct(
+            @RequestHeader("X-User-Id") Long userId,
             @RequestBody CreateProductRequestDto requestDto) {
 
         return ResponseEntity.status(CREATE_PRODUCT.getHttpStatus())
                 .body(success(CREATE_PRODUCT.getHttpStatus().value(),
                         CREATE_PRODUCT.getMessage(),
-                        productService.createProduct(requestDto)));
+                        productService.createProduct(requestDto, userId)));
     }
 
     @Operation(summary = "상품 상세 조회")
@@ -76,18 +78,21 @@ public class ProductController {
         CustomPageResponse<GetProductResponseDto> customResponse = new CustomPageResponse<>(
                 responseDto);
 
+        String message = String.format("%d개의 상품 조회 완료되었습니다.", responseDto.getTotalElements());
+
         return ResponseEntity.status(GET_PRODUCT.getHttpStatus())
-                .body(success(GET_PRODUCT.getHttpStatus().value(),
-                        GET_PRODUCT.getMessage(), customResponse));
+                .body(success(GET_PRODUCT.getHttpStatus().value(), message, customResponse));
     }
 
     @Operation(summary = "상품 수정")
     @PutMapping("/{productId}")
     public ResponseEntity<SuccessResponse<UpdateProductResponseDto>> updateProduct(
             @PathVariable("productId") String productId,
-            @RequestBody UpdateProductRequestDto requestDto) {
+            @RequestBody UpdateProductRequestDto requestDto,
+            @RequestHeader("X-User-Id") Long userId) {
 
-        UpdateProductResponseDto responseDto = productService.updateProduct(requestDto, productId);
+        UpdateProductResponseDto responseDto = productService.updateProduct(requestDto, productId,
+                userId);
 
         return ResponseEntity.status(UPDATE_PRODUCT.getHttpStatus())
                 .body(success(UPDATE_PRODUCT.getHttpStatus().value(),
@@ -98,9 +103,9 @@ public class ProductController {
     @Operation(summary = "상품 삭제")
     @DeleteMapping("/{productId}")
     public ResponseEntity<SuccessResponse<DeleteProductResponseDto>> deleteProduct(
-            @PathVariable("productId") String productId
+            @PathVariable("productId") String productId,
+            @RequestHeader("X-User-Id") Long userId
     ) {
-        Long userId = null;
         DeleteProductResponseDto responseDto = productService.deleteProduct(productId, userId);
 
         return ResponseEntity.status(DELETE_PRODUCT.getHttpStatus())
@@ -127,7 +132,8 @@ public class ProductController {
 
     @Operation(summary = "상품 수량 차감")
     @PutMapping("/{productId}/reduce-quantity")
-    public ResponseEntity<Void> reduceQuantity(@PathVariable String productId, @RequestParam Long quantity) {
+    public ResponseEntity<Void> reduceQuantity(@PathVariable String productId,
+            @RequestParam Long quantity) {
         productService.reduceProductQuantity(productId, quantity);
         return ResponseEntity.ok().build();
     }
@@ -140,7 +146,8 @@ public class ProductController {
         productService.updateProductQuantity(productId, requestDto.newQuantity());
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new SuccessResponse<>(HttpStatus.OK.value(), "Product quantity updated successfully", null));
+                .body(new SuccessResponse<>(HttpStatus.OK.value(),
+                        "Product quantity updated successfully", null));
     }
 
 
