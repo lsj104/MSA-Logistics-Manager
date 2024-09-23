@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 public interface CompanyService {
 
     // 업체 생성
-    CreateCompanyResponseDto createCompany(CreateCompanyRequestDto requestDto);
+    CreateCompanyResponseDto createCompany(CreateCompanyRequestDto requestDto, Long userId);
 
     // 업체 상세 조회
     GetCompanyResponseDto getCompany(String companyId);
@@ -22,7 +22,8 @@ public interface CompanyService {
     Page<GetCompanyResponseDto> getAllCompany(Pageable pageable);
 
     // 업체 수정
-    UpdateCompanyResponseDto updateCompany(UpdateCompanyRequestDto requestDto, String companyId);
+    UpdateCompanyResponseDto updateCompany(UpdateCompanyRequestDto requestDto, String companyId,
+            Long userId);
 
     // 업체 삭제
     DeleteCompanyResponseDto deleteCompany(String companyId, Long userId);

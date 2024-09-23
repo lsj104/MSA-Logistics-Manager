@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,12 +46,13 @@ public class CompanyController {
     @Operation(summary = "업체 생성")
     @PostMapping
     public ResponseEntity<SuccessResponse<CreateCompanyResponseDto>> createCompany(
+            @RequestHeader("X-User-Id") Long userId,
             @RequestBody CreateCompanyRequestDto requestDto) {
 
         return ResponseEntity.status(CREATE_COMPANY.getHttpStatus())
                 .body(success(CREATE_COMPANY.getHttpStatus().value(),
                         CREATE_COMPANY.getMessage(),
-                        companyService.createCompany(requestDto)));
+                        companyService.createCompany(requestDto, userId)));
     }
 
     @Operation(summary = "업체 상세 조회", description = "업체ID로 업체를 상세 조회하는 API입니다.")
@@ -74,18 +76,22 @@ public class CompanyController {
         CustomPageResponse<GetCompanyResponseDto> customResponse = new CustomPageResponse<>(
                 responseDto);
 
+        String message = String.format("%d개의 업체가 조회 완료되었습니다.", responseDto.getTotalElements());
+        
         return ResponseEntity.status(GET_COMPANY.getHttpStatus())
-                .body(success(GET_COMPANY.getHttpStatus().value(),
-                        GET_COMPANY.getMessage(), customResponse));
+                .body(success(GET_COMPANY.getHttpStatus().value(), message, customResponse));
     }
 
     @Operation(summary = "업체 수정")
     @PutMapping("/{companyId}")
     public ResponseEntity<SuccessResponse<UpdateCompanyResponseDto>> updateCompany(
             @PathVariable("companyId") String companyId,
-            @RequestBody UpdateCompanyRequestDto requestDto) {
+            @RequestBody UpdateCompanyRequestDto requestDto,
+            @RequestHeader("X-User-Id") Long userId
+    ) {
 
-        UpdateCompanyResponseDto responseDto = companyService.updateCompany(requestDto, companyId);
+        UpdateCompanyResponseDto responseDto = companyService.updateCompany(requestDto, companyId,
+                userId);
 
         return ResponseEntity.status(UPDATE_COMPANY.getHttpStatus())
                 .body(success(UPDATE_COMPANY.getHttpStatus().value(),
@@ -95,9 +101,9 @@ public class CompanyController {
     @Operation(summary = "업체 삭제")
     @DeleteMapping("/{companyId}")
     public ResponseEntity<SuccessResponse<DeleteCompanyResponseDto>> deleteCompany(
-            @PathVariable("companyId") String companyId
+            @PathVariable("companyId") String companyId,
+            @RequestHeader("X-User-Id") Long userId
     ) {
-        Long userId = null;
         DeleteCompanyResponseDto responseDto = companyService.deleteCompany(companyId, userId);
 
         return ResponseEntity.status(DELETE_COMPANY.getHttpStatus())

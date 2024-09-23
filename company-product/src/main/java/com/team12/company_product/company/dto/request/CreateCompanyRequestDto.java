@@ -4,6 +4,7 @@ import com.team12.company_product.company.domain.CompanyType;
 import java.util.UUID;
 
 public record CreateCompanyRequestDto(
+        Long userId,
         String companyName,
         CompanyType companyType,
         UUID hubId,

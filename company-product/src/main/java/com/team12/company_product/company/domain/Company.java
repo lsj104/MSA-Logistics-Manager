@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
-// TODO: nullable = false 추가
 @Entity(name = "p_company")
 @Getter
 @NoArgsConstructor
@@ -57,14 +56,17 @@ public class Company extends AuditingEntity {
     }
 
 
-    public static Company of(CreateCompanyRequestDto requestDto) {
+    public static Company of(CreateCompanyRequestDto requestDto, Long userId) {
 
         log.info(String.valueOf(requestDto.hubId()));
+        log.info(String.valueOf(userId));
+
         return Company.builder()
                 .companyName(requestDto.companyName())
                 .companyType(requestDto.companyType())
                 .hubId(requestDto.hubId())
                 .address(requestDto.address())
+                .userId(userId)
                 .build();
     }
 

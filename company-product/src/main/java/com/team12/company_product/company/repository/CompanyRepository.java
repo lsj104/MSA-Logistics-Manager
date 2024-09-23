@@ -10,4 +10,6 @@ public interface CompanyRepository extends JpaRepository<Company, String> {
     Page<Company> findByCompanyNameContaining(String companyName, Pageable pageable);
 
     Page<Company> findByCompanyIdContaining(String companyId, Pageable pageable);
+
+    Page<Company> findByIsDeletedFalse(Pageable pageable);
 }
