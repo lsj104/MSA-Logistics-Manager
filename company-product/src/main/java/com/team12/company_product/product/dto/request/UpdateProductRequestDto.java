@@ -5,7 +5,8 @@ import java.util.UUID;
 public record UpdateProductRequestDto(
         String productName,
         UUID hubId,
-        String companyId
+        String companyId,
+        Long quantity
 ) {
 
 

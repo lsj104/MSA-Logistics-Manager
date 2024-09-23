@@ -42,23 +42,28 @@ public class Product extends AuditingEntity {
     @Column(name = "quantity", nullable = false)
     private Long quantity;
 
+    @Column(name = "user_id")
+    private Long userId;
 
     @Builder
-    public Product(String productId, Company company, UUID hubId, String productName,
-            Long quantity) {
+    public Product(String productId, Company company, UUID hubId, String productName, Long quantity,
+            Long userId) {
         this.productId = productId;
         this.company = company;
         this.hubId = hubId;
         this.productName = productName;
         this.quantity = quantity;
+        this.userId = userId;
     }
 
-    public static Product of(CreateProductRequestDto requestDto, Company company) {
+
+    public static Product of(CreateProductRequestDto requestDto, Company company, Long userId) {
         return Product.builder()
                 .company(company)
                 .hubId(requestDto.hubId())
                 .productName(requestDto.productName())
                 .quantity(requestDto.quantity())
+                .userId(userId)
                 .build();
     }
 
@@ -67,6 +72,7 @@ public class Product extends AuditingEntity {
         this.productName =
                 requestDto.productName() != null ? requestDto.productName() : this.productName;
         this.hubId = requestDto.hubId() != null ? requestDto.hubId() : this.hubId;
+        this.quantity = requestDto.quantity() != null ? requestDto.quantity() : this.quantity;
     }
 
     public void delete(Long userId) {

@@ -12,7 +12,8 @@ public record UpdateProductResponseDto(
         String companyId,
         LocalDateTime updatedAt,
         Long updatedBy,
-        Boolean isDelete
+        Boolean isDelete,
+        Long quantity
 
 ) {
 
@@ -23,6 +24,7 @@ public record UpdateProductResponseDto(
                 .companyId(product.getCompany().getCompanyId())
                 .updatedAt(product.getUpdatedAt())
                 .updatedBy(product.getUpdatedBy())
+                .quantity(product.getQuantity())
                 .isDelete(product.getIsDeleted())
                 .build();
     }

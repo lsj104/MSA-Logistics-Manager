@@ -23,7 +23,7 @@ public interface OrderService {
     Page<GetOrderResponseDto> getAllOrder(Pageable pageable);
 
     // 주문 수정
-    UpdateOrderResponseDto updateOrder(UpdateOrderRequestDto requestDto, UUID orderId);
+    UpdateOrderResponseDto updateOrder(UpdateOrderRequestDto requestDto, UUID orderId, Long userId);
 
     // 주문 삭제
     DeleteOrderResponseDto deleteOrder(UUID orderId, Long userId);

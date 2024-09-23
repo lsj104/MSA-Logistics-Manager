@@ -27,11 +27,13 @@ public class CompanyServiceImpl implements CompanyService {
 
     // 업체 생성
     @Transactional
-    public CreateCompanyResponseDto createCompany(CreateCompanyRequestDto requestDto) {
+    public CreateCompanyResponseDto createCompany(CreateCompanyRequestDto requestDto, Long userId) {
 
         checkHubIfPresent(requestDto.hubId());
 
-        Company company = Company.of(requestDto);
+        Company company = Company.of(requestDto, userId);
+        company.setCreatedBy(userId);
+        company.setUpdatedBy(userId);
         companyRepository.save(company);
         return CreateCompanyResponseDto.from(company);
     }
@@ -47,18 +49,19 @@ public class CompanyServiceImpl implements CompanyService {
     // 모든 업체 조회
     @Transactional(readOnly = true)
     public Page<GetCompanyResponseDto> getAllCompany(Pageable pageable) {
-        Page<Company> companies = companyRepository.findAll(pageable);
+        Page<Company> companies = companyRepository.findByIsDeletedFalse(pageable);
         return companies.map(GetCompanyResponseDto::from);
     }
 
     // 업체 수정
     @Transactional
     public UpdateCompanyResponseDto updateCompany(UpdateCompanyRequestDto requestDto,
-            String companyId) {
+            String companyId, Long userId) {
 
         checkHubIfPresent(requestDto.hubId());
-        
+
         Company company = findById(companyId);
+        company.setUpdatedBy(userId);
         company.update(requestDto);
         return UpdateCompanyResponseDto.from(company);
     }

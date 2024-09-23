@@ -66,13 +66,13 @@ public class OrderServiceImpl implements OrderService {
     // 주문 목록 조회
     @Transactional(readOnly = true)
     public Page<GetOrderResponseDto> getAllOrder(Pageable pageable) {
-        Page<Order> orders = orderRepository.findAll(pageable);
+        Page<Order> orders = orderRepository.findByIsDeletedFalse(pageable);
         return orders.map(GetOrderResponseDto::from);
     }
 
     // 주문 수정
     @Transactional
-    public UpdateOrderResponseDto updateOrder(UpdateOrderRequestDto requestDto, UUID orderId) {
+    public UpdateOrderResponseDto updateOrder(UpdateOrderRequestDto requestDto, UUID orderId, Long userId) {
         Order existingOrder = findById(orderId);
 
         Long oldQuantity = existingOrder.getQuantity();
@@ -102,6 +102,7 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderException(ExceptionMessage.INSUFFICIENT_PRODUCT_QUANTITY);
         }
 
+        existingOrder.setUpdatedBy(userId);
         existingOrder.update(requestDto);
 
         orderRepository.save(existingOrder);
