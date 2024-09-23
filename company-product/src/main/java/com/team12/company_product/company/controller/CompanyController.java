@@ -76,8 +76,8 @@ public class CompanyController {
         CustomPageResponse<GetCompanyResponseDto> customResponse = new CustomPageResponse<>(
                 responseDto);
 
-        String message = String.format("%d개의 업체가 조회 완료되었습니다.", responseDto.getTotalElements());
-        
+        String message = String.format("%d개의 업체 조회가 완료되었습니다.", responseDto.getTotalElements());
+
         return ResponseEntity.status(GET_COMPANY.getHttpStatus())
                 .body(success(GET_COMPANY.getHttpStatus().value(), message, customResponse));
     }

@@ -70,18 +70,21 @@ public class OrderController {
         CustomPageResponse<GetOrderResponseDto> customPageResponse = new CustomPageResponse<>(
                 responseDto);
 
+        String message = String.format("%d개의 주문 조회가 완료되었습니다.", responseDto.getTotalElements());
+
         return ResponseEntity.status(GET_ORDER.getHttpStatus())
                 .body(success(GET_ORDER.getHttpStatus().value(),
-                        GET_ORDER.getMessage(), customPageResponse));
+                        message, customPageResponse));
     }
 
     @Operation(summary = "주문 수정")
     @PutMapping("/{orderId}")
     public ResponseEntity<SuccessResponse<UpdateOrderResponseDto>> updateOrder(
             @PathVariable("orderId") UUID orderId,
-            @RequestBody UpdateOrderRequestDto requestDto) {
+            @RequestBody UpdateOrderRequestDto requestDto,
+            @RequestHeader(value = "X-User-Id") Long userId) {
 
-        UpdateOrderResponseDto responseDto = orderService.updateOrder(requestDto, orderId);
+        UpdateOrderResponseDto responseDto = orderService.updateOrder(requestDto, orderId, userId);
 
         return ResponseEntity.status(UPDATE_ORDER.getHttpStatus())
                 .body(success(UPDATE_ORDER.getHttpStatus().value(),
@@ -91,9 +94,9 @@ public class OrderController {
     @Operation(summary = "주문 삭제")
     @DeleteMapping("/{orderId}")
     public ResponseEntity<SuccessResponse<DeleteOrderResponseDto>> deleteOrder(
-            @PathVariable("orderId") UUID orderId) {
+            @PathVariable("orderId") UUID orderId,
+            @RequestHeader("X-User-Id") Long userId) {
 
-        Long userId = null;
         DeleteOrderResponseDto responseDto = orderService.deleteOrder(orderId, userId);
 
         return ResponseEntity.status(DELETE_ORDER.getHttpStatus())

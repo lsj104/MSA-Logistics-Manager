@@ -78,7 +78,7 @@ public class ProductController {
         CustomPageResponse<GetProductResponseDto> customResponse = new CustomPageResponse<>(
                 responseDto);
 
-        String message = String.format("%d개의 상품 조회 완료되었습니다.", responseDto.getTotalElements());
+        String message = String.format("%d개의 상품 조회가 완료되었습니다.", responseDto.getTotalElements());
 
         return ResponseEntity.status(GET_PRODUCT.getHttpStatus())
                 .body(success(GET_PRODUCT.getHttpStatus().value(), message, customResponse));
